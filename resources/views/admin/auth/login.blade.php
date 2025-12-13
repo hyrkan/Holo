@@ -40,7 +40,7 @@
                                 </ul>
                             </div>
                         @endif
-                        <form action="{{ route('login.post') }}" method="POST" class="w-100 mt-4 pt-2">
+                        <form action="{{ route('admin.login.post') }}" method="POST" class="w-100 mt-4 pt-2">
                             @csrf
                             <div class="mb-4">
                                 <input type="email" name="email" class="form-control" placeholder="Email or Username" value="" required>
