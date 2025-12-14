@@ -23,6 +23,12 @@
         <link rel="stylesheet" href="{{ asset('landing/css') }}/default.css">
         <link rel="stylesheet" href="{{ asset('landing/css') }}/style.css">
         <link rel="stylesheet" href="{{ asset('landing/css') }}/responsive.css">
+        <style>
+            #parallax::before {
+                background: rgba(71, 0, 200, 0.7) !important;
+                opacity: 1 !important;
+            }
+        </style>
     </head>
     <body>
         <!-- header -->
@@ -33,12 +39,12 @@
                         <div class="row align-items-center">
                             <div class="col-xl-3 col-lg-3">
                                 <div class="logo">
-                                    <a href="{{ url('/') }}"><h2 class="mb-0" style="color: inherit;">Holo Board</h2></a>
+                                    <a href="{{ url('/') }}"><img src="{{ asset('landing/img/logo.jpg') }}" alt="Holo Board" style="max-height: 100px; width: auto;"></a>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-lg-9">
+                            <div class="col-xl-9 col-lg-9">
                                 <div class="responsive"><i class="icon dripicons-align-right"></i></div>
-                                <div class="main-menu text-right text-xl-center">
+                                <div class="main-menu text-right">
                                     <nav id="mobile-menu">
                                         <ul>
                                             <li><a href="{{ url('/') }}">Home</a></li>
@@ -47,11 +53,6 @@
                                             <li><a href="{{ route('student.login') }}">Login</a></li>
                                         </ul>
                                     </nav>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 text-right d-none d-xl-block">
-                                <div class="header-btn second-header-btn">
-
                                 </div>
                             </div>
                         </div>
@@ -63,7 +64,7 @@
         <!-- main-area -->
         <main>
             <!-- slider-area -->
-            <section id="parallax" class="slider-area slider-bg second-slider-bg slider-bg2 d-flex align-items-center justify-content-center fix" style="background-image:url({{ asset('landing/img') }}/home_2_slider_img.jpg)">
+            <section id="parallax" class="slider-area slider-bg second-slider-bg slider-bg2 d-flex align-items-center justify-content-center fix" style="background-image:url({{ asset('landing/img/background.jpg') }})">
                 <div class="slider-shape ss-one layer" data-depth="0.10"><img src="{{ asset('landing/img') }}/doddle_6.png" alt="shape"></div>
                 <div class="slider-shape ss-two layer" data-depth="0.30"><img src="{{ asset('landing/img') }}/doddle_8.png" alt="shape"></div>
                 <div class="slider-shape ss-three layer" data-depth="0.40"><img src="{{ asset('landing/img') }}/doddle_9.png" alt="shape"></div>
@@ -72,7 +73,7 @@
                     <div class="single-slider">
                         <div class="container">
                             <div class="row">
-                                <div class="col-12 text-center">
+                                {{-- <div class="col-12 text-center">
                                     <div class="slider-content second-slider-content">
 										<h2 data-animation="fadeInUp animated" data-delay=".4s">Digital World Conference</h2> 
                                         <ul data-animation="fadeInUp animated" data-delay=".2s">
@@ -82,6 +83,17 @@
 										</ul>
                                         
                                     </div>
+                                </div> --}}
+                                <div class="col-12 text-center">
+                                    <div class="slider-content second-slider-content">
+										<h2 data-animation="fadeInUp animated" data-delay=".4s">Lorem Ipsum</h2> 
+                                        {{-- <ul data-animation="fadeInUp animated" data-delay=".2s">
+											<li><i class="fas fa-map-marker-alt"></i> Waterfront Hotel, London</li>
+											<li><i class="far fa-clock"></i>  5 - 7 June 2019, </li>
+											<li><i class="fal fa-building"></i>  Edition </li>
+										</ul> --}}
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -89,265 +101,9 @@
                 </div>
             </section>
             <!-- slider-area-end -->
-            <!-- about-area -->
-            <section id="about" class="about-area about-p pt-120 pb-120 p-relative">
-                <div class="container">
-                    <div class="row align-items-center">                       
-                        <div class="col-lg-6">
-                            <div class="about-content s-about-content pl-30">
-                                <div class="about-title second-atitle">
-								<div class="text-outline wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">
-										<span>Event</span>
-									</div>
-                                    <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".3s">Why Join Ovent</span>
-                                    <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".4s">Why You Should Join Event</h2>
-                                    <h5 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".5s"><span></span>Shift your perspective on digital business</h5>
-                                </div>
-								<div class="wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-									<p>Study in a newly-refreshed campus located in the heart of Berlin, Europe's start-up capital. Berlin is a fantastic place to study as there are excellent travel.</p>
-									 <p>The process of planning and coordinating the event is usually referred to as event planning and which can include budgeting, scheduling, site selection, acquiring necessary permits, coordinating transportation and parking, arranging for speakers or entertainers.</p>
-								   <a href="#" class="btn mt-20"><i class="far fa-ticket-alt"></i> Buy Ticket</a>
-							   </div>
-                            </div>
-                        </div>
-						 <div class="col-lg-6">
-                         <div class="s-video-wrap" style="background-image:url({{ asset('landing/img') }}/video_bg_2.jpg)">
-                                <div class="s-video-content">
-                                    <a href="https://www.youtube.com/watch?v=7e90gBu4pas" class="popup-video mb-50"><i class="fas fa-play"></i></a>
-                                   
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+
             <!-- about-area-end -->
-			<!-- team-area -->
-            <section id="team" class="team-area p-relative pt-120 pb-120 fix">
-                <div class="section-t team-t paroller" data-paroller-factor="0.15" data-paroller-factor-lg="0.15" data-paroller-factor-md="0.15" data-paroller-factor-sm="0.15" data-paroller-type="foreground" data-paroller-direction="horizontal"><h2>Speakers</h2></div>
-				<div class="circal1 item-zoom-inout"></div>
-				<div class="circal2 item-zoom-inout"></div>
-				<div class="circal3 item-zoom-inout"></div>
-				<div class="circal4 item-zoom-inout"></div>
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-xl-6 col-lg-8">
-                            <div class="section-title text-center mb-80">
-                                <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Angels</span>
-                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".4s">Event Speakers</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                    <img src="{{ asset('landing/img') }}/speaker_1.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>James D. Franklin</h5>
-                                   <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                   <img src="{{ asset('landing/img') }}/speaker_2.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Natosha W. Green</h5>
-                                    <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                   <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-								<div class="tag">Gold</div>
-                                <div class="team-thumb">
-                                    <img src="{{ asset('landing/img') }}/speaker_3.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Brian J. Swanson</h5>
-                                    <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                            <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                   <img src="{{ asset('landing/img') }}/speaker_4.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Stephanie D. Gray</h5>                                   
-									<p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-						  <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                    <img src="{{ asset('landing/img') }}/speaker_5.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>James D. Franklin</h5>
-                                   <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                   <img src="{{ asset('landing/img') }}/speaker_6.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Natosha W. Green</h5>
-                                    <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                   <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                              <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                    <img src="{{ asset('landing/img') }}/speaker_7.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Brian J. Swanson</h5>
-                                    <p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                          <div class="col-lg-3 col-md-6 wow fadeInDown animated" data-animation="fadeInUp animated" data-delay=".2s">
-                            <div class="single-team text-center pt-50  pb-50 mb-30">
-                                <div class="team-thumb">
-                                   <img src="{{ asset('landing/img') }}/speaker_8.png" alt="img">
-                                </div>
-                                <div class="team-info">
-                                    <h5>Stephanie D. Gray</h5>                                   
-									<p>Founder & CEO</p>
-									<strong>Fire Epic Ltd.</strong> 
-                                    <div class="team-social pt-15 pb-15 mb-15">
-                                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="#"><i class="fab fa-twitter"></i></a>
-                                        <a href="#"><i class="fab fa-instagram"></i></a>
-                                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-									 <span>Content Writer</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- team-area-end -->
-             <!-- counter-area -->
-            <div class="counter-area pt-120 pb-120" style="background-image:url({{ asset('landing/img') }}/counter_bg.jpg);background-size: cover;">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-sm-6">
-                           <div class="about-title second-atitle">							
-                                    <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Why Join Ovent</span>
-                                    <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Join us at 110th oVent Expo.</h2>
-                                    <h5 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Shift your perspective on digital business</h5>
-                                </div>
-								<ul class="wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s">
-									<li>
-										<img src="{{ asset('landing/img') }}/calendar.png" alt="img"> 
-										<span>Study in a newly-refreshed campus located in the heart of Berlin, Europe's start-up capital. Berlin is a fantastic place to study as there</span>
-									</li>
-									<li>
-										<img src="{{ asset('landing/img') }}/comments.png" alt="img"> 
-										<span>Study in a newly-refreshed campus located in the heart of Berlin, Europe's start-up capital. Berlin is a fantastic place to study as there</span>
-									</li>
-								</ul>
-                        </div>
-                        <div class="col-lg-6 col-sm-6">
-						 <div class="single-counter text-center mb-30 cr1">
-                                <div class="counter p-relative">
-                                    <span class="count">20</span>
-                                    <small>+</small>
-                                </div>
-                                <p>Sponsors</p>
-                            </div>
-                            <div class="single-counter text-center mb-30 cr2">
-                                <div class="counter p-relative">
-                                    <span class="count">100</span>
-                                    <small>+</small>
-                                </div>
-                                <p>Cool Speakers</p>
-                            </div>
-							<div class="single-counter text-center mb-30 cr3">
-                                <div class="counter p-relative">
-                                    <span class="count">5</span>
-                                    <small>+</small>
-                                </div>
-                                <p>Happy People</p>
-                            </div>
-							<div class="cr4"></div>
-							<div class="cr5"></div>
-							<div class="cr6"></div>
-							
-                        </div>                        
-                    </div>
-                </div>
-            </div>
-            <!-- counter-area-end -->
+			
 			<!-- event -->
             <div class="event fix pt-120 pb-120">
 			 <div class="section-t team-t paroller" data-paroller-factor="0.15" data-paroller-factor-lg="0.15" data-paroller-factor-md="0.15" data-paroller-factor-sm="0.15" data-paroller-type="foreground" data-paroller-direction="horizontal"><h2>Event</h2></div>
@@ -355,7 +111,7 @@
                         <div class="col-xl-6 col-lg-8">
                             <div class="section-title text-center mb-80">
                                 <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Event</span>
-                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Event On Trend</h2>
+                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Event On This Month</h2>
                             </div>
                         </div>
                     </div>
@@ -893,134 +649,6 @@
 			   </div>
             </div>
             </div>
-            <!-- counter-area-end -->
-			 <!-- pricing-area -->
-            <section id="pricing" class="pricing-area pt-113 pb-90 fix" style="background-image:url({{ asset('landing/img') }}/pricing_bg.jpg);background-size: cover;">
-			<div class="section-t team-t paroller" data-paroller-factor="0.15" data-paroller-factor-lg="0.15" data-paroller-factor-md="0.15" data-paroller-factor-sm="0.15" data-paroller-type="foreground" data-paroller-direction="horizontal"><h2>Plans</h2></div>
-			 <div class="row justify-content-center">
-                        <div class="col-xl-6 col-lg-8">
-                            <div class="section-title text-center mb-80">
-                                <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Our plans</span>
-                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".4s">Get Your Ticket</h2>
-                            </div>
-                        </div>
-                    </div>
-                <div class="container">
-                   
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="pricing-box text-center mb-30 wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s">
-                                <div class="pricing-head">                                    
-                                    <h4>early bird</h4>
-                                    <div class="price-count mb-30">
-                                        <h2><small>$</small>200</h2>
-                                    </div>
-                                </div>
-                                <div class="pricing-body mb-40">
-                                    <p>Time to sit down and think about what kind of content should be created, time to stop.</p>
-									  <strong>All prices exclude 25% VAT</strong>
-									  <div class="bar">
-										<span style="width:50%;"></span>
-									  </div>
-									    <div class="bar-no">350/500</div>
-									<div class="pricing-btn mt-40">
-										<a href="#" class="btn"><i class="far fa-ticket-alt"></i> Buy Ticket</a>
-									</div>
-                                </div>
-                                
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-							<div class="pricing-box active text-center mb-30 wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s">
-								<div class="tag">Exclusive author</div>
-                                <div class="pricing-head">                                   
-                                    <h4>Gold</h4>
-                                    <div class="price-count mb-30">
-                                        <h2><small>$</small>399</h2>
-                                    </div>
-                                </div>
-                                <div class="pricing-body mb-40">
-                                    <p>Time to sit down and think about what kind of content should be created, time to stop.</p>
-									  <strong>All prices exclude 25% VAT</strong>
-									  <div class="bar">
-										<span style="width:50%;"></span>
-									  </div>
-									  <div class="bar-no">350/500</div>
-									<div class="pricing-btn mt-40">
-										<a href="#" class="btn"><i class="far fa-ticket-alt"></i> Buy Ticket</a>
-									</div>
-                                </div>
-                               
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="pricing-box text-center mb-30 wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s">
-                                <div class="pricing-head">                                    
-                                    <h4>Platinum</h4>
-                                    <div class="price-count mb-30">
-                                        <h2><small>$</small>499</h2>
-                                    </div>
-                                </div>
-                                <div class="pricing-body">
-                                   <p>Time to sit down and think about what kind of content should be created, time to stop.</p>
-								   <strong>All prices exclude 25% VAT</strong>
-								   <div class="bar">
-										<span style="width:50%;"></span>
-									  </div>
-									   <div class="bar-no">350/500</div>
-									<div class="pricing-btn mt-40">
-										<a href="#" class="btn"><i class="far fa-ticket-alt"></i> Buy Ticket</a>
-									</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- pricing-area-end -->
-            <!-- Sponsors-area -->
-            <section class="sponsors services-bg pt-113 fix">
-                <div class="container">
-                    <div class="section-t team-t paroller" data-paroller-factor="0.15" data-paroller-factor-lg="0.15" data-paroller-factor-md="0.15" data-paroller-factor-sm="0.15" data-paroller-type="foreground" data-paroller-direction="horizontal"><h2>Sponsors</h2></div>
-			 <div class="row justify-content-center">
-                        <div class="col-xl-8 col-lg-8">
-                            <div class="section-title mb-80">
-                                <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Sponsors</span>
-                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Happy Sponsors</h2>
-                            </div>
-                        </div>
-						<div class="col-xl-4 col-lg-4 text-right">
-                            <a href="#" class="btn wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s"><i class="far fa-ticket-alt"></i> Buy Ticket</a>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 text-center">
-                            <ul class="wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s">
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_1.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_2.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_3.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_4.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_5.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_6.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_7.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_8.png" alt="img"></a></li>
-								<li><a href="#"><img src="{{ asset('landing/img') }}/sponsors_9.png" alt="img"></a></li>
-							</ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="s-video-wrap wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s" style="background-image:url({{ asset('landing/img') }}/video_bg.png)">
-                                <div class="s-video-content mb-80">
-                                    <a href="https://www.youtube.com/watch?v=7e90gBu4pas" class="popup-video mb-50"><i class="fas fa-play"></i></a>
-                                    <h2>Intro Video</h2>
-                                    <p>The issue with any content strategy is time.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
             <!-- Sponsors-area-end -->
            
             <!-- blog-area -->
@@ -1032,7 +660,7 @@
                         <div class="col-xl-8 col-lg-8">
                             <div class="section-title mb-80">
                                 <span class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">feeds</span>
-                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">News Feeds</h2>
+                                <h2 class="wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s">Announcements</h2>
                             </div>
                         </div>
 						<div class="col-xl-4 col-lg-4 text-right">
@@ -1047,10 +675,6 @@
                                 </div>
                                 <div class="blog-content">
                                     <div class="b-meta mb-20">
-                                    <ul>
-										<li><i class="far fa-comments"></i>35 Comments</li>
-                                        <li><a href="#"><i class="far fa-user"></i>by Admin</a></li>
-                                    </ul>
                                     </div>
                                     <h4><a href="blog-details.html">The issue with any content strategy is time.</a></h4>
                                     <p>Lorem ipsum dolor sit amet consectetur adipisi
@@ -1066,10 +690,6 @@
                                 </div>
                                 <div class="blog-content">
                                     <div class="b-meta mb-20">
-                                    <ul>
-										<li><i class="far fa-comments"></i>35 Comments</li>
-                                        <li><a href="#"><i class="far fa-user"></i>by Admin</a></li>
-                                    </ul>
                                     </div>
                                     <h4><a href="blog-details.html">Time to sit down and think about what kind of content</a></h4>
                                     <p>Lorem ipsum dolor sit amet consectetur adipisi
@@ -1085,10 +705,6 @@
                                 </div>
                                 <div class="blog-content">
                                     <div class="b-meta mb-20">
-                                      <ul>
-										<li><i class="far fa-comments"></i>35 Comments</li>
-                                        <li><a href="#"><i class="far fa-user"></i>by Admin</a></li>
-                                    </ul>
                                     </div>
                                     <h4><a href="blog-details.html">Should be created, time to stop and write, or record.</a></h4>
                                     <p>Lorem ipsum dolor sit amet consectetur adipisi
