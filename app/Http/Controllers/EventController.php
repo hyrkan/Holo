@@ -30,7 +30,8 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        $speakers = \App\Models\Speaker::all();
+        return view('admin.events.create', compact('speakers'));
     }
 
     /**
@@ -38,7 +39,37 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'dates' => 'required|array',
+            'dates.*' => 'date',
+            'speakers' => 'nullable|array',
+            'speakers.*' => 'exists:speakers,id',
+            'tags' => 'nullable|string',
+        ]);
+
+        $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
+
+        $imagePath = $request->file('image')->store('events', 'public');
+
+        $event = Event::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'location' => $request->location,
+            'image' => $imagePath,
+            'image' => $imagePath,
+            'dates' => $request->dates,
+            'tags' => $tags,
+        ]);
+
+        if ($request->has('speakers')) {
+            $event->speakers()->attach($request->speakers);
+        }
+
+        return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
     }
 
     /**
@@ -46,7 +77,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        return view('admin.events.show', compact('event'));
     }
 
     /**
@@ -54,7 +85,8 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        //
+        $speakers = \App\Models\Speaker::all();
+        return view('admin.events.edit', compact('event', 'speakers'));
     }
 
     /**
@@ -62,7 +94,46 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'dates' => 'required|array',
+            'dates.*' => 'date',
+            'speakers' => 'nullable|array',
+            'speakers.*' => 'exists:speakers,id',
+            'tags' => 'nullable|string',
+        ]);
+
+        $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
+
+        $data = [
+            'name' => $request->name,
+            'description' => $request->description,
+            'location' => $request->location,
+            'location' => $request->location,
+            'dates' => $request->dates,
+            'tags' => $tags,
+        ];
+
+        if ($request->hasFile('image')) {
+            // Delete old image if needed, for potentially better cleanup
+            if ($event->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($event->image);
+            }
+            $data['image'] = $request->file('image')->store('events', 'public');
+        }
+
+        $event->update($data);
+
+        if ($request->has('speakers')) {
+            $event->speakers()->sync($request->speakers);
+        } else {
+            $event->speakers()->detach();
+        }
+
+        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
     }
 
     /**

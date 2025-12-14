@@ -4,8 +4,9 @@
         <div class="m-header">
             <a href="{{ route('admin.dashboard') }}" class="b-brand">
                 <!-- ========   change your logo hear   ============ -->
-                <img src="{{ asset('assets/images/logo-full.png') }}" alt="" class="logo logo-lg" />
-                <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="logo logo-sm" />
+                <img src="{{ asset('landing/img/logo.jpg') }}" alt="Holo Board" class="logo logo-lg" style="height: 40px; width: auto;" />
+                <span class="logo logo-lg ms-2 fw-bold fs-4 text-dark">Holo Board</span>
+                <img src="{{ asset('landing/img/logo.jpg') }}" alt="Holo Board" class="logo logo-sm" style="height: 30px; width: auto;" />
             </a>
         </div>
         <div class="navbar-content">
