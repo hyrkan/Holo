@@ -25,6 +25,18 @@
                         <span class="nxl-mtext">Employees</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.events.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-calendar"></i></span>
+                        <span class="nxl-mtext">Events</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.speakers.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-mic"></i></span>
+                        <span class="nxl-mtext">Speakers</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

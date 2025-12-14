@@ -14,7 +14,7 @@ Route::get('/', function () {
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    
+
     // Auth Routes
     Route::get('/login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login');
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'authenticate'])->name('login.post');
@@ -25,6 +25,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->middleware('auth')->name('dashboard');
 
     Route::resource('employees', \App\Http\Controllers\EmployeeController::class);
+    Route::resource('events', \App\Http\Controllers\EventController::class);
+    Route::resource('speakers', \App\Http\Controllers\SpeakerController::class);
 });
 
 // Student Routes
@@ -32,7 +34,7 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/login', [\App\Http\Controllers\StudentAuthController::class, 'login'])->name('login');
     Route::post('/login', [\App\Http\Controllers\StudentAuthController::class, 'authenticate'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\StudentAuthController::class, 'logout'])->name('logout');
-    
+
     Route::get('/dashboard', function () {
         return view('student.dashboard');
     })->middleware('auth:student')->name('dashboard');

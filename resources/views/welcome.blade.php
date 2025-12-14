@@ -689,7 +689,7 @@
                                     <a href="blog-details.html"><img src="{{ asset('landing/img') }}/blog_img_2.jpg" alt="img"></a>
                                 </div>
                                 <div class="blog-content">
-                                    <div class="b-meta mb-20">
+                                    <div class="b-meta mb-20">`
                                     </div>
                                     <h4><a href="blog-details.html">Time to sit down and think about what kind of content</a></h4>
                                     <p>Lorem ipsum dolor sit amet consectetur adipisi
