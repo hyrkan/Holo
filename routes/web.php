@@ -24,6 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.dashboard');
     })->middleware('auth')->name('dashboard');
 
+    Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class);
     Route::resource('employees', \App\Http\Controllers\EmployeeController::class);
     Route::resource('events', \App\Http\Controllers\EventController::class);
     Route::resource('speakers', \App\Http\Controllers\SpeakerController::class);

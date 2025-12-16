@@ -38,6 +38,12 @@
                         <span class="nxl-mtext">Speakers</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.announcements.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-bell"></i></span>
+                        <span class="nxl-mtext">Announcements</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
