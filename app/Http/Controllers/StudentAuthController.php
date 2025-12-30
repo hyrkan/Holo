@@ -29,6 +29,41 @@ class StudentAuthController extends Controller
         ])->onlyInput('email');
     }
 
+    public function register()
+    {
+        return view('student.auth.register');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'student_number' => ['required', 'string', 'max:255', 'unique:students'],
+            'program' => ['required', 'string', 'max:255'],
+            'year_level' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = \App\Models\User::create([
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        $user->student()->create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'student_number' => $request->student_number,
+            'program' => $request->program,
+            'year_level' => $request->year_level,
+        ]);
+
+        Auth::guard('student')->login($user);
+
+        return redirect()->route('student.dashboard');
+    }
+
     public function logout(Request $request)
     {
         Auth::guard('student')->logout();

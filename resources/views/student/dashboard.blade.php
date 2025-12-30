@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Welcome, {{ Auth::guard('student')->user()->name ?? 'Student' }}!</h1>
+        <h1>Welcome, {{ Auth::guard('student')->user()->student->first_name ?? 'Student' }} {{ Auth::guard('student')->user()->student->last_name ?? '' }}!</h1>
         <p>This is your student dashboard.</p>
         
         <form action="{{ route('student.logout') }}" method="POST">

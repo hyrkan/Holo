@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="keyword" content="">
     <meta name="author" content="WRAPCODERS">
-    <title>Duralux || Login</title>
+    <title>Holo Board || Admin Login</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
@@ -25,10 +25,10 @@
             <div class="minimal-card-wrapper">
                 <div class="card mb-4 mt-5 mx-4 mx-sm-0 position-relative">
                     <div class="wd-50 bg-white p-2 rounded-circle shadow-lg position-absolute translate-middle top-0 start-50">
-                        <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="img-fluid">
+                        <img src="{{ asset('landing/img/logo.jpg') }}" alt="Logo" class="img-fluid" style="border-radius: 50%;">
                     </div>
                     <div class="card-body p-sm-5">
-                        <h2 class="fs-20 fw-bolder mb-4">Login</h2>
+                        <h2 class="fs-20 fw-bolder mb-4">Holo Board</h2>
                         <h4 class="fs-13 fw-bold mb-2">Login to your account</h4>
                         <p class="fs-12 fw-medium text-muted">Enter your credentials to access the admin panel.</p>
                         @if ($errors->any())

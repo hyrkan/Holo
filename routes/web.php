@@ -19,6 +19,7 @@ Route::get('/', function () {
                 return true;
             }
         }
+
         return false;
     });
 
@@ -54,6 +55,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('student')->name('student.')->group(function () {
     Route::get('/login', [\App\Http\Controllers\StudentAuthController::class, 'login'])->name('login');
     Route::post('/login', [\App\Http\Controllers\StudentAuthController::class, 'authenticate'])->name('login.post');
+    Route::get('/register', [\App\Http\Controllers\StudentAuthController::class, 'register'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\StudentAuthController::class, 'store'])->name('register.post');
     Route::post('/logout', [\App\Http\Controllers\StudentAuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', function () {

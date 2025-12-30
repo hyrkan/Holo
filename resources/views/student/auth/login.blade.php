@@ -25,10 +25,10 @@
             <div class="minimal-card-wrapper">
                 <div class="card mb-4 mt-5 mx-4 mx-sm-0 position-relative">
                     <div class="wd-50 bg-white p-2 rounded-circle shadow-lg position-absolute translate-middle top-0 start-50">
-                        <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="img-fluid">
+                        <img src="{{ asset('landing/img/logo.jpg') }}" alt="Logo" class="img-fluid" style="border-radius: 50%;">
                     </div>
                     <div class="card-body p-sm-5">
-                        <h2 class="fs-20 fw-bolder mb-4">Student Login</h2>
+                        <h2 class="fs-20 fw-bolder mb-4">Holo Board</h2>
                         <h4 class="fs-13 fw-bold mb-2">Welcome to your Portal</h4>
                         <p class="fs-12 fw-medium text-muted">Enter your credentials to access the student dashboard.</p>
                         @if ($errors->any())
@@ -63,6 +63,9 @@
                                 <button type="submit" class="btn btn-lg btn-primary w-100">Login</button>
                             </div>
                         </form>
+                        <div class="mt-4 text-center">
+                            <p class="fs-12 fw-medium text-muted">Don't have an account? <a href="{{ route('student.register') }}" class="text-primary">Register here</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
