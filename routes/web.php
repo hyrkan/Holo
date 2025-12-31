@@ -31,7 +31,11 @@ Route::get('/', function () {
         ->get();
 
     return view('welcome', compact('events', 'announcements'));
-});
+})->middleware('role_redirect');
+
+Route::get('/dashboard', function () {
+    return redirect('/');
+})->middleware(['auth:web,student', 'role_redirect']);
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -41,14 +45,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'authenticate'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->middleware('auth')->name('dashboard');
+    Route::middleware(['auth', 'role:admin|employee'])->group(function () {
+        Route::get('/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
 
-    Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class);
-    Route::resource('employees', \App\Http\Controllers\EmployeeController::class);
-    Route::resource('events', \App\Http\Controllers\EventController::class);
-    Route::resource('speakers', \App\Http\Controllers\SpeakerController::class);
+        // Resources accessible by both admin and employee?
+        // Based on seeder: employee can manage students.
+        // Let's assume announcements and events are admin only for now.
+        Route::resource('students', \App\Http\Controllers\StudentController::class);
+        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
+        Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
+        Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
+        Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
+        Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
+        Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
+    });
 });
 
 // Student Routes
@@ -61,5 +73,5 @@ Route::prefix('student')->name('student.')->group(function () {
 
     Route::get('/dashboard', function () {
         return view('student.dashboard');
-    })->middleware('auth:student')->name('dashboard');
+    })->middleware(['auth:student', 'role:student'])->name('dashboard');
 });

@@ -20,6 +20,16 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+
+            // Check if user has the correct role for this portal
+            if (!$user->hasAnyRole(['admin', 'employee'])) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'These credentials do not match our admin records.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('admin.dashboard'));

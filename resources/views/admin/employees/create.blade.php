@@ -52,6 +52,22 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">Role <span class="text-danger">*</span></label>
+                                <select name="role" class="form-control" required>
+                                    <option value="">Select Role</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->name }}" {{ old('role', 'employee') == $role->name ? 'selected' : '' }}>
+                                            {{ ucfirst($role->name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('role')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-12">
                                 <label class="form-label">Address</label>
                                 <input type="text" name="address" class="form-control" required value="{{ old('address') }}">
                                 @error('address')

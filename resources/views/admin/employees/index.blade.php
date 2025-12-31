@@ -25,6 +25,7 @@
                             <thead>
                                 <tr class="border-b">
                                     <th scope="row">Name</th>
+                                    <th>Role</th>
                                     <th>Phone</th>
                                     <th>Address</th>
                                     <th>Joined At</th>
@@ -42,6 +43,9 @@
                                                 <span class="fs-12 d-block fw-normal text-muted">{{ $employee->user->email ?? 'N/A' }}</span>
                                             </a>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-soft-info text-info text-uppercase">{{ $employee->user->roles->first()?->name ?? 'N/A' }}</span>
                                     </td>
                                     <td>{{ $employee->phone }}</td>
                                     <td>{{Str::limit($employee->address, 30) }}</td>

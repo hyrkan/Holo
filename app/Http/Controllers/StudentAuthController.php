@@ -20,6 +20,16 @@ class StudentAuthController extends Controller
         ]);
 
         if (Auth::guard('student')->attempt($credentials)) {
+            $user = Auth::guard('student')->user();
+
+            // Check if user has the student role
+            if (!$user->hasRole('student')) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'These credentials do not match our student records.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('student.dashboard'));
         }
@@ -50,6 +60,8 @@ class StudentAuthController extends Controller
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
         ]);
+
+        $user->assignRole('student');
 
         $user->student()->create([
             'first_name' => $request->first_name,

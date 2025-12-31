@@ -44,6 +44,21 @@
                         <span class="nxl-mtext">Announcements</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-caption">
+                    <label>Access Control</label>
+                </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.roles.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-shield"></i></span>
+                        <span class="nxl-mtext">Roles</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.permissions.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-key"></i></span>
+                        <span class="nxl-mtext">Permissions</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

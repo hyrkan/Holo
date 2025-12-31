@@ -16,11 +16,11 @@ class EmployeeController extends Controller
 
         $employees = Employee::when($search, function ($query, $search) {
             return $query->where('first_name', 'like', "%{$search}%")
-                         ->orWhere('last_name', 'like', "%{$search}%");
+                ->orWhere('last_name', 'like', "%{$search}%");
         })
-        ->latest()
-        ->paginate(10);
-        
+            ->latest()
+            ->paginate(10);
+
         return view('admin.employees.index', compact('employees'));
     }
 
@@ -29,7 +29,8 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('admin.employees.create');
+        $roles = \Spatie\Permission\Models\Role::all();
+        return view('admin.employees.create', compact('roles'));
     }
 
     /**
@@ -44,12 +45,15 @@ class EmployeeController extends Controller
             'password' => 'required|string|min:8',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
+            'role' => 'required|exists:roles,name',
         ]);
 
         $user = \App\Models\User::create([
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
         ]);
+
+        $user->assignRole($validated['role']);
 
         $employee = Employee::create([
             'user_id' => $user->id,
@@ -75,7 +79,8 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
-        return view('admin.employees.edit', compact('employee'));
+        $roles = \Spatie\Permission\Models\Role::all();
+        return view('admin.employees.edit', compact('employee', 'roles'));
     }
 
     /**
@@ -90,12 +95,15 @@ class EmployeeController extends Controller
             'password' => 'nullable|string|min:8',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
+            'role' => 'required|exists:roles,name',
         ]);
 
         $employee->user->update([
             'email' => $validated['email'],
             'password' => $validated['password'] ? bcrypt($validated['password']) : $employee->user->password,
         ]);
+
+        $employee->user->syncRoles([$validated['role']]);
 
         $employee->update([
             'first_name' => $validated['first_name'],
