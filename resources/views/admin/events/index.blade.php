@@ -27,6 +27,8 @@
                                     <th scope="row">Event Info</th>
                                     <th>Location</th>
                                     <th>Dates</th>
+                                    <th>Target</th>
+                                    <th>Capacity</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -55,6 +57,22 @@
                                             @endforeach
                                         @else
                                             <span class="text-muted">No dates</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(!$event->departments || in_array('All', $event->departments))
+                                            <span class="badge bg-soft-success text-success">All</span>
+                                        @else
+                                            @foreach($event->departments as $dept)
+                                                <span class="badge bg-soft-info text-info me-1">{{ $dept }}</span>
+                                            @endforeach
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($event->capacity)
+                                            <span class="fw-bold">{{ $event->capacity }}</span>
+                                        @else
+                                            <span class="text-muted">Unlimited</span>
                                         @endif
                                     </td>
                                     <td class="text-end">

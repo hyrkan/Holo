@@ -46,6 +46,38 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="capacity" class="form-label">Max Participants</label>
+                            <input type="number" class="form-control @error('capacity') is-invalid @enderror" id="capacity" name="capacity" value="{{ old('capacity') }}" min="0" placeholder="Leave empty for unlimited">
+                            <div class="form-text">Set the maximum number of people who can attend. Leave blank for no limit.</div>
+                            @error('capacity')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Target Departments</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="departments[]" value="All" id="dept_all" {{ is_array(old('departments')) && in_array('All', old('departments')) ? 'checked' : (!old('departments') ? 'checked' : '') }}>
+                                    <label class="form-check-label" for="dept_all">All Departments</label>
+                                </div>
+                                @php
+                                    $availableDepts = ['BSIT', 'BSCS', 'BSCPE', 'BSBA', 'BSED', 'BEED', 'BSHM', 'BSTM'];
+                                @endphp
+                                @foreach($availableDepts as $dept)
+                                    <div class="form-check">
+                                        <input class="form-check-input dept-checkbox" type="checkbox" name="departments[]" value="{{ $dept }}" id="dept_{{ $dept }}" {{ is_array(old('departments')) && in_array($dept, old('departments')) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="dept_{{ $dept }}">{{ $dept }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="form-text">Select which departments this event is for. Select "All Departments" to make it available to everyone.</div>
+                            @error('departments')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
                             <label for="image" class="form-label">Event Image</label>
                             <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*" required>
                             @error('image')
@@ -245,6 +277,29 @@
                         if (remainingBtn) remainingBtn.disabled = true;
                     }
                 }
+            });
+        }
+
+        
+        // Department Selection Logic
+        const deptAll = document.getElementById('dept_all');
+        const deptCheckboxes = document.querySelectorAll('.dept-checkbox');
+
+        if (deptAll) {
+            deptAll.addEventListener('change', function() {
+                if (this.checked) {
+                    deptCheckboxes.forEach(cb => {
+                        cb.checked = false;
+                    });
+                }
+            });
+
+            deptCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        deptAll.checked = false;
+                    }
+                });
             });
         }
 

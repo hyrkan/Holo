@@ -28,6 +28,31 @@
                                     @endforeach
                                 @endif
                             </div>
+
+                            <div class="mb-4">
+                                <p class="mb-1 fw-bold text-dark">Max Participants:</p>
+                                <p class="text-muted">
+                                    <i class="feather-users me-2"></i>
+                                    @if($event->capacity)
+                                        {{ $event->capacity }} people
+                                    @else
+                                        Unlimited
+                                    @endif
+                                </p>
+                            </div>
+
+                            <div class="mb-4">
+                                <p class="mb-1 fw-bold text-dark">Target Departments:</p>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if(!$event->departments || in_array('All', $event->departments))
+                                        <span class="badge bg-soft-success text-success">All Departments</span>
+                                    @else
+                                        @foreach($event->departments as $dept)
+                                            <span class="badge bg-soft-info text-info">{{ $dept }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
                             <div class="mb-4">
                                 <h5>Dates</h5>
                                 @if(is_array($event->dates) && count($event->dates) > 0)

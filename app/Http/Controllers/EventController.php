@@ -49,6 +49,9 @@ class EventController extends Controller
             'speakers' => 'nullable|array',
             'speakers.*' => 'exists:speakers,id',
             'tags' => 'nullable|string',
+            'capacity' => 'nullable|integer|min:0',
+            'departments' => 'nullable|array',
+            'departments.*' => 'string',
         ]);
 
         $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
@@ -63,6 +66,8 @@ class EventController extends Controller
             'image' => $imagePath,
             'dates' => $request->dates,
             'tags' => $tags,
+            'capacity' => $request->capacity,
+            'departments' => $request->departments,
         ]);
 
         if ($request->has('speakers')) {
@@ -104,6 +109,9 @@ class EventController extends Controller
             'speakers' => 'nullable|array',
             'speakers.*' => 'exists:speakers,id',
             'tags' => 'nullable|string',
+            'capacity' => 'nullable|integer|min:0',
+            'departments' => 'nullable|array',
+            'departments.*' => 'string',
         ]);
 
         $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
@@ -115,6 +123,8 @@ class EventController extends Controller
             'location' => $request->location,
             'dates' => $request->dates,
             'tags' => $tags,
+            'capacity' => $request->capacity,
+            'departments' => $request->departments,
         ];
 
         if ($request->hasFile('image')) {

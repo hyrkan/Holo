@@ -10,6 +10,7 @@ class Event extends Model
     protected $casts = [
         'dates' => 'array',
         'tags' => 'array',
+        'departments' => 'array',
     ];
 
     public function speakers()

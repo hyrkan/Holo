@@ -182,11 +182,25 @@
                            <div class="col-lg-10">
                               <div class="event-list-content fix">
                                  <ul data-animation="fadeInUp animated" data-delay=".2s" style="animation-delay: 0.2s;" class="">
-									<li><i class="fas fa-map-marker-alt"></i> {{ $event->location }}</li>
-									<li><i class="far fa-clock"></i> 
+                                    <li><i class="fas fa-map-marker-alt"></i> {{ $event->location }}</li>
+                                    <li><i class="far fa-clock"></i> 
                                         @foreach($event->dates as $date)
                                             {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}{{ !$loop->last ? ' | ' : '' }}
                                         @endforeach
+                                    </li>
+                                    <li><i class="fas fa-users"></i> 
+                                        @if($event->capacity)
+                                            Max {{ $event->capacity }} Participants
+                                        @else
+                                            Unlimited Participants
+                                        @endif
+                                    </li>
+                                    <li><i class="fas fa-graduation-cap"></i>
+                                        @if(!$event->departments || in_array('All', $event->departments))
+                                            Open for All Departments
+                                        @else
+                                            For: {{ implode(', ', $event->departments) }}
+                                        @endif
                                     </li>
 								 </ul>
 								 <h2>{{ $event->name }}</h2>
