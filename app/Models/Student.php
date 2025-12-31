@@ -8,6 +8,7 @@ class Student extends Model
 {
     protected $fillable = [
         'user_id',
+        'uuid',
         'student_number',
         'first_name',
         'last_name',
@@ -16,8 +17,26 @@ class Student extends Model
         'year_level',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($student) {
+            $student->uuid = (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_registrations');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

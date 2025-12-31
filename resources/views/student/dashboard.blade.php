@@ -74,6 +74,22 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-lg-12">
+                            <div class="card border border-light-subtle shadow-none rounded-4">
+                                <div class="card-body text-center py-5">
+                                    <div class="avatar-text avatar-xl bg-soft-primary text-primary rounded-circle mb-3 mx-auto">
+                                        <i class="feather-grid fs-2"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2">Event Attendance QR</h5>
+                                    <p class="text-muted mb-4">Use your unique QR code to mark your attendance at registered events.</p>
+                                    <a href="{{ route('student.profile') }}?tab=qr" class="btn btn-primary px-5 rounded-pill">
+                                        <i class="feather-maximize me-2"></i> View My QR Code
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="mt-5">
                         <h5>Quick Actions</h5>

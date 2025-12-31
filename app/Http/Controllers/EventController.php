@@ -63,12 +63,14 @@ class EventController extends Controller
             'description' => $request->description,
             'location' => $request->location,
             'image' => $imagePath,
-            'image' => $imagePath,
-            'dates' => $request->dates,
             'tags' => $tags,
             'capacity' => $request->capacity,
             'departments' => $request->departments,
         ]);
+
+        foreach ($request->dates as $date) {
+            $event->eventDates()->create(['date' => $date]);
+        }
 
         if ($request->has('speakers')) {
             $event->speakers()->attach($request->speakers);
@@ -120,15 +122,12 @@ class EventController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'location' => $request->location,
-            'location' => $request->location,
-            'dates' => $request->dates,
             'tags' => $tags,
             'capacity' => $request->capacity,
             'departments' => $request->departments,
         ];
 
         if ($request->hasFile('image')) {
-            // Delete old image if needed, for potentially better cleanup
             if ($event->image) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($event->image);
             }
@@ -136,6 +135,12 @@ class EventController extends Controller
         }
 
         $event->update($data);
+
+        // Update dates: for simplicity, delete all and recreate or sync
+        $event->eventDates()->delete();
+        foreach ($request->dates as $date) {
+            $event->eventDates()->create(['date' => $date]);
+        }
 
         if ($request->has('speakers')) {
             $event->speakers()->sync($request->speakers);
@@ -152,5 +157,27 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+    /**
+     * Student joins an event.
+     */
+    public function join(Event $event)
+    {
+        $student = auth()->guard('student')->user()->student;
+
+        // Check if already registered
+        if ($event->students()->where('student_id', $student->id)->exists()) {
+            return back()->with('error', 'You are already registered for this event.');
+        }
+
+        // Check capacity
+        if ($event->capacity && $event->students()->count() >= $event->capacity) {
+            return back()->with('error', 'Event is full.');
+        }
+
+        $event->students()->attach($student->id, ['status' => 'registered']);
+
+        return back()->with('success', 'You have successfully joined the event.');
     }
 }

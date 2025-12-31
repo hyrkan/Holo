@@ -97,7 +97,7 @@
                             <label class="form-label">Event Dates</label>
                             <div id="dates-container">
                                 @php
-                                    $dates = old('dates', $event->dates ?? []);
+                                    $dates = old('dates', $event->eventDates->pluck('date')->toArray());
                                 @endphp
                                 @if(count($dates) > 0)
                                     @foreach($dates as $date)

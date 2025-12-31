@@ -12,16 +12,12 @@ Route::get('/', function () {
     $currentMonth = now()->month;
     $currentYear = now()->year;
 
-    $events = \App\Models\Event::with('speakers')->latest()->get()->filter(function ($event) use ($currentMonth, $currentYear) {
+    $events = \App\Models\Event::with(['speakers', 'eventDates'])->latest()->get()->filter(function ($event) use ($currentMonth, $currentYear) {
         // Date filter
-        $onThisMonth = false;
-        foreach ($event->dates as $date) {
-            $carbonDate = \Carbon\Carbon::parse($date);
-            if ($carbonDate->month == $currentMonth && $carbonDate->year == $currentYear) {
-                $onThisMonth = true;
-                break;
-            }
-        }
+        $onThisMonth = $event->eventDates->contains(function ($eventDate) use ($currentMonth, $currentYear) {
+            $carbonDate = \Carbon\Carbon::parse($eventDate->date);
+            return $carbonDate->month == $currentMonth && $carbonDate->year == $currentYear;
+        });
 
         if (!$onThisMonth) return false;
 
@@ -50,6 +46,10 @@ Route::get('/', function () {
     return view('welcome', compact('events', 'announcements'));
 });
 
+Route::post('/student/events/{event}/join', [\App\Http\Controllers\EventController::class, 'join'])
+    ->name('student.events.join')
+    ->middleware(['auth:student', 'role:student']);
+
 Route::get('/dashboard', function () {
     return redirect('/');
 })->middleware(['auth:web,student', 'role_redirect']);
@@ -77,6 +77,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
         Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
+        
+        Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
     });
 });
 
@@ -96,5 +98,6 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\StudentController::class, 'profile'])->name('profile');
         Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
+        Route::get('/events/joined', [\App\Http\Controllers\StudentController::class, 'joinedEvents'])->name('events.joined');
     });
 });

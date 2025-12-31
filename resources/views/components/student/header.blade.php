@@ -40,6 +40,10 @@
                             <i class="feather-user"></i>
                             <span>My Profile</span>
                         </a>
+                        <a href="{{ route('student.profile') }}?tab=qr" class="dropdown-item">
+                            <i class="feather-grid"></i>
+                            <span>My QR</span>
+                        </a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ route('student.logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('header-logout-form').submit();">
                             <i class="feather-log-out"></i>

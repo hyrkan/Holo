@@ -25,6 +25,12 @@
                         <span class="nxl-mtext">Browse Events</span>
                     </a>
                 </li>
+                <li class="nxl-item {{ Request::routeIs('student.events.joined') ? 'active' : '' }}">
+                    <a href="{{ route('student.events.joined') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-check-square"></i></span>
+                        <span class="nxl-mtext">Events Joined</span>
+                    </a>
+                </li>
                 <li class="nxl-item {{ Request::routeIs('student.profile') ? 'active' : '' }}">
                     <a href="{{ route('student.profile') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-user"></i></span>

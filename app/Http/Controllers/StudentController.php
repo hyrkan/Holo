@@ -75,6 +75,21 @@ class StudentController extends Controller
     }
 
     /**
+     * Display the events joined by the authenticated student.
+     */
+    public function joinedEvents()
+    {
+        $user = Auth::guard('student')->user();
+        $student = $user->student;
+        $events = $student->events()
+            ->with(['eventDates', 'speakers'])
+            ->latest('event_registrations.created_at')
+            ->paginate(10);
+
+        return view('student.events.joined', compact('events'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

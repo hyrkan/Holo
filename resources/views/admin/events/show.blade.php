@@ -55,45 +55,49 @@
                             </div>
                             <div class="mb-4">
                                 <h5>Dates</h5>
-                                @if(is_array($event->dates) && count($event->dates) > 0)
+                                @if($event->eventDates->count() > 0)
                                     <div>
-                                        @foreach($event->dates as $index => $date)
-                                            <span class="badge bg-soft-primary text-primary me-2 mb-2" role="button" data-bs-toggle="modal" data-bs-target="#dateMethod{{ $index }}" style="cursor: pointer;">
-                                                {{ \Carbon\Carbon::parse($date)->format('F d, Y') }} <i class="feather-maximize-2 ms-1"></i>
+                                        @foreach($event->eventDates as $eventDate)
+                                            <span class="badge bg-soft-primary text-primary me-2 mb-2">
+                                                {{ \Carbon\Carbon::parse($eventDate->date)->format('F d, Y') }}
                                             </span>
-
-                                            <!-- Date QR Modal -->
-                                            <div class="modal fade date-modal" id="dateMethod{{ $index }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Event QR Code</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body text-center">
-                                                            <div id="qr-content-{{ $index }}" class="p-4 border rounded fw-bold" style="background: white;">
-                                                                <h4 class="mb-3">{{ $event->name }}</h4>
-                                                                <p class="mb-3 text-muted">{{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</p>
-                                                                <p class="mb-3 text-muted">{{ $event->location }}</p>
-                                                                <div class="mb-3 d-inline-block p-2 bg-white rounded">
-                                                                    {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(200)->generate(json_encode(['event_id' => $event->id, 'date' => $date])) !!}
-                                                                </div>
-                                                                <p class="small text-muted mb-0">Scan for Attendance</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer justify-content-center">
-                                                            <button type="button" class="btn btn-primary" onclick="downloadQrContent('qr-content-{{ $index }}', '{{ Str::slug($event->name) }}-{{ $date }}-qr')">
-                                                                <i class="feather-download me-2"></i> Download QR Card
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         @endforeach
                                     </div>
                                 @else
                                     <p class="text-muted">No dates scheduled.</p>
                                 @endif
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>Registered Participants ({{ $event->students->count() }}/{{ $event->capacity ?: 'Unlimited' }})</h5>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-hover table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Student Number</th>
+                                                <th>Name</th>
+                                                <th>Program</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($event->students as $student)
+                                                <tr>
+                                                    <td>{{ $student->student_number }}</td>
+                                                    <td>{{ $student->first_name }} {{ $student->last_name }}</td>
+                                                    <td>{{ $student->program }}</td>
+                                                    <td>
+                                                        <span class="badge bg-soft-success text-success">Registered</span>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted">No students joined yet.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -180,15 +184,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Move all speaker modals to body to ensure they display correctly over the backdrop
         const speakerModals = document.querySelectorAll('.speaker-modal');
         speakerModals.forEach(modal => {
-            document.body.appendChild(modal);
-        });
-
-        // Move all date modals to body
-        const dateModals = document.querySelectorAll('.date-modal');
-        dateModals.forEach(modal => {
             document.body.appendChild(modal);
         });
     });

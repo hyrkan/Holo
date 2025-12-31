@@ -190,13 +190,13 @@
                                  <ul data-animation="fadeInUp animated" data-delay=".2s" style="animation-delay: 0.2s;" class="">
                                     <li><i class="fas fa-map-marker-alt"></i> {{ $event->location }}</li>
                                     <li><i class="far fa-clock"></i> 
-                                        @foreach($event->dates as $date)
-                                            {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}{{ !$loop->last ? ' | ' : '' }}
+                                        @foreach($event->eventDates as $eventDate)
+                                            {{ \Carbon\Carbon::parse($eventDate->date)->format('M d, Y') }}{{ !$loop->last ? ' | ' : '' }}
                                         @endforeach
                                     </li>
                                     <li><i class="fas fa-users"></i> 
                                         @if($event->capacity)
-                                            Max {{ $event->capacity }} Participants
+                                            Max {{ $event->capacity }} Participants (Joined: {{ $event->students()->count() }})
                                         @else
                                             Unlimited Participants
                                         @endif
@@ -213,6 +213,24 @@
 								 <p>{{ $event->description }}</p>
 								 {{-- <a href="#" class="btn mt-20 mr-10"><i class="far fa-ticket-alt"></i> Buy Ticket</a> --}}
 								 <a href="#" class="btn mt-20">Read More</a>
+                                 
+                                 @if(Auth::guard('student')->check())
+                                    @php 
+                                        $isJoined = $event->students()->where('student_id', Auth::guard('student')->user()->student->id)->exists();
+                                        $isFull = $event->capacity && $event->students()->count() >= $event->capacity;
+                                    @endphp
+                                    
+                                    @if($isJoined)
+                                        <button class="btn mt-20 ml-10" style="background: #28a745; border-color: #28a745;" disabled>Joined</button>
+                                    @elseif($isFull)
+                                        <button class="btn mt-20 ml-10" style="background: #dc3545; border-color: #dc3545;" disabled>Event Full</button>
+                                    @else
+                                        <form action="{{ route('student.events.join', $event) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn mt-20 ml-10">Join Event</button>
+                                        </form>
+                                    @endif
+                                 @endif
 								 {{-- <div class="crical"><i class="fal fa-video"></i> </div> --}}
                               </div>
                            </div>
