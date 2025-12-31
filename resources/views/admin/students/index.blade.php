@@ -28,7 +28,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
                                             <div>
-                                                <span class="d-block">{{ $student->first_name }} {{ $student->last_name }}</span>
+                                                <a href="{{ route('admin.students.show', $student) }}" class="d-block fw-bold text-dark">{{ $student->first_name }} {{ $student->last_name }}</a>
                                                 <span class="fs-12 d-block fw-normal text-muted">{{ $student->user->email ?? 'N/A' }}</span>
                                             </div>
                                         </div>

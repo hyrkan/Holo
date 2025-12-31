@@ -16,16 +16,19 @@ Route::get('/', function () {
         // Date filter
         $onThisMonth = $event->eventDates->contains(function ($eventDate) use ($currentMonth, $currentYear) {
             $carbonDate = \Carbon\Carbon::parse($eventDate->date);
+
             return $carbonDate->month == $currentMonth && $carbonDate->year == $currentYear;
         });
 
-        if (!$onThisMonth) return false;
+        if (! $onThisMonth) {
+            return false;
+        }
 
         // Department filter for logged-in students
         if (Auth::guard('student')->check()) {
             $student = Auth::guard('student')->user()->student;
             $departments = $event->departments ?? ['All'];
-            
+
             if (in_array('All', $departments)) {
                 return true;
             }
@@ -73,11 +76,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('students', \App\Http\Controllers\StudentController::class);
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
+        Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
         Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
         Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
-        
+
         Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
     });
 });

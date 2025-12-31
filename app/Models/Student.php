@@ -32,7 +32,7 @@ class Student extends Model
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_registrations');
+        return $this->belongsToMany(Event::class, 'event_registrations')->withPivot('status')->withTimestamps();
     }
 
     public function attendances()

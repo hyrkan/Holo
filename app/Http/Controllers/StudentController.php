@@ -110,7 +110,8 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        //
+        $student->load(['user', 'events', 'attendances.eventDate.event']);
+        return view('admin.students.show', compact('student'));
     }
 
     /**

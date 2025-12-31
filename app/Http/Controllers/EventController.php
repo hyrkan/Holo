@@ -180,4 +180,13 @@ class EventController extends Controller
 
         return back()->with('success', 'You have successfully joined the event.');
     }
+
+    /**
+     * Display the participants of the specified event.
+     */
+    public function participants(Event $event)
+    {
+        $participants = $event->students()->with('user')->get();
+        return view('admin.events.participants', compact('event', 'participants'));
+    }
 }

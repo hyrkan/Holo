@@ -69,34 +69,15 @@
                             </div>
 
                             <div class="mb-4">
-                                <h5>Registered Participants ({{ $event->students->count() }}/{{ $event->capacity ?: 'Unlimited' }})</h5>
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-hover table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Student Number</th>
-                                                <th>Name</th>
-                                                <th>Program</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($event->students as $student)
-                                                <tr>
-                                                    <td>{{ $student->student_number }}</td>
-                                                    <td>{{ $student->first_name }} {{ $student->last_name }}</td>
-                                                    <td>{{ $student->program }}</td>
-                                                    <td>
-                                                        <span class="badge bg-soft-success text-success">Registered</span>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="4" class="text-center text-muted">No students joined yet.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Registered Participants</h5>
+                                    <a href="{{ route('admin.events.participants', $event) }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="feather-users me-2"></i> View All Participants ({{ $event->students->count() }})
+                                    </a>
+                                </div>
+                                <div class="p-3 bg-light rounded-4 border border-dashed text-center">
+                                    <p class="text-muted mb-0">There are currently <strong>{{ $event->students->count() }}</strong> students registered for this event.</p>
+                                    <a href="{{ route('admin.events.participants', $event) }}" class="btn btn-link btn-sm mt-1">Manage Participants List <i class="feather-arrow-right ms-1"></i></a>
                                 </div>
                             </div>
 
