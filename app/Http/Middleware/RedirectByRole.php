@@ -16,8 +16,8 @@ class RedirectByRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Only trigger redirection for the root '/' or '/dashboard'
-        if ($request->is('/') || $request->is('dashboard')) {
+        // Only trigger redirection for '/dashboard'
+        if ($request->is('dashboard')) {
             // Check Admin/Employee (web guard)
             if (Auth::guard('web')->check()) {
                 $user = Auth::guard('web')->user();

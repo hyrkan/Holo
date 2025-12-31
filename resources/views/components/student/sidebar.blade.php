@@ -19,6 +19,12 @@
                         <span class="nxl-mtext">Dashboard</span>
                     </a>
                 </li>
+                <li class="nxl-item">
+                    <a href="{{ url('/') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-home"></i></span>
+                        <span class="nxl-mtext">Browse Events</span>
+                    </a>
+                </li>
                 <li class="nxl-item {{ Request::routeIs('student.profile') ? 'active' : '' }}">
                     <a href="{{ route('student.profile') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-user"></i></span>

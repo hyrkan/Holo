@@ -78,6 +78,9 @@
                     <div class="mt-5">
                         <h5>Quick Actions</h5>
                         <div class="d-flex gap-3 mt-3">
+                            <a href="{{ url('/') }}" class="btn btn-primary px-4">
+                                <i class="feather-calendar me-2"></i> Browse Events
+                            </a>
                             <a href="{{ route('student.profile') }}" class="btn btn-outline-primary px-4">
                                 <i class="feather-edit-2 me-2"></i> Edit Profile
                             </a>

@@ -12,15 +12,32 @@ Route::get('/', function () {
     $currentMonth = now()->month;
     $currentYear = now()->year;
 
-    $events = \App\Models\Event::with('speakers')->get()->filter(function ($event) use ($currentMonth, $currentYear) {
+    $events = \App\Models\Event::with('speakers')->latest()->get()->filter(function ($event) use ($currentMonth, $currentYear) {
+        // Date filter
+        $onThisMonth = false;
         foreach ($event->dates as $date) {
             $carbonDate = \Carbon\Carbon::parse($date);
             if ($carbonDate->month == $currentMonth && $carbonDate->year == $currentYear) {
-                return true;
+                $onThisMonth = true;
+                break;
             }
         }
 
-        return false;
+        if (!$onThisMonth) return false;
+
+        // Department filter for logged-in students
+        if (Auth::guard('student')->check()) {
+            $student = Auth::guard('student')->user()->student;
+            $departments = $event->departments ?? ['All'];
+            
+            if (in_array('All', $departments)) {
+                return true;
+            }
+
+            return in_array($student->program, $departments);
+        }
+
+        return true;
     });
 
     $announcements = \App\Models\Announcement::whereYear('start_date', $currentYear)
@@ -31,7 +48,7 @@ Route::get('/', function () {
         ->get();
 
     return view('welcome', compact('events', 'announcements'));
-})->middleware('role_redirect');
+});
 
 Route::get('/dashboard', function () {
     return redirect('/');

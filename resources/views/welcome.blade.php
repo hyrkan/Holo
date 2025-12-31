@@ -50,7 +50,13 @@
                                             <li><a href="{{ url('/') }}">Home</a></li>
                                             <li><a href="#">Announcements</a></li>
                                             <li><a href="#">Lost and Found</a></li>
-                                            <li><a href="{{ route('student.login') }}">Login</a></li>
+                                            @if(Auth::guard('student')->check())
+                                                <li><a href="{{ route('student.dashboard') }}">Dashboard</a></li>
+                                            @elseif(Auth::guard('web')->check())
+                                                <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                            @else
+                                                <li><a href="{{ route('student.login') }}">Login</a></li>
+                                            @endif
                                         </ul>
                                     </nav>
                                 </div>
