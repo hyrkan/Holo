@@ -74,4 +74,10 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', function () {
         return view('student.dashboard');
     })->middleware(['auth:student', 'role:student'])->name('dashboard');
+
+    Route::middleware(['auth:student', 'role:student'])->group(function () {
+        Route::get('/profile', [\App\Http\Controllers\StudentController::class, 'profile'])->name('profile');
+        Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
+    });
 });

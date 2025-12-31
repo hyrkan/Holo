@@ -27,6 +27,12 @@
                     </a>
                 </li>
                 <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.students.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-user"></i></span>
+                        <span class="nxl-mtext">Students</span>
+                    </a>
+                </li>
+                <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.events.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-calendar"></i></span>
                         <span class="nxl-mtext">Events</span>
