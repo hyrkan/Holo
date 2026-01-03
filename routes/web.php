@@ -78,6 +78,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
         Route::get('/events/{event}/attendance', [\App\Http\Controllers\EventController::class, 'attendance'])->name('events.attendance')->middleware('role:admin');
+        Route::get('/speakers/{speaker}/events', [\App\Http\Controllers\SpeakerController::class, 'events'])->name('speakers.events')->middleware('role:admin');
         Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');

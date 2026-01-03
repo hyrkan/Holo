@@ -38,25 +38,15 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="card-title mb-1">
-                            @if($event)
-                                Smart Check-in: {{ $event->name }}
-                            @else
-                                Universal Student Lookup
-                            @endif
+                            Smart Check-in: {{ $event->name }}
                         </h5>
                         <p class="text-muted small mb-0">
-                            @if($event)
-                                Automatically recording attendance for today: {{ date('M d, Y') }}
-                            @else
-                                Scan any student QR to view their records and profile.
-                            @endif
+                            Automatically recording attendance for today: {{ date('M d, Y') }}
                         </p>
                     </div>
-                    @if($event)
-                        <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-light btn-sm">
-                            <i class="feather-arrow-left me-2"></i> Back to Event
-                        </a>
-                    @endif
+                    <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-light btn-sm">
+                        <i class="feather-arrow-left me-2"></i> Back to Event
+                    </a>
                 </div>
                 <div class="card-body">
                     <div class="scanner-container">
@@ -71,9 +61,7 @@
                                     <i class="feather-search"></i>
                                 </button>
                             </div>
-                            <div class="mt-2 text-start">
-                                <small class="text-info"><i class="feather-help-circle me-1"></i> Tip: Use HTTPS or 'herd secure' to enable camera scanning.</small>
-                            </div>
+
                         </div>
 
                         <div id="scan-result" class="mt-4 scan-feedback d-none">
@@ -165,7 +153,7 @@
             },
             body: JSON.stringify({
                 student_uuid: uuid,
-                event_id: "{{ $event ? $event->id : '' }}"
+                event_id: "{{ $event->id }}"
             })
         })
         .then(response => response.json())

@@ -14,7 +14,7 @@ class EventController extends Controller
     {
         $search = $request->input('search');
 
-        $events = Event::when($search, function ($query, $search) {
+        $events = Event::with('eventDates')->when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%")
                          ->orWhere('description', 'like', "%{$search}%")
                          ->orWhere('location', 'like', "%{$search}%");

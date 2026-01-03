@@ -71,15 +71,7 @@
                         <span class="nxl-mtext">Permissions</span>
                     </a>
                 </li>
-                <li class="nxl-item nxl-caption">
-                    <label>Utilities</label>
-                </li>
-                <li class="nxl-item">
-                    <a href="{{ route('admin.attendance.scanner') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-maximize"></i></span>
-                        <span class="nxl-mtext">Global QR Scanner</span>
-                    </a>
-                </li>
+
             </ul>
         </div>
     </div>

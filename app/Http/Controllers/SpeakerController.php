@@ -32,7 +32,7 @@ class SpeakerController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.speakers.create');
     }
 
     /**
@@ -85,7 +85,7 @@ class SpeakerController extends Controller
      */
     public function edit(Speaker $speaker)
     {
-        //
+        return view('admin.speakers.edit', compact('speaker'));
     }
 
     /**
@@ -93,7 +93,32 @@ class SpeakerController extends Controller
      */
     public function update(Request $request, Speaker $speaker)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
+            'twitter' => 'nullable|url|max:255',
+            'linkedin' => 'nullable|url|max:255',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($speaker->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($speaker->image);
+            }
+            $validated['image'] = $request->file('image')->store('speakers', 'public');
+        }
+
+        $speaker->update($validated);
+
+        return redirect()->route('admin.speakers.index')->with('success', 'Speaker updated successfully.');
     }
 
     /**
@@ -102,5 +127,13 @@ class SpeakerController extends Controller
     public function destroy(Speaker $speaker)
     {
         //
+    }
+    /**
+     * Display all events for a specific speaker.
+     */
+    public function events(Speaker $speaker)
+    {
+        $events = $speaker->events()->with(['speakers', 'eventDates'])->latest()->paginate(10);
+        return view('admin.speakers.events', compact('speaker', 'events'));
     }
 }

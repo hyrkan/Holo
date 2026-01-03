@@ -65,6 +65,9 @@
                                     </td>
                                     <td class="text-end">
                                         <div class="hstack gap-3 justify-content-end">
+                                            <a href="{{ route('admin.speakers.events', $speaker) }}" class="text-secondary" data-bs-toggle="tooltip" title="View Events">
+                                                <i class="feather-calendar fs-16"></i>
+                                            </a>
                                             <a href="{{ route('admin.speakers.edit', $speaker) }}" class="text-secondary" data-bs-toggle="tooltip" title="Edit">
                                                 <i class="feather-edit-3 fs-16"></i>
                                             </a>

@@ -5,19 +5,14 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
-                <div class="card-header">
-                    <h5 class="card-title">Events</h5>
-                    <div class="card-header-action">
-                        <form action="{{ route('admin.events.index') }}" method="GET" class="me-3">
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="Search event..." value="{{ request('search') }}">
-                                <button class="btn btn-outline-secondary" type="submit"><i class="feather-search"></i></button>
-                            </div>
-                        </form>
-                        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">
-                            <i class="feather-plus me-2"></i> Create Event
-                        </a>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">Events for Speaker: {{ $speaker->first_name }} {{ $speaker->last_name }}</h5>
+                        <p class="text-muted small mb-0">{{ $speaker->title }} @if($speaker->company) at {{ $speaker->company }} @endif</p>
                     </div>
+                    <a href="{{ route('admin.speakers.index') }}" class="btn btn-light btn-sm">
+                        <i class="feather-arrow-left me-2"></i> Back to Speakers
+                    </a>
                 </div>
                 <div class="card-body custom-card-action p-0">
                     <div class="table-responsive">
@@ -28,7 +23,6 @@
                                     <th>Location</th>
                                     <th>Dates</th>
                                     <th>Target</th>
-                                    <th>Capacity</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -81,36 +75,19 @@
                                             @endforeach
                                         @endif
                                     </td>
-                                    <td>
-                                        @if($event->capacity)
-                                            <span class="fw-bold">{{ $event->capacity }}</span>
-                                        @else
-                                            <span class="text-muted">Unlimited</span>
-                                        @endif
-                                    </td>
                                     <td class="text-end">
                                         <div class="hstack gap-3 justify-content-end">
-                                            <a href="{{ route('admin.events.show', $event) }}" class="text-secondary" data-bs-toggle="tooltip" title="View">
+                                            <a href="{{ route('admin.events.show', $event) }}" class="text-secondary" data-bs-toggle="tooltip" title="View Detail">
                                                 <i class="feather-eye fs-16"></i>
                                             </a>
-                                            <a href="{{ route('admin.events.edit', $event) }}" class="text-secondary" data-bs-toggle="tooltip" title="Edit">
-                                                <i class="feather-edit-3 fs-16"></i>
-                                            </a>
-                                            <form action="{{ route('admin.events.destroy', $event) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-danger border-0 bg-transparent p-0" onclick="return confirm('Are you sure?')" data-bs-toggle="tooltip" title="Delete">
-                                                    <i class="feather-trash-2 fs-16"></i>
-                                                </button>
-                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-5">
+                                    <td colspan="5" class="text-center py-5">
                                         <i class="feather-calendar fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No events found.</p>
+                                        <p class="text-muted mt-2">No events found for this speaker.</p>
                                     </td>
                                 </tr>
                                 @endforelse
