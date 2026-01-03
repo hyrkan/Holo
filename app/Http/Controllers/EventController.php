@@ -189,4 +189,16 @@ class EventController extends Controller
         $participants = $event->students()->with('user')->get();
         return view('admin.events.participants', compact('event', 'participants'));
     }
+
+    /**
+     * Display the attendance sheet of the specified event.
+     */
+    public function attendance(Event $event)
+    {
+        $event->load(['eventDates', 'students.user', 'students.attendances']);
+        $dates = $event->eventDates->sortBy('date');
+        $participants = $event->students;
+        
+        return view('admin.events.attendance', compact('event', 'dates', 'participants'));
+    }
 }

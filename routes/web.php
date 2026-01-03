@@ -77,12 +77,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
+        Route::get('/events/{event}/attendance', [\App\Http\Controllers\EventController::class, 'attendance'])->name('events.attendance')->middleware('role:admin');
         Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
         Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
 
         Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
+        Route::get('/attendance/scanner', [\App\Http\Controllers\AttendanceController::class, 'showScanner'])->name('attendance.scanner');
     });
 });
 

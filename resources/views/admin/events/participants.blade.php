@@ -38,8 +38,23 @@
                         </button>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
+                <div class="card-body p-0">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs nav-tabs-custom px-4 pt-3 border-bottom-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('admin.events.participants', $event) }}">
+                                <i class="feather-users me-2"></i>Registration List
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.events.attendance', $event) }}">
+                                <i class="feather-check-square me-2"></i>Attendance Sheet
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="p-4 pt-2">
+                        <div class="table-responsive">
                         <table id="participants-table" class="table table-hover mb-0">
                             <thead>
                                 <tr>

@@ -54,17 +54,55 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <h5>Dates</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Event Schedule & Attendance</h5>
+                                    <a href="{{ route('admin.attendance.scanner', ['event_id' => $event->id]) }}" class="btn btn-primary">
+                                        <i class="feather-maximize me-2"></i> Open Smart Scanner
+                                    </a>
+                                </div>
+                                <div class="alert alert-soft-primary d-flex align-items-center mb-4">
+                                    <i class="feather-info me-2 text-primary"></i>
+                                    <span class="small">The <b>Smart Scanner</b> automatically detects today's session and marks attendance for registered students.</span>
+                                </div>
                                 @if($event->eventDates->count() > 0)
-                                    <div>
+                                    <div class="row g-3">
                                         @foreach($event->eventDates as $eventDate)
-                                            <span class="badge bg-soft-primary text-primary me-2 mb-2">
-                                                {{ \Carbon\Carbon::parse($eventDate->date)->format('F d, Y') }}
-                                            </span>
+                                            <div class="col-md-6 col-xl-4">
+                                                <div class="p-3 border rounded-4 bg-white shadow-sm @if(\Carbon\Carbon::parse($eventDate->date)->isToday()) border-primary border-2 @endif">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <h6 class="mb-1 fw-bold text-dark">{{ \Carbon\Carbon::parse($eventDate->date)->format('F d, Y') }}</h6>
+                                                            @if(\Carbon\Carbon::parse($eventDate->date)->isToday())
+                                                                <span class="badge bg-success text-white small animated-pulse">Active Today</span>
+                                                            @else
+                                                                <span class="badge bg-soft-secondary text-secondary small">Day {{ $loop->iteration }}</span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="dropdown">
+                                                            <a href="javascript:void(0);" class="btn btn-light btn-icon btn-sm" data-bs-toggle="dropdown">
+                                                                <i class="feather-more-vertical"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu dropdown-menu-end">
+                                                                                                                                                                                                        <a href="{{ route('admin.events.attendance', $event) }}" class="dropdown-item">
+                                                                    <i class="feather-file-text me-2"></i> Attendance Sheet
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="p-2 bg-soft-primary text-primary rounded-circle">
+                                                            <i class="feather-check-circle fs-12"></i>
+                                                        </div>
+                                                        <span class="fs-12 fw-medium">{{ $eventDate->attendances->count() }} Students Present</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endforeach
                                     </div>
                                 @else
-                                    <p class="text-muted">No dates scheduled.</p>
+                                    <div class="p-4 bg-light rounded-4 text-center border border-dashed">
+                                        <p class="text-muted mb-0">No dates scheduled for this event yet.</p>
+                                    </div>
                                 @endif
                             </div>
 
