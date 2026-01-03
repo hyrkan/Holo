@@ -21,7 +21,8 @@
                                     <th>Event Name</th>
                                     <th>Date(s)</th>
                                     <th>Location</th>
-                                    <th class="text-end">Status</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Certificate</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,8 +49,17 @@
         <td>
             <small><i class="feather-map-pin me-1"></i> {{ $event->location }}</small>
         </td>
-        <td class="text-end">
+        <td>
             <span class="badge bg-soft-success text-success">Joined</span>
+        </td>
+        <td class="text-end">
+            @if($event->certificate && $event->certificate->is_active && auth()->user()->student->isEligibleForCertificate($event))
+                <a href="{{ route('student.events.certificate.download', $event) }}" target="_blank" class="btn btn-sm btn-info">
+                    <i class="feather-download me-1"></i> Download
+                </a>
+            @else
+                <span class="text-muted small">Not Available</span>
+            @endif
         </td>
     </tr>
 @empty

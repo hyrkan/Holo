@@ -31,4 +31,9 @@ class Event extends Model
     {
         return $this->belongsToMany(Student::class, 'event_registrations')->withPivot('status')->withTimestamps();
     }
+
+    public function certificate()
+    {
+        return $this->hasOne(Certificate::class);
+    }
 }

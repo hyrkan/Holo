@@ -82,7 +82,7 @@ class StudentController extends Controller
         $user = Auth::guard('student')->user();
         $student = $user->student;
         $events = $student->events()
-            ->with(['eventDates', 'speakers'])
+            ->with(['eventDates', 'speakers', 'certificate'])
             ->latest('event_registrations.created_at')
             ->paginate(10);
 

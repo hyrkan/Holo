@@ -25,6 +25,11 @@ class Student extends Model
         });
     }
 
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} " . ($this->middle_name ? "{$this->middle_name} " : "") . "{$this->last_name}";
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -38,5 +43,14 @@ class Student extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function isEligibleForCertificate(Event $event)
+    {
+        $registration = \App\Models\EventRegistration::where('event_id', $event->id)
+            ->where('student_id', $this->id)
+            ->first();
+            
+        return $registration && $registration->is_eligible_for_certificate;
     }
 }

@@ -8,6 +8,7 @@
                 <div class="card-header d-flex justify-content-between">
                     <h5 class="card-title">Event Details</h5>
                     <div class="d-flex gap-2">
+                        <a href="{{ route('admin.events.certificate.edit', $event) }}" class="btn btn-info"><i class="feather-award me-2"></i> Manage Certificate</a>
                         <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-warning"><i class="feather-edit me-2"></i> Edit Event</a>
                         <a href="{{ route('admin.events.index') }}" class="btn btn-light"><i class="feather-arrow-left me-2"></i> Back to Events</a>
                     </div>
