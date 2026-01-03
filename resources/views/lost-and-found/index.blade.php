@@ -5,19 +5,23 @@
 <!-- lost-and-found-area -->
 <section id="lost-and-found" class="pt-120 pb-120">
     <div class="container">
-        <div class="row align-items-center mb-60">
-            <div class="col-lg-6">
-                <div class="section-title">
-                    <span>Recent Reports</span>
-                    <h2>Lost & Found Items</h2>
-                </div>
-            </div>
-            <div class="col-lg-6 text-right">
-                <div class="lost-found-filter">
-                    <a href="{{ route('lost-and-found.index', ['type' => 'all']) }}" class="btn mr-10 {{ $type == 'all' ? '' : 'btn-outline' }}">All</a>
-                    <a href="{{ route('lost-and-found.index', ['type' => 'lost']) }}" class="btn mr-10 {{ $type == 'lost' ? '' : 'btn-outline' }}">Lost</a>
-                    <a href="{{ route('lost-and-found.index', ['type' => 'found']) }}" class="btn mr-10 {{ $type == 'found' ? '' : 'btn-outline' }}">Found</a>
-                    <a href="{{ route('lost-and-found.create') }}" class="btn" style="background: #28a745; border-color: #28a745;"><i class="fas fa-plus"></i> Report Item</a>
+        <div class="row mb-50">
+            <div class="col-lg-12">
+                <div class="lost-found-tabs d-flex align-items-center justify-content-start" style="border-bottom: 2px solid #eee; padding-bottom: 20px;">
+                    <ul class="nav nav-pills custom-tabs">
+                        <li class="nav-item">
+                            <a href="{{ route('lost-and-found.index', ['type' => 'all']) }}" class="nav-link {{ $type == 'all' ? 'active' : '' }}">All Reports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('lost-and-found.index', ['type' => 'lost']) }}" class="nav-link {{ $type == 'lost' ? 'active' : '' }}">Lost Items</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('lost-and-found.index', ['type' => 'found']) }}" class="nav-link {{ $type == 'found' ? 'active' : '' }}">Found Items</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('lost-and-found.index', ['type' => 'returned']) }}" class="nav-link {{ $type == 'returned' ? 'active' : '' }}">Recently Returned</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -36,8 +40,8 @@
                             <a href="{{ route('lost-and-found.show', $item) }}">
                                 <img src="{{ $item->image_path ? asset('storage/' . $item->image_path) : asset('landing/img/blog_img_1.jpg') }}" alt="{{ $item->item_name }}" style="height: 250px; width: 100%; object-fit: cover;">
                             </a>
-                            <div class="type-badge" style="position: absolute; top: 10px; right: 10px; background: {{ $item->type == 'lost' ? '#dc3545' : '#28a745' }}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px;">
-                                {{ $item->type }}
+                            <div class="type-badge" style="position: absolute; top: 10px; right: 10px; background: {{ $item->status == 'resolved' ? '#28a745' : ($item->type == 'lost' ? '#dc3545' : '#4700c8') }}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">
+                                {{ $item->status == 'resolved' ? 'Returned' : $item->type }}
                             </div>
                         </div>
                         <div class="blog-content" style="padding: 20px;">
@@ -79,8 +83,8 @@
             @endforelse
         </div>
 
-        @if($recentlyResolved->count() > 0)
-        <!-- Recently Resolved Section -->
+        @if($type == 'all' && $recentlyResolved->count() > 0)
+        <!-- Recently Resolved Section (Shown only on 'All' tab) -->
         <div class="row mt-80">
             <div class="col-lg-12">
                 <div class="section-title text-center mb-50">
@@ -116,6 +120,22 @@
 
 @push('css')
 <style>
+    .custom-tabs .nav-link {
+        color: #444;
+        font-weight: 600;
+        padding: 10px 25px;
+        border-radius: 5px;
+        transition: all 0.3s;
+        margin-right: 10px;
+    }
+    .custom-tabs .nav-link:hover {
+        background: #f4f2f9;
+        color: #4700c8;
+    }
+    .custom-tabs .nav-link.active {
+        background: #4700c8 !important;
+        color: #fff !important;
+    }
     .btn-outline {
         background: transparent;
         border: 1px solid #4700c8;
@@ -124,9 +144,6 @@
     .btn-outline:hover {
         background: #4700c8;
         color: white;
-    }
-    .lost-found-filter .btn {
-        padding: 10px 25px;
     }
 </style>
 @endpush

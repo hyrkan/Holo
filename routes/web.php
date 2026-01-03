@@ -59,9 +59,7 @@ Route::get('/dashboard', function () {
 
 // Lost and Found Routes
 Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'index'])->name('lost-and-found.index');
-Route::get('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'create'])->name('lost-and-found.create');
 Route::get('/lost-and-found/{lostAndFound}', [\App\Http\Controllers\LostAndFoundController::class, 'show'])->name('lost-and-found.show');
-Route::post('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'store'])->name('lost-and-found.store');
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -120,6 +118,5 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
         Route::get('/events/joined', [\App\Http\Controllers\StudentController::class, 'joinedEvents'])->name('events.joined');
-        Route::get('/lost-and-found/reports', [\App\Http\Controllers\LostAndFoundController::class, 'myReports'])->name('lost-and-found.reports');
     });
 });

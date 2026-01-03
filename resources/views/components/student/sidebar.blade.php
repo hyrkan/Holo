@@ -37,12 +37,6 @@
                         <span class="nxl-mtext">My Profile</span>
                     </a>
                 </li>
-                <li class="nxl-item {{ Request::routeIs('student.lost-and-found.reports') ? 'active' : '' }}">
-                    <a href="{{ route('student.lost-and-found.reports') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-search"></i></span>
-                        <span class="nxl-mtext">My Lost & Found</span>
-                    </a>
-                </li>
                 
                 <li class="nxl-item nxl-caption">
                     <label>Account</label>

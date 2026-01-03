@@ -15,14 +15,18 @@ class LostAndFoundController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type', 'all');
-        $query = LostAndFound::where('status', 'active')->latest();
 
-        if ($type !== 'all') {
-            $query->where('type', $type);
+        if ($type === 'returned') {
+            $query = LostAndFound::where('status', 'resolved')->latest('resolved_at');
+        } else {
+            $query = LostAndFound::where('status', 'active')->latest();
+            if ($type !== 'all') {
+                $query->where('type', $type);
+            }
         }
 
         $items = $query->paginate(12);
-        
+
         $recentlyResolved = LostAndFound::where('status', 'resolved')
             ->latest('resolved_at')
             ->take(4)
@@ -31,48 +35,6 @@ class LostAndFoundController extends Controller
         return view('lost-and-found.index', compact('items', 'type', 'recentlyResolved'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('lost-and-found.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'item_name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'type' => 'required|in:lost,found',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'contact_info' => 'nullable|string|max:255',
-            'is_anonymous' => 'boolean',
-            'reporter_name' => 'nullable|string|max:255',
-            'owner_name' => 'nullable|string|max:255',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
-        }
-
-        unset($validated['image']);
-        // Automatically tag as anonymous if no reporter name is provided
-        $validated['is_anonymous'] = $request->has('is_anonymous') || empty($validated['reporter_name']);
-        
-        $validated['user_id'] = Auth::guard('student')->id() ?? Auth::id();
-        $validated['status'] = 'active';
-        $validated['date_reported'] = now();
-
-        LostAndFound::create($validated);
-
-        return redirect()->route('lost-and-found.index')
-            ->with('success', 'Your report has been submitted successfully.');
-    }
 
     public function show(LostAndFound $lostAndFound)
     {
@@ -85,6 +47,7 @@ class LostAndFoundController extends Controller
     public function adminIndex()
     {
         $items = LostAndFound::with('user')->latest()->get();
+
         return view('admin.lost-and-found.index', compact('items'));
     }
 
@@ -94,6 +57,7 @@ class LostAndFoundController extends Controller
     public function adminCreate(Request $request)
     {
         $type = $request->get('type', 'lost');
+
         return view('admin.lost-and-found.create', compact('type'));
     }
 
@@ -121,7 +85,7 @@ class LostAndFoundController extends Controller
         unset($validated['image']);
         // Automatically tag as anonymous if no reporter name is provided
         $validated['is_anonymous'] = $request->has('is_anonymous') || empty($validated['reporter_name']);
-        
+
         $validated['user_id'] = Auth::id(); // Admin/Staff user
         $validated['status'] = 'active';
         $validated['date_reported'] = now();
@@ -131,20 +95,6 @@ class LostAndFoundController extends Controller
         return redirect()->route('admin.lost-and-found.index')
             ->with('success', 'Report created successfully.');
     }
-
-    /**
-     * Display a listing of items reported by the current student.
-     */
-    public function myReports()
-    {
-        $userId = Auth::guard('student')->id();
-        $items = LostAndFound::where('user_id', $userId)
-            ->latest()
-            ->paginate(10);
-
-        return view('student.lost-and-found.my-reports', compact('items'));
-    }
-
 
     /**
      * Show resolve form
@@ -191,7 +141,7 @@ class LostAndFoundController extends Controller
                 $matchedItem->resolved_at = now();
                 $matchedItem->resolved_by = Auth::id();
                 $matchedItem->matched_item_id = $lost_and_found->id; // Mutual link
-                $matchedItem->identity_proof_ref = 'Resolved via matched report #' . $lost_and_found->id;
+                $matchedItem->identity_proof_ref = 'Resolved via matched report #'.$lost_and_found->id;
                 $matchedItem->save();
             }
         }
@@ -208,7 +158,7 @@ class LostAndFoundController extends Controller
         if ($lost_and_found->handover_image_path) {
             Storage::disk('public')->delete($lost_and_found->handover_image_path);
         }
-        
+
         $lost_and_found->delete();
 
         return redirect()->route('admin.lost-and-found.index')
