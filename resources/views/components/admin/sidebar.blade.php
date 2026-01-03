@@ -56,6 +56,12 @@
                         <span class="nxl-mtext">Announcements</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="{{ route('admin.lost-and-found.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-search"></i></span>
+                        <span class="nxl-mtext">Lost & Found</span>
+                    </a>
+                </li>
                 <li class="nxl-item nxl-caption">
                     <label>Access Control</label>
                 </li>
