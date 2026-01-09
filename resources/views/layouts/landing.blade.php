@@ -66,7 +66,7 @@
                                 <nav id="mobile-menu">
                                     <ul>
                                         <li><a href="{{ url('/') }}">Home</a></li>
-                                        <li><a href="#">Announcements</a></li>
+
                                         <li><a href="{{ route('lost-and-found.index') }}">Lost and Found</a></li>
                                         @if(Auth::guard('student')->check())
                                             <li><a href="{{ route('student.dashboard') }}">Dashboard</a></li>

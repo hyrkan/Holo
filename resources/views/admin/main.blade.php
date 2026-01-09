@@ -12,10 +12,10 @@
     <meta name="author" content="WRAPCODERS" />
     <!--! The above 6 meta tags *must* come first in the head; any other head content must come *after* these tags !-->
     <!--! BEGIN: Apps Title-->
-    <title>Duralux || Dashboard</title>
+    <title>HoloBoard || Dashboard</title>
     <!--! END:  Apps Title-->
     <!--! BEGIN: Favicon-->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('landing/img/favicon.ico') }}" />
     <!--! END: Favicon-->
     <!--! BEGIN: Bootstrap CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}" />
@@ -42,10 +42,10 @@
     <nav class="nxl-navigation">
         <div class="navbar-wrapper">
             <div class="m-header">
-                <a href="index.html" class="b-brand">
+                <a href="{{ route('admin.dashboard') }}" class="b-brand">
                     <!-- ========   change your logo hear   ============ -->
-                    <img src="{{ asset('assets/images/logo-full.png') }}" alt="" class="logo logo-lg" />
-                    <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="logo logo-sm" />
+                    <img src="{{ asset('landing/img/logo.jpg') }}" alt="Holo Board" class="logo logo-lg" style="height: 40px; width: auto;" />
+                    <img src="{{ asset('landing/img/logo.jpg') }}" alt="Holo Board" class="logo logo-sm" style="height: 30px; width: auto;" />
                 </a>
             </div>
             <div class="navbar-content">

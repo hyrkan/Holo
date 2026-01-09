@@ -106,7 +106,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.admin-store');
         Route::get('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'resolve'])->name('lost-and-found.resolve');
         Route::post('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'storeResolution'])->name('lost-and-found.store-resolution');
-        Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
+        Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
+        Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
     });
 });
 

@@ -1,4 +1,15 @@
 {{-- Header Component --}}
+@php
+    $userName = Auth::user()->name ?? 'Admin User';
+    $nameParts = explode(' ', $userName);
+    $initials = '';
+    if (count($nameParts) > 1) {
+        $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
+    } else {
+        $initials = strtoupper(substr($userName, 0, 2));
+    }
+@endphp
+
 <header class="nxl-header">
     <div class="header-wrapper">
         <!--! [Start] Header Left !-->
@@ -29,21 +40,20 @@
         <div class="header-right ms-auto">
             <div class="d-flex align-items-center">
                 {{-- Search, Notifications, Profile dropdown etc --}}
-                <div class="dropdown nxl-h-item">
-                    <a class="nxl-head-link me-3" href="javascript:void(0);" data-bs-toggle="dropdown" role="button" data-bs-auto-close="outside">
-                        <i class="feather-bell"></i>
-                        <span class="badge bg-danger nxl-h-badge">3</span>
-                    </a>
-                </div>
+
                 
                 <div class="dropdown nxl-h-item">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" role="button" data-bs-auto-close="outside">
-                        <img src="{{ asset('assets/images/avatar/1.png') }}" alt="user-image" class="img-fluid user-avtar me-0" />
+                        <div class="avatar-text user-avtar me-0 bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold">
+                            {{ $initials }}
+                        </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-user-dropdown">
                         <div class="dropdown-header">
                             <div class="d-flex align-items-center">
-                                <img src="{{ asset('assets/images/avatar/1.png') }}" alt="user-image" class="img-fluid user-avtar" />
+                                <div class="avatar-text user-avtar bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold me-3">
+                                    {{ $initials }}
+                                </div>
                                 <div>
                                     <h6 class="text-dark mb-0">{{ Auth::user()->name ?? 'Admin User' }}</h6>
                                     <span class="fs-12 fw-medium text-muted">{{ Auth::user()->email ?? 'admin@example.com' }}</span>
@@ -51,11 +61,11 @@
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="{{ route('admin.profile') }}" class="dropdown-item">
                             <i class="feather-user"></i>
                             <span>Profile Details</span>
                         </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="{{ route('admin.profile') }}" class="dropdown-item">
                             <i class="feather-settings"></i>
                             <span>Account Settings</span>
                         </a>

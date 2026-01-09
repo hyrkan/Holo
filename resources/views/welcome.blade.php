@@ -124,9 +124,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-12 justify-content-center text-center">
-                    <a href="#" class="btn mt-20 mr-10">More Program  +</a>
-                </div>
+
             </div>
         </div>
     </div>
