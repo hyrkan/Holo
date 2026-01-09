@@ -4,6 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     .avatar-image {
         width: 40px;
@@ -18,6 +19,27 @@
     }
     .registration-row.selected {
         background-color: rgba(110, 98, 255, 0.05);
+    }
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #e2e5e9;
+        border-radius: 4px;
+        min-height: 31px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #6e62ff;
+        border: 1px solid #6e62ff;
+        color: white;
+        border-radius: 3px;
+        padding: 0 5px;
+        margin-top: 3px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+        margin-right: 5px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background: transparent;
+        color: #ddd;
     }
 </style>
 @endpush
@@ -59,17 +81,31 @@
                     <div class="p-4 pt-2">
                         <!-- Bulk Actions -->
                         <div id="bulk-actions" class="mb-3 d-none">
-                            <form action="{{ route('admin.events.certificate.bulk', $event) }}" method="POST" id="bulk-form" class="d-flex align-items-center gap-2 bg-light p-3 rounded">
+                            <form action="{{ route('admin.events.certificate.bulk', $event) }}" method="POST" id="bulk-form" class="bg-light p-3 rounded">
                                 @csrf
-                                <span class="fw-bold text-dark"><span id="selected-count">0</span> Selected:</span>
-                                <input type="hidden" name="action" id="bulk-action-type">
-                                <div id="selected-ids-container"></div>
-                                <button type="button" class="btn btn-success btn-sm" onclick="submitBulk('award')">
-                                    <i class="feather-award me-1"></i> Award Certificate
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="submitBulk('revoke')">
-                                    <i class="feather-x-circle me-1"></i> Revoke Certificate
-                                </button>
+                                <div class="row align-items-end g-3">
+                                    <div class="col-md-3">
+                                        <span class="fw-bold text-dark d-block mb-1"><span id="selected-count">0</span> Selected Participants</span>
+                                        <div id="selected-ids-container"></div>
+                                        <input type="hidden" name="action" id="bulk-action-type">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Select Certificates</label>
+                                        <select name="certificate_ids[]" class="form-select select2-multiple" multiple data-placeholder="Choose certificates...">
+                                            @foreach($event->certificates as $cert)
+                                                <option value="{{ $cert->id }}">{{ $cert->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex gap-2">
+                                        <button type="button" class="btn btn-success btn-sm flex-grow-1" onclick="submitBulk('award')">
+                                            <i class="feather-award me-1"></i> Award
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm flex-grow-1" onclick="submitBulk('revoke')">
+                                            <i class="feather-x-circle me-1"></i> Revoke
+                                        </button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -81,9 +117,8 @@
                                         <th>Student</th>
                                         <th>Student Number</th>
                                         <th>Program</th>
-                                        <th>Registration Date</th>
-                                        <th>Certificate</th>
-                                        <th class="text-end">Actions</th>
+                                        <th>Awarded Certificates</th>
+                                        <th class="text-end" width="100">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -105,17 +140,21 @@
                                             </td>
                                             <td>{{ $student->student_number }}</td>
                                             <td>{{ $student->program }}</td>
-                                            <td>{{ $student->pivot->created_at ? $student->pivot->created_at->format('M d, Y') : 'N/A' }}</td>
                                             <td>
-                                                @if($student->pivot->is_eligible_for_certificate)
-                                                    <span class="badge bg-soft-success text-success">
-                                                        <i class="feather-award me-1"></i> Eligible
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-soft-secondary text-secondary">
-                                                        Not Awarded
-                                                    </span>
-                                                @endif
+                                                <select class="form-select select2-multiple student-eligibility" 
+                                                        multiple 
+                                                        data-student-id="{{ $student->id }}"
+                                                        data-url="{{ route('admin.events.certificate.update-eligibility', [$event, $student]) }}"
+                                                        data-placeholder="Award certificates...">
+                                                    @foreach($event->certificates as $cert)
+                                                        @php
+                                                            $isAwarded = $student->certificates->contains($cert->id);
+                                                        @endphp
+                                                        <option value="{{ $cert->id }}" {{ $isAwarded ? 'selected' : '' }}>
+                                                            {{ $cert->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </td>
                                             <td class="text-end">
                                                 <div class="dropdown">
@@ -123,14 +162,6 @@
                                                         <i class="feather-more-vertical"></i>
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                        <form action="{{ route('admin.events.certificate.toggle', [$event, $student]) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="dropdown-item">
-                                                                <i class="feather-{{ $student->pivot->is_eligible_for_certificate ? 'x-circle' : 'award' }} me-2"></i>
-                                                                {{ $student->pivot->is_eligible_for_certificate ? 'Revoke Certificate' : 'Award Certificate' }}
-                                                            </button>
-                                                        </form>
-                                                        <div class="dropdown-divider"></div>
                                                         <a href="{{ route('admin.students.show', $student) }}" class="dropdown-item">
                                                             <i class="feather-eye me-2"></i> View Profile
                                                         </a>
@@ -154,13 +185,19 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Initialize Select2
+        $('.select2-multiple').select2({
+            width: '100%'
+        });
+
         const table = $('#participants-table').DataTable({
-            "order": [[4, "desc"]],
+            "order": [[1, "asc"]],
             "pageLength": 50,
             "columnDefs": [
-                { "orderable": false, "targets": [0, 6] }
+                { "orderable": false, "targets": [0, 4, 5] }
             ],
             "language": {
                 "search": "_INPUT_",
@@ -168,9 +205,26 @@
             }
         });
 
+        // Individual Eligibility Update
+        $('.student-eligibility').on('change', function() {
+            const url = $(this).data('url');
+            const certificateIds = $(this).val();
+            
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    certificate_ids: certificateIds
+                },
+                success: function(response) {
+                    // Optional: Show toast
+                }
+            });
+        });
+
         // Bulk Selection Logic
         const selectAll = $('#select-all');
-        const checkboxes = $('.participant-checkbox');
         const bulkActions = $('#bulk-actions');
         const selectedCount = $('#selected-count');
 
@@ -210,7 +264,13 @@
         });
 
         window.submitBulk = function(action) {
-            if (confirm(`Are you sure you want to ${action} certificates for the selected participants?`)) {
+            const certIds = $('#bulk-form select').val();
+            if (!certIds || certIds.length === 0) {
+                alert('Please select at least one certificate type.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to ${action} selected certificates for the selected participants?`)) {
                 const container = $('#selected-ids-container');
                 container.empty();
                 

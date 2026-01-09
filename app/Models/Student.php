@@ -53,4 +53,9 @@ class Student extends Model
             
         return $registration && $registration->is_eligible_for_certificate;
     }
+
+    public function certificates()
+    {
+        return $this->belongsToMany(Certificate::class, 'certificate_student');
+    }
 }

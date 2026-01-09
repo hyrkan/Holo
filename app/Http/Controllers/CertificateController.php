@@ -6,20 +6,44 @@ use App\Models\Event;
 use App\Models\Certificate;
 use App\Models\Student;
 use App\Models\CertificateSignatory;
+use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
-    public function edit(Event $event)
+    public function index(Event $event)
     {
-        $certificate = $event->certificate()->with('signatories')->first() ?? new Certificate();
+        $certificates = $event->certificates;
+        return view('admin.events.certificate.index', compact('event', 'certificates'));
+    }
+
+    public function create(Event $event)
+    {
+        $certificate = new Certificate();
         return view('admin.events.certificate.edit', compact('event', 'certificate'));
     }
 
-    public function update(Request $request, Event $event)
+    public function store(Request $request, Event $event)
+    {
+        return $this->save($request, $event, new Certificate());
+    }
+
+    public function edit(Event $event, Certificate $certificate)
+    {
+        $certificate->load('signatories');
+        return view('admin.events.certificate.edit', compact('event', 'certificate'));
+    }
+
+    public function update(Request $request, Event $event, Certificate $certificate)
+    {
+        return $this->save($request, $event, $certificate);
+    }
+
+    protected function save(Request $request, Event $event, Certificate $certificate)
     {
         $request->validate([
+            'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
             'sub_title' => 'required|string|max:255',
             'body' => 'required|string',
@@ -31,20 +55,19 @@ class CertificateController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $certData = $request->only([
-            'title', 'sub_title', 'body',
-        ]);
-        
-        $certData['is_active'] = $request->has('is_active');
+        $data = $request->only(['name', 'title', 'sub_title', 'body']);
+        $data['is_active'] = $request->has('is_active');
+        $data['event_id'] = $event->id;
 
         if ($request->hasFile('background_image')) {
-            if ($event->certificate && $event->certificate->background_image) {
-                Storage::disk('public')->delete($event->certificate->background_image);
+            if ($certificate->background_image) {
+                Storage::disk('public')->delete($certificate->background_image);
             }
-            $certData['background_image'] = $request->file('background_image')->store('certificates', 'public');
+            $data['background_image'] = $request->file('background_image')->store('certificates', 'public');
         }
 
-        $certificate = $event->certificate()->updateOrCreate(['event_id' => $event->id], $certData);
+        $certificate->fill($data);
+        $certificate->save();
 
         // Handle Signatories
         $existingSignatoryIds = $certificate->signatories()->pluck('id')->toArray();
@@ -64,7 +87,6 @@ class CertificateController extends Controller
                     $path = $file->store('signatures', 'public');
                     $updateData['signature_image'] = $path;
 
-                    // Delete old signature if updating
                     if ($signatoryId) {
                         $oldSignatory = CertificateSignatory::find($signatoryId);
                         if ($oldSignatory && $oldSignatory->signature_image) {
@@ -82,7 +104,6 @@ class CertificateController extends Controller
             }
         }
 
-        // Delete removed signatories
         $toDelete = array_diff($existingSignatoryIds, $submittedSignatoryIds);
         if (!empty($toDelete)) {
             $signatoriesToDelete = CertificateSignatory::whereIn('id', $toDelete)->get();
@@ -94,15 +115,29 @@ class CertificateController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.show', $event)->with('success', 'Certificate template updated successfully.');
+        return redirect()->route('admin.events.certificates.index', $event)->with('success', 'Certificate template saved successfully.');
     }
 
-    public function preview(Event $event)
+    public function destroy(Event $event, Certificate $certificate)
     {
-        $certificate = $event->certificate()->with('signatories')->first();
-        if (!$certificate) {
-            return back()->with('error', 'Certificate template not found.');
+        if ($certificate->background_image) {
+            Storage::disk('public')->delete($certificate->background_image);
         }
+        
+        foreach ($certificate->signatories as $sig) {
+            if ($sig->signature_image) {
+                Storage::disk('public')->delete($sig->signature_image);
+            }
+        }
+        
+        $certificate->delete();
+        return back()->with('success', 'Certificate deleted successfully.');
+    }
+
+    public function preview(Certificate $certificate)
+    {
+        $certificate->load('signatories');
+        $event = $certificate->event;
 
         $student = (object)[
             'full_name' => 'JUAN DELA CRUZ',
@@ -112,43 +147,48 @@ class CertificateController extends Controller
         return view('admin.events.certificate.preview', compact('event', 'certificate', 'student'));
     }
 
-    public function download(Event $event)
+    public function download(Certificate $certificate)
     {
-        // If student, check eligibility
+        $event = $certificate->event;
+        
         if (auth()->guard('student')->check()) {
             $student = auth()->guard('student')->user()->student;
             
-            // Check if student is eligible for certificate
-            $registration = \App\Models\EventRegistration::where('event_id', $event->id)
-                ->where('student_id', $student->id)
-                ->first();
+            // Check if student is awarded this specific certificate
+            $isEligible = $student->certificates()->where('certificate_id', $certificate->id)->exists();
 
-            if (!$registration || !$registration->is_eligible_for_certificate) {
-                return back()->with('error', 'You are not eligible for a certificate. Please contact the event administrator.');
+            if (!$isEligible) {
+                return back()->with('error', 'You are not eligible for this certificate.');
             }
         } else {
             return back()->with('error', 'Unauthorized.');
         }
 
-        $certificate = $event->certificate()->with('signatories')->first();
-        if (!$certificate || !$certificate->is_active) {
+        if (!$certificate->is_active) {
             return back()->with('error', 'Certificate is not yet available.');
         }
 
         return view('admin.events.certificate.preview', compact('event', 'certificate', 'student'));
     }
 
-    public function toggleEligibility(Request $request, Event $event, Student $student)
+    public function updateEligibility(Request $request, Event $event, Student $student)
     {
-        $registration = \App\Models\EventRegistration::where('event_id', $event->id)
-            ->where('student_id', $student->id)
-            ->firstOrFail();
+        $certificateIds = $request->input('certificate_ids', []);
+        
+        // Only consider certificates belonging to this event
+        $eventCertificateIds = $event->certificates()->pluck('id')->toArray();
+        $validCertificateIds = array_intersect($certificateIds, $eventCertificateIds);
+        
+        // Get student's current certificates NOT in this event
+        $otherEventCertificates = $student->certificates()
+            ->whereNotIn('certificate_id', $eventCertificateIds)
+            ->pluck('certificates.id')
+            ->toArray();
+            
+        // Sync the combination
+        $student->certificates()->sync(array_merge($otherEventCertificates, $validCertificateIds));
 
-        $registration->update([
-            'is_eligible_for_certificate' => !$registration->is_eligible_for_certificate
-        ]);
-
-        return back()->with('success', 'Participant eligibility updated.');
+        return response()->json(['success' => true]);
     }
 
     public function bulkEligibility(Request $request, Event $event)
@@ -156,14 +196,21 @@ class CertificateController extends Controller
         $request->validate([
             'student_ids' => 'required|array',
             'student_ids.*' => 'exists:students,id',
+            'certificate_ids' => 'nullable|array',
+            'certificate_ids.*' => 'exists:certificates,id',
             'action' => 'required|in:award,revoke'
         ]);
 
-        \App\Models\EventRegistration::where('event_id', $event->id)
-            ->whereIn('student_id', $request->student_ids)
-            ->update([
-                'is_eligible_for_certificate' => $request->action === 'award'
-            ]);
+        $students = Student::whereIn('id', $request->student_ids)->get();
+        $certificateIds = $request->input('certificate_ids', []);
+
+        foreach ($students as $student) {
+            if ($request->action === 'award') {
+                $student->certificates()->syncWithoutDetaching($certificateIds);
+            } else {
+                $student->certificates()->detach($certificateIds);
+            }
+        }
 
         return back()->with('success', 'Selected participants eligibility updated successfully.');
     }

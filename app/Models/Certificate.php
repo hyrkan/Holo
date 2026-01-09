@@ -17,4 +17,9 @@ class Certificate extends Model
     {
         return $this->hasMany(CertificateSignatory::class)->orderBy('order');
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'certificate_student');
+    }
 }

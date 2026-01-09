@@ -6,21 +6,30 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title">Manage Certificate: {{ $event->name }}</h5>
+                    <h5 class="card-title">{{ $certificate->id ? 'Edit' : 'Create' }} Certificate: {{ $event->name }}</h5>
                     <div class="card-header-action">
-                        <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-light">
-                            <i class="feather-arrow-left me-1"></i> Back to Event
+                        <a href="{{ route('admin.events.certificates.index', $event) }}" class="btn btn-sm btn-light">
+                            <i class="feather-arrow-left me-1"></i> Back to Certificates
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.events.certificate.update', $event) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ $certificate->id ? route('admin.events.certificates.update', [$event, $certificate]) : route('admin.events.certificates.store', $event) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-4">
-                                    <label for="title" class="form-label">Certificate Title <span class="text-danger">*</span></label>
+                                    <label for="name" class="form-label">Internal Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $certificate->name) }}" required placeholder="e.g. Participation Certificate">
+                                    <div class="form-text">This is used only for identification in the admin list.</div>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="title" class="form-label">Certificate Title (Display) <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $certificate->title ?? 'CERTIFICATE OF PARTICIPATION') }}" required>
                                     <div class="form-text">Example: CERTIFICATE OF RECOGNITION, CERTIFICATE OF ATTENDANCE</div>
                                     @error('title')
@@ -81,7 +90,7 @@
 
                         <div id="signatories-container" class="row">
                             @php
-                                $signatories = old('signatories', $certificate->signatories->toArray() ?? []);
+                                $signatories = old('signatories', $certificate->signatories ? $certificate->signatories->toArray() : []);
                             @endphp
                             
                             @forelse($signatories as $index => $signatory)
@@ -106,7 +115,7 @@
 
                                             <div class="mb-0">
                                                 <label class="form-label small fw-bold">Signature Image</label>
-                                                @if(isset($signatory['signature_image']))
+                                                @if(isset($signatory['signature_image']) && !is_object($signatory['signature_image']))
                                                     <div class="mb-2 text-center bg-light p-2 rounded">
                                                         <img src="{{ asset('storage/' . $signatory['signature_image']) }}" alt="Signature" style="max-height: 40px;">
                                                     </div>
@@ -126,7 +135,7 @@
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             @if($certificate->id)
-                                <a href="{{ route('admin.events.certificate.preview', $event) }}" target="_blank" class="btn btn-info">
+                                <a href="{{ route('admin.events.certificate.preview', $certificate) }}" target="_blank" class="btn btn-info">
                                     <i class="feather-eye me-1"></i> Preview Template
                                 </a>
                             @endif
@@ -150,7 +159,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let signatoryCount = {{ count($signatories) }};
 
     addButton.addEventListener('click', function() {
-        if (noMsg) noMsg.remove();
+        const currentNoMsg = container.querySelector('.no-signatories-msg');
+        if (currentNoMsg) currentNoMsg.remove();
         
         const index = signatoryCount++;
         const html = `

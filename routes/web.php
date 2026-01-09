@@ -82,10 +82,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
         Route::get('/events/{event}/attendance', [\App\Http\Controllers\EventController::class, 'attendance'])->name('events.attendance')->middleware('role:admin');
-        Route::get('/events/{event}/certificate', [\App\Http\Controllers\CertificateController::class, 'edit'])->name('events.certificate.edit')->middleware('role:admin');
-        Route::post('/events/{event}/certificate', [\App\Http\Controllers\CertificateController::class, 'update'])->name('events.certificate.update')->middleware('role:admin');
-        Route::get('/events/{event}/certificate/preview', [\App\Http\Controllers\CertificateController::class, 'preview'])->name('events.certificate.preview')->middleware('role:admin');
-        Route::post('/events/{event}/certificate/toggle/{student}', [\App\Http\Controllers\CertificateController::class, 'toggleEligibility'])->name('events.certificate.toggle')->middleware('role:admin');
+        Route::get('/events/{event}/certificates', [\App\Http\Controllers\CertificateController::class, 'index'])->name('events.certificates.index')->middleware('role:admin');
+        Route::get('/events/{event}/certificates/create', [\App\Http\Controllers\CertificateController::class, 'create'])->name('events.certificates.create')->middleware('role:admin');
+        Route::post('/events/{event}/certificates/store', [\App\Http\Controllers\CertificateController::class, 'store'])->name('events.certificates.store')->middleware('role:admin');
+        Route::get('/events/{event}/certificates/{certificate}/edit', [\App\Http\Controllers\CertificateController::class, 'edit'])->name('events.certificates.edit')->middleware('role:admin');
+        Route::post('/events/{event}/certificates/{certificate}/update', [\App\Http\Controllers\CertificateController::class, 'update'])->name('events.certificates.update')->middleware('role:admin');
+        Route::delete('/events/{event}/certificates/{certificate}', [\App\Http\Controllers\CertificateController::class, 'destroy'])->name('events.certificates.destroy')->middleware('role:admin');
+        Route::get('/certificates/{certificate}/preview', [\App\Http\Controllers\CertificateController::class, 'preview'])->name('events.certificate.preview')->middleware('role:admin');
+        Route::post('/events/{event}/certificate/update-eligibility/{student}', [\App\Http\Controllers\CertificateController::class, 'updateEligibility'])->name('events.certificate.update-eligibility')->middleware('role:admin');
         Route::post('/events/{event}/certificate/bulk', [\App\Http\Controllers\CertificateController::class, 'bulkEligibility'])->name('events.certificate.bulk')->middleware('role:admin');
         Route::get('/speakers/{speaker}/events', [\App\Http\Controllers\SpeakerController::class, 'events'])->name('speakers.events')->middleware('role:admin');
         Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
@@ -123,6 +127,6 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
         Route::get('/events/joined', [\App\Http\Controllers\StudentController::class, 'joinedEvents'])->name('events.joined');
-        Route::get('/events/{event}/certificate/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
+        Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
     });
 });
