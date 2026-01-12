@@ -92,7 +92,7 @@
                                     </ul>
                                     <h2>{{ $event->name }}</h2>
                                     <p>{{ $event->description }}</p>
-                                    <a href="#" class="btn mt-20">Read More</a>
+
                                     
                                     @if(Auth::guard('student')->check())
                                     @php 

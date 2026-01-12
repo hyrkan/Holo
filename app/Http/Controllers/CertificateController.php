@@ -164,10 +164,6 @@ class CertificateController extends Controller
             return back()->with('error', 'Unauthorized.');
         }
 
-        if (!$certificate->is_active) {
-            return back()->with('error', 'Certificate is not yet available.');
-        }
-
         return view('admin.events.certificate.preview', compact('event', 'certificate', 'student'));
     }
 

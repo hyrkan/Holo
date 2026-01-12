@@ -81,12 +81,17 @@ class StudentController extends Controller
     {
         $user = Auth::guard('student')->user();
         $student = $user->student;
+        
+        // Load events with their specific data
         $events = $student->events()
             ->with(['eventDates', 'speakers', 'certificates'])
             ->latest('event_registrations.created_at')
             ->paginate(10);
+            
+        // Eager load awarded certificates for this student and these specific events
+        $awardedCertificateIds = $student->certificates()->pluck('certificates.id')->toArray();
 
-        return view('student.events.joined', compact('events'));
+        return view('student.events.joined', compact('events', 'awardedCertificateIds'));
     }
 
     /**

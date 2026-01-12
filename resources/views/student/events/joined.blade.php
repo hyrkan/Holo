@@ -54,34 +54,19 @@
                                         </td>
                                         <td class="text-end">
                                             @php
-                                                $student = auth()->guard('student')->user()->student;
-                                                $awardedCerts = $student->certificates()
-                                                    ->where('certificates.event_id', $event->id)
-                                                    ->where('certificates.is_active', true)
-                                                    ->get();
+                                                $awardedCerts = $event->certificates->filter(function($cert) use ($awardedCertificateIds) {
+                                                    return in_array($cert->id, $awardedCertificateIds);
+                                                });
                                             @endphp
                                             
                                             @if($awardedCerts->count() > 0)
-                                                @if($awardedCerts->count() == 1)
-                                                    <a href="{{ route('student.events.certificate.download', $awardedCerts->first()) }}" target="_blank" class="btn btn-sm btn-info">
-                                                        <i class="feather-download me-1"></i> {{ $awardedCerts->first()->name }}
-                                                    </a>
-                                                @else
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                            <i class="feather-download me-1"></i> Certificates
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            @foreach($awardedCerts as $awardedCert)
-                                                                <li>
-                                                                    <a class="dropdown-item" href="{{ route('student.events.certificate.download', $awardedCert) }}" target="_blank">
-                                                                        <i class="feather-award me-2"></i> {{ $awardedCert->name }}
-                                                                    </a>
-                                                                </li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </div>
-                                                @endif
+                                                <div class="d-flex flex-column align-items-end gap-2">
+                                                    @foreach($awardedCerts as $awardedCert)
+                                                        <a href="{{ route('student.events.certificate.download', $awardedCert) }}" target="_blank" class="btn btn-sm btn-info w-100 text-nowrap">
+                                                            <i class="feather-download me-1"></i> Download {{ $awardedCert->name }}
+                                                        </a>
+                                                    @endforeach
+                                                </div>
                                             @else
                                                 <span class="text-muted small">Not Available</span>
                                             @endif
