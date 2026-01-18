@@ -48,6 +48,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Resources accessible by both admin and employee?
         // Based on seeder: employee can manage students.
         // Let's assume announcements and events are admin only for now.
+        Route::post('students/{student}/approve', [\App\Http\Controllers\StudentController::class, 'approve'])->name('students.approve');
+        Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');

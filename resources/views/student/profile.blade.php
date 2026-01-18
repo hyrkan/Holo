@@ -63,7 +63,8 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <label class="form-label">Program/Course</label>
-                                        <input type="text" name="program" class="form-control" required value="{{ old('program', $student->program) }}">
+                                        <input type="text" class="form-control bg-light" value="{{ $student->program ?? 'Not Assigned Yet' }}" readonly>
+                                        <small class="text-muted">Wait for admin to assign your program.</small>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Year Level</label>

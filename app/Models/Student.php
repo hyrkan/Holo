@@ -15,14 +15,58 @@ class Student extends Model
         'middle_name',
         'program',
         'year_level',
+        'status',
+        'student_type',
+        'approved_at',
+        'expired_at',
     ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'expired_at' => 'datetime',
+    ];
+
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_DENIED = 'denied';
+    const STATUS_EXPIRED = 'expired';
+
+    const TYPE_REGULAR = 'regular';
+    const TYPE_GUEST = 'guest';
 
     protected static function boot()
     {
         parent::boot();
         static::creating(function ($student) {
             $student->uuid = (string) \Illuminate\Support\Str::uuid();
+            if (!$student->status) {
+                $student->status = self::STATUS_PENDING;
+            }
         });
+    }
+
+    public function isApproved()
+    {
+        return $this->status === self::STATUS_APPROVED;
+    }
+
+    public function isExpired()
+    {
+        if ($this->status === self::STATUS_EXPIRED) {
+            return true;
+        }
+
+        if ($this->student_type === self::TYPE_GUEST && $this->expired_at && $this->expired_at->isPast()) {
+            $this->update(['status' => self::STATUS_EXPIRED]);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', self::STATUS_APPROVED);
     }
 
     public function getFullNameAttribute()

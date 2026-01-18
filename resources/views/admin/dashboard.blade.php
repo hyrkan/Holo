@@ -54,5 +54,8 @@
 @endsection
 
 @push('scripts')
-{{-- Add page-specific scripts here --}}
+    <script src="{{ asset('assets/vendors/js/daterangepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/js/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/js/circle-progress.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/dashboard-init.min.js') }}"></script> --}}
 @endpush

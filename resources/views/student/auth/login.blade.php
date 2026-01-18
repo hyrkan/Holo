@@ -31,6 +31,11 @@
                         <h2 class="fs-20 fw-bolder mb-4">Holo Board</h2>
                         <h4 class="fs-13 fw-bold mb-2">Welcome to your Portal</h4>
                         <p class="fs-12 fw-medium text-muted">Enter your credentials to access the student dashboard.</p>
+                        @if (session('success'))
+                            <div class="alert alert-success mt-3 fs-12">
+                                {{ session('success') }}
+                            </div>
+                        @endif
                         @if ($errors->any())
                             <div class="alert alert-danger mt-3">
                                 <ul class="mb-0 ps-3">

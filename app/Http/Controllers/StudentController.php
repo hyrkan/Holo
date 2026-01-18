@@ -9,18 +9,57 @@ use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StudentStatusMail;
 use Illuminate\Validation\Rules\Password;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
         // For admin usage to list students
-        $students = Student::with('user')->latest()->paginate(10);
+        $query = Student::with('user');
+
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $students = $query->latest()->paginate(10);
         return view('admin.students.index', compact('students'));
+    }
+
+    public function approve(Request $request, Student $student)
+    {
+        $request->validate([
+            'program' => ['required', 'string', 'max:255'],
+            'year_level' => ['required', 'string', 'max:255'],
+        ]);
+
+        $student->update([
+            'program' => $request->program,
+            'year_level' => $request->year_level,
+            'status' => Student::STATUS_APPROVED,
+            'approved_at' => now(),
+        ]);
+
+        Mail::to($student->user->email)->send(new StudentStatusMail($student, Student::STATUS_APPROVED));
+
+        return back()->with('success', "Student {$student->full_name} has been approved and assigned to {$student->program}.");
+    }
+
+    public function deny(Request $request, Student $student)
+    {
+        $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $student->update([
+            'status' => Student::STATUS_DENIED,
+        ]);
+
+        Mail::to($student->user->email)->send(new StudentStatusMail($student, Student::STATUS_DENIED, $request->reason));
+
+        return back()->with('success', "Student {$student->full_name} has been denied.");
     }
 
     public function dashboard()
@@ -102,7 +141,6 @@ class StudentController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
-            'program' => ['required', 'string', 'max:255'],
             'year_level' => ['required', 'string', 'max:255'],
         ]);
 
@@ -110,7 +148,6 @@ class StudentController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'middle_name' => $request->middle_name,
-            'program' => $request->program,
             'year_level' => $request->year_level,
         ]);
 

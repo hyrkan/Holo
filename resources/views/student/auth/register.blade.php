@@ -53,19 +53,12 @@
                             <div class="mb-4">
                                 <input type="text" name="student_number" class="form-control" placeholder="Student Number" value="{{ old('student_number') }}" required>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <input type="text" name="program" class="form-control" placeholder="Program (e.g. BSIT)" value="{{ old('program') }}" required>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <select name="year_level" class="form-control" required>
-                                        <option value="" disabled {{ old('year_level') ? '' : 'selected' }}>Select Year Level</option>
-                                        <option value="1st Year" {{ old('year_level') == '1st Year' ? 'selected' : '' }}>1st Year</option>
-                                        <option value="2nd Year" {{ old('year_level') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
-                                        <option value="3rd Year" {{ old('year_level') == '3rd Year' ? 'selected' : '' }}>3rd Year</option>
-                                        <option value="4th Year" {{ old('year_level') == '4th Year' ? 'selected' : '' }}>4th Year</option>
-                                    </select>
-                                </div>
+                            <div class="mb-4">
+                                <label class="form-label fs-12 fw-bold text-muted">Student Type</label>
+                                <select name="student_type" class="form-control" required>
+                                    <option value="regular" {{ old('student_type') == 'regular' ? 'selected' : '' }}>Regular</option>
+                                    <option value="guest" {{ old('student_type') == 'guest' ? 'selected' : '' }}>Guest</option>
+                                </select>
                             </div>
                             <div class="mb-4">
                                 <input type="email" name="email" class="form-control" placeholder="Email Address" value="{{ old('email') }}" required>

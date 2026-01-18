@@ -14,7 +14,30 @@
                             {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
                         </div>
                         <h4 class="fw-bold mb-1">{{ $student->first_name }} {{ $student->last_name }}</h4>
-                        <p class="text-muted small mb-0">{{ $student->student_number }}</p>
+                        <p class="text-muted small mb-2">{{ $student->student_number }}</p>
+                        <div class="mb-3">
+                            <span class="badge bg-soft-info text-info me-1">{{ ucfirst($student->student_type) }}</span>
+                            @if($student->status === 'pending')
+                                <span class="badge bg-soft-warning text-warning">Pending Approval</span>
+                            @elseif($student->status === 'approved')
+                                <span class="badge bg-soft-success text-success">Approved</span>
+                            @elseif($student->status === 'denied')
+                                <span class="badge bg-soft-danger text-danger">Denied</span>
+                            @elseif($student->status === 'expired')
+                                <span class="badge bg-soft-secondary text-secondary">Expired</span>
+                            @endif
+                        </div>
+
+                        @if($student->status === 'pending')
+                            <div class="d-flex justify-content-center gap-2 mb-4">
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                                    Approve Account
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#denyModal">
+                                    Deny Registration
+                                </button>
+                            </div>
+                        @endif
                     </div>
                     
                     <div class="mb-4">
@@ -134,5 +157,73 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
+
+@endsection
+
+@section('modals')
+@if($student->status === 'pending')
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('admin.students.approve', $student) }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="approveModalLabel">Approve Student</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <p>Assign a program and year level for <strong>{{ $student->full_name }}</strong>:</p>
+                        <div class="mb-3">
+                            <label class="form-label">Program</label>
+                            <input type="text" name="program" class="form-control" placeholder="e.g. BSIT" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Year Level</label>
+                            <select name="year_level" class="form-control" required>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                                <option value="N/A">N/A</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Approve & Assign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deny Modal -->
+    <div class="modal fade" id="denyModal" tabindex="-1" aria-labelledby="denyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('admin.students.deny', $student) }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="denyModalLabel">Deny Registration</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <p>Are you sure you want to deny <strong>{{ $student->full_name }}</strong>?</p>
+                        <div class="mb-3">
+                            <label class="form-label">Reason (Optional)</label>
+                            <textarea name="reason" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Confirm Deny</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endif
 @endsection

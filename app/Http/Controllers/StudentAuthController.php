@@ -30,6 +30,36 @@ class StudentAuthController extends Controller
                 ])->onlyInput('email');
             }
 
+            $student = $user->student;
+
+            if (!$student) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'Student record not found.',
+                ])->onlyInput('email');
+            }
+
+            if ($student->isExpired()) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'Your guest account has expired.',
+                ])->onlyInput('email');
+            }
+
+            if ($student->status === \App\Models\Student::STATUS_DENIED) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'Your account registration has been denied.',
+                ])->onlyInput('email');
+            }
+
+            if ($student->status === \App\Models\Student::STATUS_PENDING) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'Your account is pending approval by the admin.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('student.dashboard'));
         }
@@ -50,8 +80,7 @@ class StudentAuthController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'student_number' => ['required', 'string', 'max:255', 'unique:students'],
-            'program' => ['required', 'string', 'max:255'],
-            'year_level' => ['required', 'string', 'max:255'],
+            'student_type' => ['required', 'string', 'in:regular,guest'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -63,17 +92,21 @@ class StudentAuthController extends Controller
 
         $user->assignRole('student');
 
+        $expiredAt = null;
+        if ($request->student_type === \App\Models\Student::TYPE_GUEST) {
+            $expiredAt = now()->addDays(30);
+        }
+
         $user->student()->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'student_number' => $request->student_number,
-            'program' => $request->program,
-            'year_level' => $request->year_level,
+            'student_type' => $request->student_type,
+            'status' => \App\Models\Student::STATUS_PENDING,
+            'expired_at' => $expiredAt,
         ]);
 
-        Auth::guard('student')->login($user);
-
-        return redirect()->route('student.dashboard');
+        return redirect()->route('student.login')->with('success', 'Registration successful! Your account is pending approval by the admin.');
     }
 
     public function logout(Request $request)
