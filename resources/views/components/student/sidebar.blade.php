@@ -19,12 +19,6 @@
                         <span class="nxl-mtext">Dashboard</span>
                     </a>
                 </li>
-                <li class="nxl-item">
-                    <a href="{{ url('/') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-home"></i></span>
-                        <span class="nxl-mtext">Browse Events</span>
-                    </a>
-                </li>
                 <li class="nxl-item {{ Request::routeIs('student.events.joined') ? 'active' : '' }}">
                     <a href="{{ route('student.events.joined') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-check-square"></i></span>
@@ -35,6 +29,13 @@
                     <a href="{{ route('student.profile') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-user"></i></span>
                         <span class="nxl-mtext">My Profile</span>
+                    </a>
+                </li>
+
+                <li class="nxl-item {{ Request::is('student/lost-and-found*') || Request::is('lost-and-found*') ? 'active' : '' }}">
+                    <a href="{{ route('lost-and-found.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-search"></i></span>
+                        <span class="nxl-mtext">Lost & Found</span>
                     </a>
                 </li>
                 

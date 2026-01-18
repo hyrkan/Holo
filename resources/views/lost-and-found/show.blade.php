@@ -1,8 +1,8 @@
-@extends('layouts.landing')
+@extends(Auth::guard('student')->check() ? 'layouts.student' : 'layouts.landing')
 
 @section('content')
 
-<section class="pt-120 pb-120">
+<section class="{{ Auth::guard('student')->check() ? 'p-4' : 'pt-120 pb-120' }}">
     <div class="container">
         <div class="row">
             <div class="col-lg-6">
@@ -18,16 +18,16 @@
                     <h2 class="mb-20">{{ $lostAndFound->item_name }}</h2>
                     
                     <div class="info-list mb-30">
-                        <p><strong><i class="far fa-calendar-alt mr-10"></i> Reported Date:</strong> {{ $lostAndFound->date_reported->format('M d, Y') }}</p>
-                        <p><strong><i class="fas fa-map-marker-alt mr-10"></i> Location:</strong> {{ $lostAndFound->location }}</p>
+                        <p><strong><i class="{{ Auth::guard('student')->check() ? 'feather-calendar me-2' : 'far fa-calendar-alt mr-10' }}"></i> Reported Date:</strong> {{ $lostAndFound->date_reported->format('M d, Y') }}</p>
+                        <p><strong><i class="{{ Auth::guard('student')->check() ? 'feather-map-pin me-2' : 'fas fa-map-marker-alt mr-10' }}"></i> Location:</strong> {{ $lostAndFound->location }}</p>
                         @php
                             $displayName = $lostAndFound->is_anonymous ? 'Anonymous' : ($lostAndFound->reporter_name ?: ($lostAndFound->user ? $lostAndFound->user->name : ''));
                         @endphp
                         @if($displayName)
-                            <p><strong><i class="fas fa-user mr-10"></i> Reported By:</strong> {{ $displayName }}</p>
+                            <p><strong><i class="{{ Auth::guard('student')->check() ? 'feather-user me-2' : 'fas fa-user mr-10' }}"></i> Reported By:</strong> {{ $displayName }}</p>
                         @endif
                         @if($lostAndFound->owner_name)
-                            <p><strong><i class="fas fa-id-badge mr-10"></i> Owner:</strong> {{ $lostAndFound->owner_name }}</p>
+                            <p><strong><i class="{{ Auth::guard('student')->check() ? 'feather-tag me-2' : 'fas fa-id-badge mr-10' }}"></i> Owner:</strong> {{ $lostAndFound->owner_name }}</p>
                         @endif
                     </div>
 

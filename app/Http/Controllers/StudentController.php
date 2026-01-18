@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Event;
+use App\Models\Announcement;
+use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +21,63 @@ class StudentController extends Controller
         // For admin usage to list students
         $students = Student::with('user')->latest()->paginate(10);
         return view('admin.students.index', compact('students'));
+    }
+
+    public function dashboard()
+    {
+        $user = Auth::guard('student')->user();
+        $student = $user->student;
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        // Fetch events relevant to the student (similar to landing page logic)
+        $events = Event::with(['speakers', 'eventDates'])
+            ->latest()
+            ->get()
+            ->filter(function ($event) use ($currentMonth, $currentYear, $student) {
+                $onThisMonth = $event->eventDates->contains(function ($eventDate) use ($currentMonth, $currentYear) {
+                    $carbonDate = \Carbon\Carbon::parse($eventDate->date);
+                    return $carbonDate->month == $currentMonth && $carbonDate->year == $currentYear;
+                });
+
+                if (!$onThisMonth) return false;
+
+                $departments = $event->departments ?? ['All'];
+                if (in_array('All', $departments)) return true;
+
+                return in_array($student->program, $departments);
+            });
+
+        $announcements = Announcement::whereYear('start_date', $currentYear)
+            ->whereMonth('start_date', $currentMonth)
+            ->where('is_active', true)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $lostAndFoundItems = LostAndFound::where('status', 'active')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $analytics = [
+            'total_events_joined' => $student->events()->count(),
+            'total_attendances' => $student->attendances()->count(),
+            'total_certificates' => $student->certificates()->count(),
+            'total_reports' => LostAndFound::where('user_id', $user->id)->count(),
+            'resolved_reports' => LostAndFound::where('user_id', $user->id)->where('status', 'resolved')->count(),
+        ];
+
+        return view('student.dashboard', compact('events', 'announcements', 'lostAndFoundItems', 'analytics'));
+    }
+
+    public function myLostAndFoundReports()
+    {
+        $items = LostAndFound::where('user_id', Auth::id())
+            ->latest()
+            ->paginate(10);
+        
+        return view('student.lost-and-found.my-reports', compact('items'));
     }
 
     /**

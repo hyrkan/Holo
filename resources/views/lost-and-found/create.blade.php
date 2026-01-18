@@ -1,8 +1,8 @@
-@extends('layouts.landing')
+@extends(Auth::guard('student')->check() ? 'layouts.student' : 'layouts.landing')
 
 @section('content')
 
-<section class="pt-120 pb-120">
+<section class="{{ Auth::guard('student')->check() ? 'p-4' : 'pt-120 pb-120' }}">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">

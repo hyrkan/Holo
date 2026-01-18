@@ -9,44 +9,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $currentMonth = now()->month;
-    $currentYear = now()->year;
+    if (Auth::guard('student')->check()) {
+        return redirect()->route('student.dashboard');
+    }
 
-    $events = \App\Models\Event::with(['speakers', 'eventDates'])->latest()->get()->filter(function ($event) use ($currentMonth, $currentYear) {
-        // Date filter
-        $onThisMonth = $event->eventDates->contains(function ($eventDate) use ($currentMonth, $currentYear) {
-            $carbonDate = \Carbon\Carbon::parse($eventDate->date);
-
-            return $carbonDate->month == $currentMonth && $carbonDate->year == $currentYear;
-        });
-
-        if (! $onThisMonth) {
-            return false;
-        }
-
-        // Department filter for logged-in students
-        if (Auth::guard('student')->check()) {
-            $student = Auth::guard('student')->user()->student;
-            $departments = $event->departments ?? ['All'];
-
-            if (in_array('All', $departments)) {
-                return true;
-            }
-
-            return in_array($student->program, $departments);
-        }
-
-        return true;
-    });
-
-    $announcements = \App\Models\Announcement::whereYear('start_date', $currentYear)
-        ->whereMonth('start_date', $currentMonth)
-        ->where('is_active', true)
-        ->where('is_draft', false)
-        ->latest()
-        ->get();
-
-    return view('welcome', compact('events', 'announcements'));
+    return redirect()->route('student.login');
 });
 
 Route::post('/student/events/{event}/join', [\App\Http\Controllers\EventController::class, 'join'])
@@ -59,6 +26,10 @@ Route::get('/dashboard', function () {
 
 // Lost and Found Routes
 Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'index'])->name('lost-and-found.index');
+Route::get('/lost-and-found/create', function () {
+    return view('lost-and-found.create');
+})->name('lost-and-found.create');
+Route::post('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.store');
 Route::get('/lost-and-found/{lostAndFound}', [\App\Http\Controllers\LostAndFoundController::class, 'show'])->name('lost-and-found.show');
 
 // Admin Routes
@@ -121,15 +92,14 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::post('/register', [\App\Http\Controllers\StudentAuthController::class, 'store'])->name('register.post');
     Route::post('/logout', [\App\Http\Controllers\StudentAuthController::class, 'logout'])->name('logout');
 
-    Route::get('/dashboard', function () {
-        return view('student.dashboard');
-    })->middleware(['auth:student', 'role:student'])->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\StudentController::class, 'dashboard'])->middleware(['auth:student', 'role:student'])->name('dashboard');
 
     Route::middleware(['auth:student', 'role:student'])->group(function () {
         Route::get('/profile', [\App\Http\Controllers\StudentController::class, 'profile'])->name('profile');
         Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
         Route::get('/events/joined', [\App\Http\Controllers\StudentController::class, 'joinedEvents'])->name('events.joined');
+        Route::get('/lost-and-found/my-reports', [\App\Http\Controllers\StudentController::class, 'myLostAndFoundReports'])->name('lost-and-found.my-reports');
         Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
     });
 });

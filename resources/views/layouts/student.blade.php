@@ -14,8 +14,30 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('landing/fontawesome') }}/css/all.min.css">
     
     @stack('styles')
+    <style>
+        .custom-tabs-pill .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            background: #f8fafc;
+            margin-right: 10px;
+        }
+        .custom-tabs-pill .nav-link:hover {
+            background: #f1f5f9;
+            color: #4700c8;
+        }
+        .custom-tabs-pill .nav-link.active {
+            background: #4700c8 !important;
+            color: #fff !important;
+            box-shadow: 0 4px 6px -1px rgba(71, 0, 200, 0.2);
+        }
+    </style>
 </head>
 
 <body>

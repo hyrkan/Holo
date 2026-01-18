@@ -1,9 +1,9 @@
-@extends('layouts.landing')
+@extends(Auth::guard('student')->check() ? 'layouts.student' : 'layouts.landing')
 
 @section('content')
 
 <!-- lost-and-found-area -->
-<section id="lost-and-found" class="pt-120 pb-120">
+<section id="lost-and-found" class="{{ Auth::guard('student')->check() ? 'p-4' : 'pt-120 pb-120' }}">
     <div class="container">
         <div class="row mb-50">
             <div class="col-lg-12">
@@ -47,8 +47,8 @@
                         <div class="blog-content" style="padding: 20px;">
                             <div class="b-meta mb-15">
                                 <ul style="display: flex; gap: 15px; list-style: none; padding: 0; margin: 0; font-size: 13px; color: #666;">
-                                    <li><i class="far fa-calendar-alt"></i> {{ $item->date_reported->format('M d, Y') }}</li>
-                                    <li><i class="fas fa-map-marker-alt"></i> {{ $item->location }}</li>
+                                    <li><i class="{{ Auth::guard('student')->check() ? 'feather-calendar me-1' : 'far fa-calendar-alt' }}"></i> {{ $item->date_reported->format('M d, Y') }}</li>
+                                    <li><i class="{{ Auth::guard('student')->check() ? 'feather-map-pin me-1' : 'fas fa-map-marker-alt' }}"></i> {{ $item->location }}</li>
                                 </ul>
                             </div>
                             <h4 style="margin-bottom: 15px; min-height: 50px;">
@@ -66,7 +66,7 @@
                                     @endif
                                 </span>
                                 @if($item->contact_info)
-                                    <span style="font-size: 12px; color: #4700c8;"><i class="fas fa-phone"></i> Contact provided</span>
+                                    <span style="font-size: 12px; color: #4700c8;"><i class="{{ Auth::guard('student')->check() ? 'feather-phone me-1' : 'fas fa-phone' }}"></i> Contact provided</span>
                                 @endif
                             </div>
                         </div>
@@ -75,7 +75,7 @@
             @empty
                 <div class="col-12 text-center py-5">
                     <div class="mb-30">
-                        <i class="fas fa-search fa-4x text-muted"></i>
+                        <i class="{{ Auth::guard('student')->check() ? 'feather-search' : 'fas fa-search' }} fa-4x text-muted"></i>
                     </div>
                     <h3>No items found</h3>
                     <p>There are no {{ $type !== 'all' ? $type : '' }} items reported at the moment.</p>
@@ -99,7 +99,7 @@
             <div class="col-lg-3 col-md-6 mb-30">
                 <div class="resolved-item text-center p-20" style="border: 1px dashed #28a745; border-radius: 10px; opacity: 0.8;">
                     <div class="icon mb-15">
-                        <i class="fas fa-check-circle" style="color: #28a745; font-size: 30px;"></i>
+                        <i class="{{ Auth::guard('student')->check() ? 'feather-check-circle' : 'fas fa-check-circle' }}" style="color: #28a745; font-size: 30px;"></i>
                     </div>
                     <h5 class="mb-10 text-success">{{ $resolved->item_name }}</h5>
                     <p class="small mb-0 text-muted">Reunited on {{ $resolved->resolved_at->format('M d') }}</p>
