@@ -41,9 +41,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
     Route::middleware(['auth', 'role:admin|employee'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Resources accessible by both admin and employee?
         // Based on seeder: employee can manage students.
