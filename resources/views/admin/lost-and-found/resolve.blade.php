@@ -37,11 +37,13 @@
                             @error('matched_item_id') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
 
+
+
                         <div class="mb-4">
-                            <label class="form-label" for="identity_proof_ref">Identity Verification Reference <span class="text-danger">*</span></label>
-                            <input type="text" name="identity_proof_ref" id="identity_proof_ref" class="form-control" placeholder="e.g. Student ID No, Driver's License Description" required>
-                            <div class="form-text">Reference or description of the identification presented by the claimant.</div>
-                            @error('identity_proof_ref') <span class="text-danger small">{{ $message }}</span> @enderror
+                            <label class="form-label" for="returned_by_name">Returned By / Claimed By Name</label>
+                            <input type="text" name="returned_by_name" id="returned_by_name" class="form-control" placeholder="Who is receiving/returning this item?">
+                            <div class="form-text">The name of the person who found and returned the item, or the owner who claimed it.</div>
+                            @error('returned_by_name') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-4">

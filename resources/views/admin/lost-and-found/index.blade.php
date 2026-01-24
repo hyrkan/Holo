@@ -76,6 +76,11 @@
                                         <span class="badge bg-{{ $item->status == 'active' ? 'warning' : 'primary' }}">
                                             {{ ucfirst($item->status) }}
                                         </span>
+                                        @if(strtolower($item->status) == 'resolved' && $item->returned_by_name)
+                                            <div class="mt-1 small text-success fw-bold">
+                                                <i class="feather-user"></i> {{ $item->returned_by_name }}
+                                            </div>
+                                        @endif
                                         @if($item->matched_item_id)
                                             <div class="mt-1">
                                                 <span class="badge bg-info-subtle text-info small" title="Matched with report #{{ $item->matched_item_id }}">
@@ -92,10 +97,21 @@
                                                     <i class="feather-check-circle"></i> Resolve
                                                 </a>
                                             @else
-                                                <button class="btn btn-sm btn-soft-success" title="Resolved" disabled>
-                                                    <i class="feather-check"></i> Resolved
-                                                </button>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-soft-success" title="Resolved" disabled>
+                                                        <i class="feather-check"></i> Resolved
+                                                    </button>
+                                                    @if($item->handover_image_path)
+                                                        <a href="{{ asset('storage/' . $item->handover_image_path) }}" target="_blank" class="btn btn-sm btn-soft-success" title="View Handover Proof">
+                                                            <i class="feather-image"></i> Proof
+                                                        </a>
+                                                    @endif
+                                                </div>
                                             @endif
+
+                                            <a href="{{ route('admin.lost-and-found.show', $item) }}" class="btn btn-sm btn-soft-info" title="View Details">
+                                                <i class="feather-eye"></i> View
+                                            </a>
                                             
                                             <form action="{{ route('admin.lost-and-found.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this report?')">
                                                 @csrf

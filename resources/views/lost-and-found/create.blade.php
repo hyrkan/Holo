@@ -32,7 +32,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="contact-field p-relative c-name mb-20">                                    
-                                            <input type="text" name="reporter_name" placeholder="Reporter Name (Optional)" value="{{ old('reporter_name') }}">
+                                            <input type="text" name="reporter_name" placeholder="Reporter Name *" required value="{{ old('reporter_name') }}">
                                             @error('reporter_name') <span class="text-danger small">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
@@ -76,9 +76,9 @@
 
                             <div class="col-lg-12">
                                 <div class="contact-field p-relative c-subject mb-30">
-                                    <label class="mb-10 d-block">Contact Information</label>
-                                    <input type="text" name="contact_info" placeholder="Email or Phone Number" value="{{ old('contact_info') }}">
-                                    <small class="text-muted">How can people reach you regarding this item?</small>
+                                    <label class="mb-10 d-block">Reporter Email *</label>
+                                    <input type="email" name="contact_info" placeholder="e.g. reporter@example.com" required value="{{ old('contact_info') }}">
+                                    <small class="text-muted">We will use this email to notify you if the item is found/returned.</small>
                                     @error('contact_info') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>

@@ -17,8 +17,8 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-4">
-                                <label class="form-label" for="reporter_name">Reporter Name (Optional)</label>
-                                <input type="text" name="reporter_name" id="reporter_name" class="form-control" placeholder="Who is reporting this?" value="{{ old('reporter_name') }}">
+                                <label class="form-label" for="reporter_name">Reporter Name <span class="text-danger">*</span></label>
+                                <input type="text" name="reporter_name" id="reporter_name" class="form-control" placeholder="Who is reporting this?" required value="{{ old('reporter_name') }}">
                                 @error('reporter_name') <span class="text-danger small">{{ $message }}</span> @enderror
                             </div>
                             <div class="col-md-6 mb-4">
@@ -54,9 +54,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label" for="contact_info">Contact Information (Optional)</label>
-                            <input type="text" name="contact_info" id="contact_info" class="form-control" placeholder="Email or Phone Number" value="{{ old('contact_info') }}">
-                            <div class="form-text">How people can contact you regarding this report.</div>
+                            <label class="form-label" for="contact_info">Reporter Email <span class="text-danger">*</span></label>
+                            <input type="email" name="contact_info" id="contact_info" class="form-control" placeholder="e.g. reporter@example.com" required value="{{ old('contact_info') }}">
+                            <div class="form-text">We will use this email to notify you if the item is found/returned.</div>
                             @error('contact_info') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
 

@@ -6,6 +6,8 @@ use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LostAndFoundResolvedMail;
 
 class LostAndFoundController extends Controller
 {
@@ -41,6 +43,12 @@ class LostAndFoundController extends Controller
         return view('lost-and-found.show', compact('lostAndFound'));
     }
 
+    public function adminShow(LostAndFound $lost_and_found)
+    {
+        $lost_and_found->load(['user', 'resolver', 'matchedItem']);
+        return view('admin.lost-and-found.show', compact('lost_and_found'));
+    }
+
     /**
      * Admin view to manage reports
      */
@@ -72,9 +80,9 @@ class LostAndFoundController extends Controller
             'location' => 'required|string|max:255',
             'type' => 'required|in:lost,found',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'contact_info' => 'nullable|string|max:255',
+            'contact_info' => 'required|email|max:255',
             'is_anonymous' => 'boolean',
-            'reporter_name' => 'nullable|string|max:255',
+            'reporter_name' => 'required|string|max:255',
             'owner_name' => 'nullable|string|max:255',
         ]);
 
@@ -83,8 +91,8 @@ class LostAndFoundController extends Controller
         }
 
         unset($validated['image']);
-        // Automatically tag as anonymous if no reporter name is provided
-        $validated['is_anonymous'] = $request->has('is_anonymous') || empty($validated['reporter_name']);
+        // Automatically tag as anonymous if requested
+        $validated['is_anonymous'] = $request->has('is_anonymous');
 
         $validated['user_id'] = Auth::id(); // Admin/Staff user
         $validated['status'] = 'active';
@@ -117,21 +125,32 @@ class LostAndFoundController extends Controller
     public function storeResolution(Request $request, LostAndFound $lost_and_found)
     {
         $validated = $request->validate([
-            'identity_proof_ref' => 'required|string|max:255',
             'handover_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'matched_item_id' => 'nullable|exists:lost_and_founds,id',
+            'returned_by_name' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('handover_image')) {
             $lost_and_found->handover_image_path = $request->file('handover_image')->store('handovers', 'public');
         }
 
-        $lost_and_found->identity_proof_ref = $validated['identity_proof_ref'];
         $lost_and_found->matched_item_id = $validated['matched_item_id'];
+        $lost_and_found->returned_by_name = $validated['returned_by_name'];
         $lost_and_found->status = 'resolved';
         $lost_and_found->resolved_at = now();
         $lost_and_found->resolved_by = Auth::id();
         $lost_and_found->save();
+
+        // Notify reporter if email is provided
+        $recipient = trim($lost_and_found->contact_info);
+        if ($recipient && filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($recipient)->send(new LostAndFoundResolvedMail($lost_and_found));
+            } catch (\Exception $e) {
+                // Log error or ignore if mail fails
+                \Log::error("Failed to send Lost and Found resolution email to {$recipient}: " . $e->getMessage());
+            }
+        }
 
         // If a matching report was selected, resolve it too
         if ($validated['matched_item_id']) {
@@ -143,6 +162,16 @@ class LostAndFoundController extends Controller
                 $matchedItem->matched_item_id = $lost_and_found->id; // Mutual link
                 $matchedItem->identity_proof_ref = 'Resolved via matched report #'.$lost_and_found->id;
                 $matchedItem->save();
+
+                // Notify reporter of the matched item too if email is provided
+                $matchedRecipient = trim($matchedItem->contact_info);
+                if ($matchedRecipient && filter_var($matchedRecipient, FILTER_VALIDATE_EMAIL)) {
+                    try {
+                        Mail::to($matchedRecipient)->send(new LostAndFoundResolvedMail($matchedItem));
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to send matched Lost and Found resolution email to {$matchedRecipient}: " . $e->getMessage());
+                    }
+                }
             }
         }
 
