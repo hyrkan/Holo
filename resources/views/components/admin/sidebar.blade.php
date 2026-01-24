@@ -14,12 +14,6 @@
                 <li class="nxl-item nxl-caption">
                     <label>Navigation</label>
                 </li>
-                <li class="nxl-item">
-                    <a href="{{ url('/') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-external-link"></i></span>
-                        <span class="nxl-mtext">View Site</span>
-                    </a>
-                </li>
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.dashboard') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-airplay"></i></span>
