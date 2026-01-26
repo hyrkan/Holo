@@ -77,9 +77,13 @@
                                                         </span>
                                                         @php 
                                                             $isJoined = $event->students()->where('student_id', Auth::guard('student')->user()->student->id)->exists();
+                                                            $lastDate = $event->eventDates->sortByDesc('date')->first();
+                                                            $isPast = $lastDate ? \Carbon\Carbon::parse($lastDate->date)->endOfDay()->isPast() : false;
                                                         @endphp
                                                         @if($isJoined)
                                                             <span class="badge bg-soft-success text-success">Joined</span>
+                                                        @elseif($isPast)
+                                                            <button type="button" class="btn btn-xs btn-secondary rounded-pill px-3" disabled>Ended</button>
                                                         @else
                                                             <form action="{{ route('student.events.join', $event) }}" method="POST">
                                                                 @csrf

@@ -1,4 +1,9 @@
 {{-- Student Header Component --}}
+@php
+    $student = Auth::guard('student')->user()->student;
+    $initials = strtoupper(substr($student->first_name ?? 'S', 0, 1) . substr($student->last_name ?? 'T', 0, 1));
+@endphp
+
 <header class="nxl-header">
     <div class="header-wrapper">
         <div class="header-left d-flex align-items-center gap-4">
@@ -23,12 +28,16 @@
             <div class="d-flex align-items-center">
                 <div class="dropdown nxl-h-item">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" role="button" data-bs-auto-close="outside">
-                        <img src="{{ asset('assets/images/avatar/1.png') }}" alt="user-image" class="img-fluid user-avtar me-0" />
+                        <div class="avatar-text user-avtar me-0 bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold">
+                            {{ $initials }}
+                        </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-user-dropdown">
                         <div class="dropdown-header">
                             <div class="d-flex align-items-center">
-                                <img src="{{ asset('assets/images/avatar/1.png') }}" alt="user-image" class="img-fluid user-avtar" />
+                                <div class="avatar-text user-avtar bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold me-3">
+                                    {{ $initials }}
+                                </div>
                                 <div>
                                     <h6 class="text-dark mb-0">{{ Auth::guard('student')->user()->student->first_name ?? 'Student' }}</h6>
                                     <span class="fs-12 fw-medium text-muted">{{ Auth::guard('student')->user()->email }}</span>

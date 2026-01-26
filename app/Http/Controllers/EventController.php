@@ -171,6 +171,12 @@ class EventController extends Controller
             return back()->with('error', 'You are already registered for this event.');
         }
 
+        // Check if event is in the past
+        $lastDate = $event->eventDates->max('date');
+        if ($lastDate && \Carbon\Carbon::parse($lastDate)->endOfDay()->isPast()) {
+            return back()->with('error', 'This event has already ended.');
+        }
+
         // Check capacity
         if ($event->capacity && $event->students()->count() >= $event->capacity) {
             return back()->with('error', 'Event is full.');
