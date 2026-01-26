@@ -5,20 +5,33 @@
 @push('styles')
 <style>
     .attendance-cell {
-        width: 100px;
+        min-width: 150px;
         text-align: center;
         vertical-align: middle !important;
     }
+    .attendance-time {
+        font-size: 0.75rem;
+        display: block;
+        color: #6c757d;
+    }
+    .photo-preview {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .photo-preview:hover {
+        transform: scale(1.1);
+    }
     .present-box {
         color: #10b981;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     .absent-box {
         color: #ef4444;
         font-size: 1.2rem;
-    }
-    .table-responsive {
-        max-height: 70vh;
     }
     .sticky-col {
         position: sticky;
@@ -77,6 +90,7 @@
                                         <th class="attendance-cell">
                                             <div class="small fw-normal text-muted">{{ \Carbon\Carbon::parse($date->date)->format('D') }}</div>
                                             <div class="fw-bold">{{ \Carbon\Carbon::parse($date->date)->format('M d') }}</div>
+                                            <div class="small text-muted" style="font-size: 10px;">Clock In / Out</div>
                                         </th>
                                     @endforeach
                                     <th class="text-center fw-bold bg-soft-primary">Total</th>
@@ -100,13 +114,42 @@
                                         @foreach($dates as $date)
                                             <td class="attendance-cell">
                                                 @php
-                                                    $wasPresent = $student->attendances->where('event_date_id', $date->id)->first();
-                                                    if($wasPresent) $presentCount++;
+                                                    $attendance = $student->attendances->where('event_date_id', $date->id)->first();
+                                                    if($attendance) $presentCount++;
                                                 @endphp
-                                                @if($wasPresent)
-                                                    <span class="present-box" title="Scanned at: {{ \Carbon\Carbon::parse($wasPresent->scanned_at)->format('h:i A') }}">
-                                                        <i class="feather-check-circle"></i>
-                                                    </span>
+                                                @if($attendance)
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                                            @if($attendance->photo)
+                                                                <img src="{{ asset('storage/' . $attendance->photo) }}" 
+                                                                     class="photo-preview" 
+                                                                     alt="Student Photo"
+                                                                     onclick="showPhoto('{{ asset('storage/' . $attendance->photo) }}', '{{ $student->first_name }} {{ $student->last_name }}')"
+                                                                >
+                                                            @endif
+                                                            <span class="present-box" title="Recorded">
+                                                                <i class="feather-check-circle"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="attendance-time">
+                                                            @if($attendance->clock_in)
+                                                                <span class="badge bg-soft-success text-success p-1" style="font-size: 9px;">
+                                                                    IN: {{ $attendance->clock_in->format('h:i A') }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="attendance-time mt-1">
+                                                            @if($attendance->clock_out)
+                                                                <span class="badge bg-soft-info text-info p-1" style="font-size: 9px;">
+                                                                    OUT: {{ $attendance->clock_out->format('h:i A') }}
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-soft-secondary text-secondary p-1" style="font-size: 9px;">
+                                                                    OUT: --:--
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 @else
                                                     <span class="absent-box">
                                                         <i class="feather-x-circle opacity-25"></i>
@@ -134,3 +177,27 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="photoModalTitle">Student Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" id="modalPhoto" class="img-fluid rounded shadow" alt="Attendance Photo">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPhoto(url, name) {
+    document.getElementById('modalPhoto').src = url;
+    document.getElementById('photoModalTitle').innerText = 'Clock-in Photo: ' + name;
+    new bootstrap.Modal(document.getElementById('photoModal')).show();
+}
+</script>
+@endpush

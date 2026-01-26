@@ -10,6 +10,8 @@ class Attendance extends Model
 
     protected $casts = [
         'scanned_at' => 'datetime',
+        'clock_in' => 'datetime',
+        'clock_out' => 'datetime',
     ];
 
     public function student()

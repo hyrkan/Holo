@@ -34,9 +34,19 @@ class AttendanceController extends Controller
         $request->validate([
             'student_uuid' => 'required|exists:students,uuid',
             'event_id' => 'required|exists:events,id',
+            'photo' => 'nullable|string', // Base64 image
         ]);
 
-        $student = Student::with('user')->where('uuid', $request->student_uuid)->firstOrFail();
+        $student = Student::with('user')->where('uuid', $request->student_uuid)->first();
+        
+        if (!$student) {
+            return response()->json([
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Student not found with this ID code.',
+            ], 200);
+        }
+
         $today = Carbon::today()->toDateString();
         
         // Response data for lookup
@@ -86,13 +96,73 @@ class AttendanceController extends Controller
             ->where('event_date_id', $eventDate->id)
             ->first();
 
+        // Handle Photo Upload
+        $photoPath = null;
+        if ($request->photo) {
+            $photoData = $request->photo;
+            $photoData = str_replace('data:image/jpeg;base64,', '', $photoData);
+            $photoData = str_replace(' ', '+', $photoData);
+            $photoName = 'attendance_' . time() . '_' . $student->id . '.jpg';
+            $photoPath = 'attendance/' . $photoName;
+            \Storage::disk('public')->put($photoPath, base64_decode($photoData));
+        }
+
         if ($attendance) {
+            // Case A: Missing Clock-in (e.g. from manual entry or old scan)
+            if (!$attendance->clock_in) {
+                if (!$request->photo) {
+                    return response()->json([
+                        'success' => true,
+                        'type' => 'needs_photo',
+                        'student' => $studentData
+                    ]);
+                }
+
+                $attendance->update([
+                    'clock_in' => now(),
+                    'photo' => $photoPath,
+                    'scanned_at' => now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'type' => 'clock_in_recorded',
+                    'message' => 'Clock-in recorded successfully!',
+                    'student' => $studentData,
+                ]);
+            }
+
+            // Case B: Already Clocked In, now Clocking Out
+            if (!$attendance->clock_out) {
+                $attendance->update([
+                    'clock_out' => now(),
+                    'scanned_at' => now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'type' => 'clock_out_recorded',
+                    'message' => 'Clock-out recorded successfully!',
+                    'student' => $studentData,
+                ]);
+            }
+
+            // Case C: Attendance already completed
             return response()->json([
                 'success' => false,
                 'type' => 'attendance_exists',
-                'message' => 'Attendance already recorded for today.',
+                'message' => 'Attendance already completed.',
                 'student' => $studentData,
             ], 200);
+        }
+
+        // Case D: Completely New Attendance Record - Needs Photo First
+        if (!$request->photo) {
+            return response()->json([
+                'success' => true,
+                'type' => 'needs_photo',
+                'student' => $studentData
+            ]);
         }
 
         Attendance::create([
@@ -100,12 +170,14 @@ class AttendanceController extends Controller
             'event_date_id' => $eventDate->id,
             'status' => 'present',
             'scanned_at' => now(),
+            'clock_in' => now(),
+            'photo' => $photoPath,
         ]);
 
         return response()->json([
             'success' => true,
-            'type' => 'attendance_recorded',
-            'message' => 'Attendance recorded successfully for today!',
+            'type' => 'clock_in_recorded',
+            'message' => 'Clock-in recorded successfully!',
             'student' => $studentData,
         ]);
     }
