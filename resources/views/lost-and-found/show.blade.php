@@ -7,7 +7,13 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="item-image mb-30">
-                    <img src="{{ $lostAndFound->image_path ? asset('storage/' . $lostAndFound->image_path) : asset('landing/img/blog_img_1.jpg') }}" alt="{{ $lostAndFound->item_name }}" class="img-fluid rounded shadow-sm" style="width: 100%; max-height: 500px; object-fit: cover;">
+                    @if($lostAndFound->image_path)
+                        <img src="{{ asset('storage/' . $lostAndFound->image_path) }}" alt="{{ $lostAndFound->item_name }}" class="img-fluid rounded shadow-sm" style="width: 100%; max-height: 500px; object-fit: cover;">
+                    @else
+                        <div class="d-flex align-items-center justify-content-center bg-light rounded shadow-sm" style="width: 100%; height: 400px;">
+                            <i class="{{ Auth::guard('student')->check() ? 'feather-image' : 'fas fa-image' }} fa-4x" style="color: #cbd5e1;"></i>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="col-lg-6">

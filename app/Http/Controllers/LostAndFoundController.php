@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\LostAndFoundResolvedMail;
 use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\LostAndFoundResolvedMail;
+use Illuminate\Support\Facades\Storage;
 
 class LostAndFoundController extends Controller
 {
@@ -37,7 +37,6 @@ class LostAndFoundController extends Controller
         return view('lost-and-found.index', compact('items', 'type', 'recentlyResolved'));
     }
 
-
     public function show(LostAndFound $lostAndFound)
     {
         return view('lost-and-found.show', compact('lostAndFound'));
@@ -46,6 +45,7 @@ class LostAndFoundController extends Controller
     public function adminShow(LostAndFound $lost_and_found)
     {
         $lost_and_found->load(['user', 'resolver', 'matchedItem']);
+
         return view('admin.lost-and-found.show', compact('lost_and_found'));
     }
 
@@ -67,6 +67,57 @@ class LostAndFoundController extends Controller
         $type = $request->get('type', 'lost');
 
         return view('admin.lost-and-found.create', compact('type'));
+    }
+
+    /**
+     * Store report from student or public
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'type' => 'required|in:lost,found',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'contact_info' => 'required|email|max:255',
+            'is_anonymous' => 'boolean',
+            'reporter_name' => 'required|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
+        }
+
+        unset($validated['image']);
+        $validated['is_anonymous'] = false; // Always false now
+
+        // Associate with logged in user (student or employee/admin)
+        if (Auth::guard('student')->check()) {
+            $validated['user_id'] = Auth::guard('student')->id();
+            $validated['type'] = 'lost'; // Students can only report lost items
+        } elseif (Auth::check()) {
+            $validated['user_id'] = Auth::id();
+        }
+
+        $validated['status'] = 'active';
+        $validated['date_reported'] = now();
+
+        LostAndFound::create($validated);
+
+        if (Auth::guard('student')->check()) {
+            return redirect()->route('student.lost-and-found.my-reports')
+                ->with('success', 'Your report has been submitted successfully.');
+        }
+
+        if (Auth::check()) {
+            return redirect()->route('admin.lost-and-found.index')
+                ->with('success', 'Report created successfully.');
+        }
+
+        return redirect()->route('lost-and-found.index')
+            ->with('success', 'Report submitted successfully. Thank you for your help!');
     }
 
     /**
@@ -148,7 +199,7 @@ class LostAndFoundController extends Controller
                 Mail::to($recipient)->send(new LostAndFoundResolvedMail($lost_and_found));
             } catch (\Exception $e) {
                 // Log error or ignore if mail fails
-                \Log::error("Failed to send Lost and Found resolution email to {$recipient}: " . $e->getMessage());
+                \Log::error("Failed to send Lost and Found resolution email to {$recipient}: ".$e->getMessage());
             }
         }
 
@@ -169,7 +220,7 @@ class LostAndFoundController extends Controller
                     try {
                         Mail::to($matchedRecipient)->send(new LostAndFoundResolvedMail($matchedItem));
                     } catch (\Exception $e) {
-                        \Log::error("Failed to send matched Lost and Found resolution email to {$matchedRecipient}: " . $e->getMessage());
+                        \Log::error("Failed to send matched Lost and Found resolution email to {$matchedRecipient}: ".$e->getMessage());
                     }
                 }
             }

@@ -32,11 +32,16 @@
                     </a>
                 </li>
 
-                <li class="nxl-item {{ Request::is('student/lost-and-found*') || Request::is('lost-and-found*') ? 'active' : '' }}">
-                    <a href="{{ route('lost-and-found.index') }}" class="nxl-link">
+                <li class="nxl-item nxl-hasmenu {{ Request::is('lost-and-found*') || Request::is('student/lost-and-found*') ? 'active nxl-trigger' : '' }}">
+                    <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-search"></i></span>
-                        <span class="nxl-mtext">Lost & Found</span>
+                        <span class="nxl-mtext">Lost & Found</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                     </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item {{ Request::routeIs('lost-and-found.index') ? 'active' : '' }}"><a class="nxl-link" href="{{ route('lost-and-found.index') }}">Browse Items</a></li>
+                        <li class="nxl-item {{ Request::routeIs('lost-and-found.create') ? 'active' : '' }}"><a class="nxl-link" href="{{ route('lost-and-found.create') }}">Report Item</a></li>
+                        <li class="nxl-item {{ Request::routeIs('student.lost-and-found.my-reports') ? 'active' : '' }}"><a class="nxl-link" href="{{ route('student.lost-and-found.my-reports') }}">My Reports</a></li>
+                    </ul>
                 </li>
                 
                 <li class="nxl-item nxl-caption">

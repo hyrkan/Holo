@@ -38,7 +38,13 @@
                     <div class="single-post mb-30" style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 100%;">
                         <div class="blog-thumb">
                             <a href="{{ route('lost-and-found.show', $item) }}">
-                                <img src="{{ $item->image_path ? asset('storage/' . $item->image_path) : asset('landing/img/blog_img_1.jpg') }}" alt="{{ $item->item_name }}" style="height: 250px; width: 100%; object-fit: cover;">
+                                @if($item->image_path)
+                                    <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->item_name }}" style="height: 250px; width: 100%; object-fit: cover;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px; width: 100%;">
+                                        <i class="{{ Auth::guard('student')->check() ? 'feather-image' : 'fas fa-image' }} fa-3x" style="color: #cbd5e1;"></i>
+                                    </div>
+                                @endif
                             </a>
                             <div class="type-badge" style="position: absolute; top: 10px; right: 10px; background: {{ $item->status == 'resolved' ? '#28a745' : ($item->type == 'lost' ? '#dc3545' : '#4700c8') }}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">
                                 {{ $item->status == 'resolved' ? 'Returned' : $item->type }}
@@ -89,7 +95,7 @@
             <div class="col-lg-12">
                 <div class="section-title text-center mb-50">
                     <span>Happy News</span>
-                    <h2>Recently Reunited</h2>
+                    <h2>Recently Returned</h2>
                     <p>These items have been successfully returned to their owners.</p>
                 </div>
             </div>
@@ -102,7 +108,7 @@
                         <i class="{{ Auth::guard('student')->check() ? 'feather-check-circle' : 'fas fa-check-circle' }}" style="color: #28a745; font-size: 30px;"></i>
                     </div>
                     <h5 class="mb-10 text-success">{{ $resolved->item_name }}</h5>
-                    <p class="small mb-0 text-muted">Reunited on {{ $resolved->resolved_at->format('M d') }}</p>
+                    <p class="small mb-0 text-muted">Returned on {{ $resolved->resolved_at->format('M d') }}</p>
                 </div>
             </div>
             @endforeach

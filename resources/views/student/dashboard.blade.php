@@ -107,8 +107,9 @@
                                 <div class="tab-pane fade" id="lost-found" role="tabpanel" aria-labelledby="lost-found-tab">
                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                         <h5 class="mb-0">Lost & Found</h5>
-                                        <div class="d-flex gap-2">
-                                            <a href="{{ route('lost-and-found.index') }}" class="btn btn-sm btn-link text-primary p-0">Browse All</a>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <a href="{{ route('lost-and-found.create') }}" class="btn btn-sm btn-primary py-1 px-3 rounded-pill fs-11">Report Item</a>
+                                            <a href="{{ route('lost-and-found.index') }}" class="btn btn-sm btn-link text-primary p-0 ms-2">Browse All</a>
                                         </div>
                                     </div>
                                     <div class="row g-4">

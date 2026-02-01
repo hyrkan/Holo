@@ -1,142 +1,141 @@
 @extends(Auth::guard('student')->check() ? 'layouts.student' : 'layouts.landing')
 
-@section('content')
+@section('title', 'Report Item || Holo Board')
 
-<section class="{{ Auth::guard('student')->check() ? 'p-4' : 'pt-120 pb-120' }}">
+@section('content')
+<div class="{{ Auth::guard('student')->check() ? 'main-content p-4' : 'pt-120 pb-120' }}">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="contact-bg02" style="padding: 40px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 10px;">
-                    <div class="section-title mb-40">
-                        <span>New Report</span>
-                        <h2>Item Details</h2>
+                <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <div class="section-title mb-0">
+                            <span class="text-primary fw-bold text-uppercase fs-12 d-block mb-1">New Report</span>
+                            <h2 class="fw-bold mb-0">Item Details</h2>
+                        </div>
                     </div>
                     
-                    <form action="{{ route('lost-and-found.store') }}" method="POST" enctype="multipart/form-data" class="contact-form">
-                        @csrf
-                        <div class="row">
-                            <div class="col-lg-12 mb-20">
-                                <label class="mb-10 d-block">Report Type</label>
-                                <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
-                                    <label class="btn btn-outline flex-fill active" id="type-lost-label">
-                                        <input type="radio" name="type" id="type-lost" value="lost" checked> Lost Item
-                                    </label>
-                                    <label class="btn btn-outline flex-fill" id="type-found-label">
-                                        <input type="radio" name="type" id="type-found" value="found"> Found Item
-                                    </label>
-                                </div>
-                                @error('type') <span class="text-danger small">{{ $message }}</span> @enderror
-                            </div>
+                    <div class="card-body p-4">
+                        <form action="{{ route('lost-and-found.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row g-4">
+                                @if(Auth::guard('student')->check())
+                                    <input type="hidden" name="type" value="lost">
+                                @else
+                                <div class="col-lg-12 mt-2">
+                                    <label class="form-label fw-bold mb-3 d-block">Report Type</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="type" id="type-lost" value="lost" {{ old('type', 'lost') == 'lost' ? 'checked' : '' }} autocomplete="off">
+                                        <label class="btn btn-outline-danger py-2 fw-medium" for="type-lost">
+                                            <i class="feather-alert-octagon me-2"></i> Lost Item
+                                        </label>
 
-                            <div class="col-lg-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="contact-field p-relative c-name mb-20">                                    
-                                            <input type="text" name="reporter_name" placeholder="Reporter Name *" required value="{{ old('reporter_name') }}">
-                                            @error('reporter_name') <span class="text-danger small">{{ $message }}</span> @enderror
-                                        </div>
+                                        <input type="radio" class="btn-check" name="type" id="type-found" value="found" {{ old('type') == 'found' ? 'checked' : '' }} autocomplete="off">
+                                        <label class="btn btn-outline-success py-2 fw-medium" for="type-found">
+                                            <i class="feather-search me-2"></i> Found Item
+                                        </label>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="contact-field p-relative c-name mb-20">                                    
-                                            <input type="text" name="owner_name" placeholder="Owner Name (If known)" value="{{ old('owner_name') }}">
-                                            @error('owner_name') <span class="text-danger small">{{ $message }}</span> @enderror
-                                        </div>
+                                    @error('type') <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror
+                                </div>
+                                @endif
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Reporter Name *</label>
+                                        <input type="text" name="reporter_name" class="form-control form-control-lg bg-light border-0 px-4" placeholder="Enter your name" required value="{{ old('reporter_name', Auth::guard('student')->check() ? Auth::guard('student')->user()->student->full_name : '') }}">
+                                        @error('reporter_name') <span class="text-danger small">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-lg-12">
-                                <div class="contact-field p-relative c-name mb-20">                                    
-                                    <input type="text" name="item_name" placeholder="Item Name (e.g. Blue Wallet, iPhone 13)" required value="{{ old('item_name') }}">
-                                    @error('item_name') <span class="text-danger small">{{ $message }}</span> @enderror
-                                </div>                               
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="contact-field p-relative c-subject mb-20">                                   
-                                    <input type="text" name="location" placeholder="Where was it lost/found? (e.g. Room 302, Canteen)" required value="{{ old('location') }}">
-                                    @error('location') <span class="text-danger small">{{ $message }}</span> @enderror
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Owner Name (If known)</label>
+                                        <input type="text" name="owner_name" class="form-control form-control-lg bg-light border-0 px-4" placeholder="Enter owner's name" value="{{ old('owner_name', Auth::guard('student')->check() ? Auth::guard('student')->user()->student->full_name : '') }}">
+                                        @error('owner_name') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
                                 </div>
-                            </div>		
 
-                            <div class="col-lg-12">
-                                <div class="contact-field p-relative c-message mb-30">                                  
-                                    <textarea name="description" id="message" cols="30" rows="10" placeholder="Describe the item (color, brand, unique features)..." required>{{ old('description') }}</textarea>
-                                    @error('description') <span class="text-danger small">{{ $message }}</span> @enderror
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Item Name *</label>
+                                        <input type="text" name="item_name" class="form-control form-control-lg bg-light border-0 px-4" placeholder="e.g. Blue Wallet, iPhone 13" required value="{{ old('item_name') }}">
+                                        @error('item_name') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Location *</label>
+                                        <input type="text" name="location" class="form-control form-control-lg bg-light border-0 px-4" placeholder="Where was it lost/found? (e.g. Room 302, Canteen)" required value="{{ old('location') }}">
+                                        @error('location') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Description *</label>
+                                        <textarea name="description" class="form-control bg-light border-0 px-4 py-3" rows="4" placeholder="Describe the item (color, brand, unique features)..." required>{{ old('description') }}</textarea>
+                                        @error('description') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Item Image (Optional)</label>
+                                        <input type="file" name="image" class="form-control bg-light border-0">
+                                        <small class="text-muted d-block mt-1">Upload a photo to help identify the item.</small>
+                                        @error('image') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label small fw-bold">Reporter Email *</label>
+                                        <input type="email" name="contact_info" class="form-control form-control-lg bg-light border-0 px-4" placeholder="e.g. reporter@example.com" required value="{{ old('contact_info', Auth::guard('student')->check() ? Auth::guard('student')->user()->email : '') }}">
+                                        <small class="text-muted">We will use this email to notify you of any updates.</small>
+                                        @error('contact_info') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                {{-- Removed Report Anonymously --}}
+
+                                <div class="col-lg-12 mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 shadow-none fw-bold" style="border-radius: 10px;">Submit Report</button>
                                 </div>
                             </div>
-
-                            <div class="col-lg-12">
-                                <div class="contact-field p-relative c-subject mb-30">
-                                    <label class="mb-10 d-block">Item Image (Optional)</label>
-                                    <input type="file" name="image" class="form-control-file" style="padding: 10px; border: 1px solid #f4f2f9; background: #f4f2f9; width: 100%;">
-                                    @error('image') <span class="text-danger small">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="contact-field p-relative c-subject mb-30">
-                                    <label class="mb-10 d-block">Reporter Email *</label>
-                                    <input type="email" name="contact_info" placeholder="e.g. reporter@example.com" required value="{{ old('contact_info') }}">
-                                    <small class="text-muted">We will use this email to notify you if the item is found/returned.</small>
-                                    @error('contact_info') <span class="text-danger small">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12 mb-30">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="is_anonymous" value="1" class="custom-control-input" id="is_anonymous" {{ old('is_anonymous') ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="is_anonymous">Report Anonymously</label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="slider-btn">                                          
-                                    <button class="btn ss-btn" data-animation="fadeInRight" data-delay=".8s" style="width: 100%;">Submit Report</button>				
-                                </div>                             
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 @endsection
 
 @push('css')
 <style>
-    .btn-outline {
-        background: transparent;
-        border: 1px solid #4700c8;
-        color: #4700c8;
-        margin-bottom: 0 !important;
+    .form-control-lg {
+        font-size: 0.95rem;
+        height: auto;
     }
-    .btn-outline:hover, .btn-outline.active {
-        background: #4700c8 !important;
-        color: white !important;
+    .form-control:focus {
+        background-color: #fff !important;
+        border: 1px solid #4700c8 !important;
+        box-shadow: none;
     }
-    .contact-field input, .contact-field textarea {
-        width: 100%;
-        background: #f4f2f9;
-        border: 1px solid #f4f2f9;
-        padding: 15px 30px;
-        border-radius: 5px;
+    .btn-check:checked + .btn-outline-danger {
+        background-color: #dc3545;
+        color: white;
     }
-    .contact-field input:focus, .contact-field textarea:focus {
-        border-color: #4700c8;
-        outline: none;
+    .btn-check:checked + .btn-outline-success {
+        background-color: #198754;
+        color: white;
     }
+    @if(!Auth::guard('student')->check())
+    .pt-120 { padding-top: 120px; }
+    .pb-120 { padding-bottom: 120px; }
+    .section-title h2 { font-size: 36px; color: #002691; }
+    .btn-primary { background: #4700c8; border-color: #4700c8; }
+    @endif
 </style>
-@endpush
-
-@push('js')
-<script>
-    $(document).ready(function() {
-        $('input[name="type"]').change(function() {
-            $('.btn-group-toggle label').removeClass('active');
-            $(this).parent().addClass('active');
-        });
-    });
-</script>
 @endpush

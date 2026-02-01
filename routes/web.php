@@ -29,7 +29,7 @@ Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::cla
 Route::get('/lost-and-found/create', function () {
     return view('lost-and-found.create');
 })->name('lost-and-found.create');
-Route::post('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.store');
+Route::post('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'store'])->name('lost-and-found.store');
 Route::get('/lost-and-found/{lostAndFound}', [\App\Http\Controllers\LostAndFoundController::class, 'show'])->name('lost-and-found.show');
 
 // Admin Routes
