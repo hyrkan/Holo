@@ -30,6 +30,7 @@ class Student extends Model
     const STATUS_APPROVED = 'approved';
     const STATUS_DENIED = 'denied';
     const STATUS_EXPIRED = 'expired';
+    const STATUS_INACTIVE = 'inactive';
 
     const TYPE_REGULAR = 'regular';
     const TYPE_GUEST = 'guest';
@@ -54,6 +55,10 @@ class Student extends Model
     {
         if ($this->status === self::STATUS_EXPIRED) {
             return true;
+        }
+
+        if ($this->status === self::STATUS_INACTIVE) {
+            return false;
         }
 
         if ($this->student_type === self::TYPE_GUEST && $this->expired_at && $this->expired_at->isPast()) {

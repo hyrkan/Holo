@@ -51,11 +51,11 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <input type="text" name="student_number" class="form-control" placeholder="Student Number" value="{{ old('student_number') }}" required>
+                                <input type="text" id="student_number" name="student_number" class="form-control" placeholder="Student Number" value="{{ old('student_number') }}" required>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label fs-12 fw-bold text-muted">Student Type</label>
-                                <select name="student_type" class="form-control" required>
+                                <select id="student_type" name="student_type" class="form-control" required>
                                     <option value="regular" {{ old('student_type') == 'regular' ? 'selected' : '' }}>Regular</option>
                                     <option value="guest" {{ old('student_type') == 'guest' ? 'selected' : '' }}>Guest</option>
                                 </select>
@@ -64,10 +64,20 @@
                                 <input type="email" name="email" class="form-control" placeholder="Email Address" value="{{ old('email') }}" required>
                             </div>
                             <div class="mb-4">
-                                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                                <div class="input-group">
+                                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                                    <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password" aria-label="Show password">
+                                        <i class="feather-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="mb-4">
-                                <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password" required>
+                                <div class="input-group">
+                                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm Password" required>
+                                    <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password_confirmation" aria-label="Show password">
+                                        <i class="feather-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="mt-5">
                                 <button type="submit" class="btn btn-lg btn-primary w-100">Register</button>
@@ -84,6 +94,40 @@
     
     <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    <script>
+        (function () {
+            var typeEl = document.getElementById('student_type');
+            var numEl = document.getElementById('student_number');
+            function toggleStudentNumberRequired() {
+                if (!typeEl || !numEl) return;
+                var isGuest = typeEl.value === 'guest';
+                if (isGuest) {
+                    numEl.removeAttribute('required');
+                } else {
+                    numEl.setAttribute('required', 'required');
+                }
+            }
+            if (typeEl) {
+                typeEl.addEventListener('change', toggleStudentNumberRequired);
+            }
+            toggleStudentNumberRequired();
+            var toggles = document.querySelectorAll('.toggle-password');
+            toggles.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (!input) return;
+                    var showing = input.getAttribute('type') === 'text';
+                    input.setAttribute('type', showing ? 'password' : 'text');
+                    var icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove(showing ? 'feather-eye-off' : 'feather-eye');
+                        icon.classList.add(showing ? 'feather-eye' : 'feather-eye-off');
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>

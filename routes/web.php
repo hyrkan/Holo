@@ -16,6 +16,11 @@ Route::get('/', function () {
     return redirect()->route('student.login');
 });
 
+// Default login route alias to satisfy auth middleware redirects
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
 Route::post('/student/events/{event}/join', [\App\Http\Controllers\EventController::class, 'join'])
     ->name('student.events.join')
     ->middleware(['auth:student', 'role:student']);

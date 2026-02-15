@@ -46,6 +46,13 @@ class StudentAuthController extends Controller
                 ])->onlyInput('email');
             }
 
+            if ($student->status === \App\Models\Student::STATUS_INACTIVE) {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'email' => 'Your account is inactive.',
+                ])->onlyInput('email');
+            }
+
             if ($student->status === \App\Models\Student::STATUS_DENIED) {
                 Auth::guard('student')->logout();
                 return back()->withErrors([
@@ -79,7 +86,7 @@ class StudentAuthController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'student_number' => ['required', 'string', 'max:255', 'unique:students'],
+            'student_number' => ['nullable', 'required_if:student_type,regular', 'string', 'max:255', 'unique:students,student_number'],
             'student_type' => ['required', 'string', 'in:regular,guest'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -97,10 +104,18 @@ class StudentAuthController extends Controller
             $expiredAt = now()->addDays(30);
         }
 
+        $studentNumber = $request->student_number;
+        if ($request->student_type === \App\Models\Student::TYPE_GUEST && empty($studentNumber)) {
+            do {
+                $candidate = 'GUEST-' . strtoupper(\Illuminate\Support\Str::random(8));
+            } while (\App\Models\Student::where('student_number', $candidate)->exists());
+            $studentNumber = $candidate;
+        }
+
         $user->student()->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'student_number' => $request->student_number,
+            'student_number' => $studentNumber,
             'student_type' => $request->student_type,
             'status' => \App\Models\Student::STATUS_PENDING,
             'expired_at' => $expiredAt,

@@ -24,7 +24,7 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
 
-        $students = $query->latest()->paginate(10);
+        $students = $query->latest()->get();
         return view('admin.students.index', compact('students'));
     }
 
@@ -226,7 +226,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        //
+        return view('admin.students.edit', compact('student'));
     }
 
     /**
@@ -234,7 +234,15 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        //
+            $validated = $request->validate([
+                'program' => ['nullable', 'string', 'max:255'],
+                'year_level' => ['nullable', 'string', 'max:255'],
+                'status' => ['required', 'in:pending,approved,denied,expired,inactive'],
+            ]);
+
+            $student->update($validated);
+
+            return redirect()->route('admin.students.index')->with('success', 'Student updated successfully.');
     }
 
     /**
@@ -242,6 +250,10 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+        if ($student->status !== Student::STATUS_INACTIVE) {
+            $student->status = Student::STATUS_INACTIVE;
+            $student->save();
+        }
+        return redirect()->route('admin.students.index')->with('success', 'Student account set to inactive.');
     }
 }

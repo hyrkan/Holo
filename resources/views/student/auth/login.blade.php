@@ -51,7 +51,12 @@
                                 <input type="email" name="email" class="form-control" placeholder="Email Address" value="" required>
                             </div>
                             <div class="mb-3">
-                                <input type="password" name="password" class="form-control" placeholder="Password" value="" required>
+                                <div class="input-group">
+                                    <input type="password" id="login_password" name="password" class="form-control" placeholder="Password" value="" required>
+                                    <button type="button" class="btn btn-outline-secondary toggle-password" data-target="login_password" aria-label="Show password">
+                                        <i class="feather-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
@@ -79,6 +84,25 @@
     
     <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    <script>
+        (function () {
+            var toggles = document.querySelectorAll('.toggle-password');
+            toggles.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (!input) return;
+                    var showing = input.getAttribute('type') === 'text';
+                    input.setAttribute('type', showing ? 'password' : 'text');
+                    var icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove(showing ? 'feather-eye-off' : 'feather-eye');
+                        icon.classList.add(showing ? 'feather-eye' : 'feather-eye-off');
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>
