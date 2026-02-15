@@ -35,11 +35,22 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab" aria-controls="announcements" aria-selected="false">
+                                        <i class="feather-bell me-2"></i>Announcements
+                                        @php $announcementCount = $announcements->count(); @endphp
+                                        @if($announcementCount > 0)
+                                            <span id="announcements-badge" class="badge bg-soft-danger text-danger ms-2">{{ $announcementCount }}</span>
+                                        @endif
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
                                         <i class="feather-pie-chart me-2"></i>Analytics
                                     </button>
                                 </li>
                             </ul>
+                            
+                            <div id="announcements-meta" data-latest-id="{{ optional($announcements->first())->id ?? 0 }}" data-student-id="{{ Auth::guard('student')->user()->student->id ?? 0 }}" style="display:none"></div>
 
                             <!-- Tab panes -->
                             <div class="tab-content">
@@ -149,6 +160,75 @@
                                     </div>
                                 </div>
 
+                                <!-- Announcements Pane -->
+                                <div class="tab-pane fade" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h5 class="mb-0">Announcements</h5>
+                                    </div>
+                                    <div class="row g-4">
+                                        @forelse($announcements as $announcement)
+                                        <div class="col-xxl-4 col-md-6">
+                                            <div class="card border border-light-subtle shadow-none rounded-4 h-100 mb-0"
+                                                 data-announcement="true"
+                                                 data-title="{{ $announcement->title }}"
+                                                 data-body="{{ $announcement->body }}"
+                                                 data-image="{{ $announcement->image ? asset('storage/' . $announcement->image) : '' }}"
+                                                 data-start="{{ optional($announcement->start_date)->format('M d, Y H:i') }}"
+                                                 data-end="{{ optional($announcement->end_date)->format('M d, Y H:i') }}"
+                                                 role="button" tabindex="0">
+                                                <div class="card-body">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        @if($announcement->image)
+                                                            <img src="{{ asset('storage/' . $announcement->image) }}" alt="" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @else
+                                                            <div class="avatar-text avatar-md bg-soft-warning text-warning rounded-3">
+                                                                <i class="feather-bell"></i>
+                                                            </div>
+                                                        @endif
+                                                        <div class="overflow-hidden">
+                                                            <h6 class="text-truncate mb-0">{{ $announcement->title }}</h6>
+                                                            <small class="text-muted">
+                                                                {{ optional($announcement->start_date)->format('M d, Y') }}
+                                                                @if($announcement->end_date)
+                                                                    - {{ optional($announcement->end_date)->format('M d, Y') }}
+                                                                @endif
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit($announcement->body, 100) }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @empty
+                                        <div class="col-12 text-center py-5">
+                                            <i class="feather-bell fs-1 text-muted mb-3 d-block"></i>
+                                            <p class="text-muted">No announcements available.</p>
+                                        </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="announcementModalTitle"></h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div id="announcementModalImageWrap" class="mb-3" style="display:none;">
+                                                    <img id="announcementModalImage" src="" alt="" class="img-fluid rounded-3" />
+                                                </div>
+                                                <div id="announcementModalDates" class="text-muted mb-2"></div>
+                                                <div id="announcementModalBodyText" class="fs-6"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Analytics Pane -->
                                 <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
                                     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -217,3 +297,72 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tab = document.getElementById('announcements-tab');
+  var badge = document.getElementById('announcements-badge');
+  var meta = document.getElementById('announcements-meta');
+  var latestId = 0;
+  var studentId = 0;
+  if (meta) {
+    latestId = parseInt(meta.dataset.latestId || '0', 10);
+    studentId = parseInt(meta.dataset.studentId || '0', 10);
+  }
+  var key = 'hb_last_seen_announcement_id_' + studentId;
+  var seenId = parseInt(localStorage.getItem(key) || '0', 10);
+  if (badge && latestId && seenId >= latestId) {
+    badge.style.display = 'none';
+  }
+  function markSeen() {
+    if (badge) badge.style.display = 'none';
+    if (latestId) localStorage.setItem(key, String(latestId));
+  }
+  if (tab) {
+    tab.addEventListener('shown.bs.tab', markSeen);
+    tab.addEventListener('click', markSeen);
+  }
+
+  var modalEl = document.getElementById('announcementModal');
+  var modalTitle = document.getElementById('announcementModalTitle');
+  var modalBody = document.getElementById('announcementModalBodyText');
+  var modalDates = document.getElementById('announcementModalDates');
+  var modalImgWrap = document.getElementById('announcementModalImageWrap');
+  var modalImg = document.getElementById('announcementModalImage');
+  var clickable = document.querySelectorAll('[data-announcement="true"]');
+  if (modalEl && modalTitle && modalBody && modalDates) {
+    if (modalEl.parentNode !== document.body) {
+      document.body.appendChild(modalEl);
+    }
+    clickable.forEach(function(card) {
+      card.addEventListener('click', function() {
+        var title = card.getAttribute('data-title') || '';
+        var body = card.getAttribute('data-body') || '';
+        var image = card.getAttribute('data-image') || '';
+        var start = card.getAttribute('data-start') || '';
+        var end = card.getAttribute('data-end') || '';
+        modalTitle.textContent = title;
+        modalBody.textContent = body;
+        if (start && end) {
+          modalDates.textContent = start + ' - ' + end;
+        } else if (start) {
+          modalDates.textContent = start;
+        } else {
+          modalDates.textContent = '';
+        }
+        if (image) {
+          modalImg.src = image;
+          modalImgWrap.style.display = '';
+        } else {
+          modalImg.src = '';
+          modalImgWrap.style.display = 'none';
+        }
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+      });
+    });
+  }
+});
+</script>
+@endpush
