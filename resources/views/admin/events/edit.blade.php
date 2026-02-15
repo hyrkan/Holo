@@ -132,7 +132,7 @@
                                 @endphp
                                 @foreach($speakers as $speaker)
                                     <option value="{{ $speaker->id }}" {{ in_array($speaker->id, $selectedSpeakers) ? 'selected' : '' }}>
-                                        {{ $speaker->first_name }} {{ $speaker->last_name }} ({{ $speaker->title ?? 'N/A' }})
+                                        {{ $speaker->first_name }} {{ $speaker->last_name }} ({{ $speaker->title ?? 'N/A' }}) {{ $speaker->status !== 'active' ? '(Inactive)' : '' }}
                                     </option>
                                 @endforeach
                             </select>

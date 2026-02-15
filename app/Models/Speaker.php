@@ -12,4 +12,9 @@ class Speaker extends Model
     {
         return $this->belongsToMany(Event::class);
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }

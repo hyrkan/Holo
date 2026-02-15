@@ -3,7 +3,7 @@
 @section('title', 'Student Profile || Holo Board')
 
 @section('content')
-<div class="main-content">
+<div class="main-content pb-5">
     <div class="row">
         <div class="col-lg-4">
             <!-- Student Basic Info -->
@@ -124,7 +124,7 @@
             </div>
 
             <!-- Attendance History -->
-            <div class="card stretch stretch-full">
+            <div class="card stretch stretch-full mb-4">
                 <div class="card-header">
                     <h5 class="card-title">Recent Attendance Logs</h5>
                 </div>
@@ -157,7 +157,6 @@
             </div>
         </div>
     </div>
-    @endif
 </div>
 
 @endsection

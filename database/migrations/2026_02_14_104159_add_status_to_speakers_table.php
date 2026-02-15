@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lost_and_founds', function (Blueprint $table) {
-        if (!Schema::hasColumn('lost_and_founds', 'returned_by_name')) {
-            $table->string('returned_by_name')->nullable()->after('owner_name');
-        }
+        Schema::table('speakers', function (Blueprint $table) {
+            $table->string('status')->default('active')->after('id');
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lost_and_founds', function (Blueprint $table) {
-            $table->dropColumn('returned_by_name');
+        Schema::table('speakers', function (Blueprint $table) {
+            $table->dropColumn('status');
         });
     }
 };

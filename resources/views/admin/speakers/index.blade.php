@@ -71,13 +71,14 @@
                                             <a href="{{ route('admin.speakers.edit', $speaker) }}" class="text-secondary" data-bs-toggle="tooltip" title="Edit">
                                                 <i class="feather-edit-3 fs-16"></i>
                                             </a>
-                                            <form action="{{ route('admin.speakers.destroy', $speaker) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-danger border-0 bg-transparent p-0" onclick="return confirm('Are you sure?')" data-bs-toggle="tooltip" title="Delete">
-                                                    <i class="feather-trash-2 fs-16"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    class="text-danger border-0 bg-transparent p-0" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal" 
+                                                    data-delete-url="{{ route('admin.speakers.destroy', $speaker) }}"
+                                                    title="Delete">
+                                                <i class="feather-trash-2 fs-16"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -101,3 +102,41 @@
     </div>
 </div>
 @endsection
+
+@section('modals')
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this speaker? This action will mark them as inactive.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var url = button.getAttribute('data-delete-url');
+            var form = deleteModal.querySelector('#deleteForm');
+            form.action = url;
+        });
+    });
+</script>
+@endpush

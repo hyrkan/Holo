@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('attendances', function (Blueprint $table) {
+        if (!Schema::hasColumn('attendances', 'clock_in')) {
             $table->timestamp('clock_in')->nullable()->after('scanned_at');
-            $table->timestamp('clock_out')->nullable()->after('clock_in');
-            $table->string('photo')->nullable()->after('clock_out');
+        }
+        if (!Schema::hasColumn('attendances', 'clock_out')) {
+            $table->timestamp('clock_out')->nullable()->after('clock_in'); // assumes clock_in exists now or before
+        }
+        if (!Schema::hasColumn('attendances', 'photo')) {
+            $table->string('photo')->nullable()->after('clock_out'); // assumes clock_out exists now or before
+        }
         });
     }
 

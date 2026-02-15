@@ -14,7 +14,7 @@ class SpeakerController extends Controller
     {
         $search = $request->input('search');
 
-        $speakers = Speaker::when($search, function ($query, $search) {
+        $speakers = Speaker::active()->when($search, function ($query, $search) {
             return $query->where('first_name', 'like', "%{$search}%")
                          ->orWhere('last_name', 'like', "%{$search}%")
                          ->orWhere('email', 'like', "%{$search}%")
@@ -126,7 +126,8 @@ class SpeakerController extends Controller
      */
     public function destroy(Speaker $speaker)
     {
-        //
+        $speaker->update(['status' => 'deleted']);
+        return back()->with('success', 'Speaker deleted successfully.');
     }
     /**
      * Display all events for a specific speaker.

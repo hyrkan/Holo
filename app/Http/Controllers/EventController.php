@@ -30,7 +30,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        $speakers = \App\Models\Speaker::all();
+        $speakers = \App\Models\Speaker::active()->get();
         return view('admin.events.create', compact('speakers'));
     }
 
@@ -92,7 +92,15 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        $speakers = \App\Models\Speaker::all();
+        // Get all active speakers
+        $activeSpeakers = \App\Models\Speaker::active()->get();
+        
+        // Get speakers currently attached to the event (even if inactive)
+        $eventSpeakers = $event->speakers;
+        
+        // Merge and remove duplicates
+        $speakers = $activeSpeakers->merge($eventSpeakers)->unique('id');
+        
         return view('admin.events.edit', compact('event', 'speakers'));
     }
 

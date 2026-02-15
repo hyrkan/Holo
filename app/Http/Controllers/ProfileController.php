@@ -12,22 +12,54 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+        if ($user->hasRole('employee') || $user->hasRole('admin')) {
+             $user->load('employee');
+        }
         return view('admin.profile.index', compact('user'));
     }
 
     public function update(Request $request)
     {
         $user = Auth::user();
+        
+        // If user is admin/employee, update their employee record
+        if ($user->hasRole('employee') || $user->hasRole('admin')) {
+             $request->validate([
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                'phone' => ['required', 'string', 'max:20'],
+                'address' => ['required', 'string', 'max:255'],
+            ]);
 
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-        ]);
+            // Update user email
+            $user->update([
+                'name' => $request->first_name . ' ' . $request->last_name,
+                'email' => $request->email,
+            ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+            // Update or create employee record
+            $user->employee()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                ]
+            );
+        } else {
+            // Fallback for other roles (though currently only students use separate table)
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            ]);
+    
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+            ]);
+        }
 
         return back()->with('success', 'Profile updated successfully.');
     }
