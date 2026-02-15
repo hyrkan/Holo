@@ -51,7 +51,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($students as $student)
+                                @foreach ($students as $student)
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
@@ -100,14 +100,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-5">
-                                        <i class="feather-users fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No students found.</p>
-                                    </td>
-                                </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

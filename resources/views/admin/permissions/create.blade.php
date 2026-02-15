@@ -20,9 +20,9 @@
                             <div class="form-text">Example: 'manage user', 'edit post'</div>
                         </div>
 
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">Create Permission</button>
-                            <a href="{{ route('admin.permissions.index') }}" class="btn btn-secondary">Cancel</a>
+                        <div class="mt-4 d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary btn-md w-auto px-4">Create Permission</button>
+                            <a href="{{ route('admin.permissions.index') }}" class="btn btn-light btn-md w-auto px-4">Cancel</a>
                         </div>
                     </form>
                 </div>

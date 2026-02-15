@@ -65,10 +65,6 @@
                             <i class="feather-user"></i>
                             <span>Profile Details</span>
                         </a>
-                        <a href="{{ route('admin.profile') }}" class="dropdown-item">
-                            <i class="feather-settings"></i>
-                            <span>Account Settings</span>
-                        </a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ route('admin.logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="feather-log-out"></i>

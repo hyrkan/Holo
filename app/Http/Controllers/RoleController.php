@@ -39,7 +39,9 @@ class RoleController extends Controller
         $role = Role::create(['name' => $request->name]);
         
         if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+            $permissionIds = collect($request->permissions)->map(fn($v) => (int) $v)->filter()->all();
+            $permissions = Permission::whereIn('id', $permissionIds)->get();
+            $role->syncPermissions($permissions);
         }
 
         return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
@@ -68,7 +70,9 @@ class RoleController extends Controller
         $role->update(['name' => $request->name]);
         
         if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+            $permissionIds = collect($request->permissions)->map(fn($v) => (int) $v)->filter()->all();
+            $permissions = Permission::whereIn('id', $permissionIds)->get();
+            $role->syncPermissions($permissions);
         } else {
             $role->syncPermissions([]);
         }

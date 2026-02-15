@@ -35,9 +35,9 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">Create Role</button>
-                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
+                        <div class="mt-4 d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary btn-md w-auto px-4">Create Role</button>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-light btn-md w-auto px-4">Cancel</a>
                         </div>
                     </form>
                 </div>
