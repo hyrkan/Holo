@@ -283,27 +283,28 @@
             }
         };
 
-        // CSV Export
+        // CSV Export (UTF-8 with BOM for Excel compatibility)
         $('#export-excel').click(function() {
-            let csv = [];
-            let rows = document.querySelectorAll("table tr");
-            
-            for (let i = 0; i < rows.length; i++) {
-                let row = [], cols = rows[i].querySelectorAll("td, th");
-                for (let j = 1; j < cols.length - 1; j++) { // Skip checkbox and actions
-                    let text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+            var csv = [];
+            var rows = document.querySelectorAll('#participants-table tr');
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll('td, th');
+                for (var j = 1; j < cols.length - 1; j++) { // Skip checkbox and actions
+                    var text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, ' ').trim();
+                    text = text.replace(/"/g, '""');
                     row.push('"' + text + '"');
                 }
-                if (row.length > 0) csv.push(row.join(","));
+                if (row.length > 0) csv.push(row.join(','));
             }
-
-            let csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
-            let downloadLink = document.createElement("a");
-            downloadLink.download = "participants-{{ Str::slug($event->name) }}.csv";
+            var content = '\uFEFF' + csv.join('\n');
+            var csvFile = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            var downloadLink = document.createElement('a');
+            downloadLink.download = 'participants-{{ Str::slug($event->name) }}.csv';
             downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
+            downloadLink.style.display = 'none';
             document.body.appendChild(downloadLink);
             downloadLink.click();
+            setTimeout(function(){ URL.revokeObjectURL(downloadLink.href); downloadLink.remove(); }, 1000);
         });
     });
 </script>

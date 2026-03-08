@@ -51,10 +51,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Resources accessible by both admin and employee?
         // Based on seeder: employee can manage students.
         // Let's assume announcements and events are admin only for now.
+        Route::get('students/export', [\App\Http\Controllers\StudentController::class, 'exportCsv'])->name('students.export');
         Route::post('students/{student}/approve', [\App\Http\Controllers\StudentController::class, 'approve'])->name('students.approve');
         Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
+        Route::get('events/export', [\App\Http\Controllers\EventController::class, 'exportCsv'])->name('events.export')->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
         Route::get('/events/{event}/attendance', [\App\Http\Controllers\EventController::class, 'attendance'])->name('events.attendance')->middleware('role:admin');

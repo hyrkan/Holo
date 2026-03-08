@@ -25,6 +25,42 @@ class EventController extends Controller
         return view('admin.events.index', compact('events'));
     }
 
+    public function exportCsv(Request $request)
+    {
+        $search = $request->input('search');
+        $events = Event::with('eventDates')->when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%")
+                         ->orWhere('description', 'like', "%{$search}%")
+                         ->orWhere('location', 'like', "%{$search}%");
+        })
+        ->latest()
+        ->get();
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="events.csv"',
+        ];
+        $callback = function () use ($events) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Name', 'Location', 'Departments', 'Capacity', 'Dates', 'Created At']);
+            foreach ($events as $e) {
+                $dates = $e->eventDates->sortBy('date')->pluck('date')->map(function($d){
+                    return \Carbon\Carbon::parse($d)->format('Y-m-d');
+                })->implode(', ');
+                $departments = (!$e->departments || in_array('All', (array)$e->departments)) ? 'All' : implode(', ', (array)$e->departments);
+                fputcsv($handle, [
+                    $e->name,
+                    $e->location,
+                    $departments,
+                    $e->capacity ?: 'Unlimited',
+                    $dates ?: 'No dates',
+                    optional($e->created_at)->toDateTimeString(),
+                ]);
+            }
+            fclose($handle);
+        };
+        return response()->streamDownload($callback, 'events.csv', $headers);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

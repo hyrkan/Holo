@@ -35,11 +35,19 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">
                                         <i class="feather-calendar me-2"></i>Events & Projects
+                                        @php $eventsCount = $events->count(); @endphp
+                                        @if($eventsCount > 0)
+                                            <span id="events-badge" class="badge bg-soft-primary text-primary ms-2">{{ $eventsCount }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="lost-found-tab" data-bs-toggle="tab" data-bs-target="#lost-found" type="button" role="tab" aria-controls="lost-found" aria-selected="false">
                                         <i class="feather-search me-2"></i>Lost & Found
+                                        @php $lostFoundCount = $lostAndFoundItems->count(); @endphp
+                                        @if($lostFoundCount > 0)
+                                            <span id="lost-found-badge" class="badge bg-soft-info text-info ms-2">{{ $lostFoundCount }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -58,6 +66,8 @@
                                 </li>
                             </ul>
                             
+                            <div id="events-meta" data-latest-id="{{ optional($events->first())->id ?? 0 }}" data-student-id="{{ Auth::guard('student')->user()->student->id ?? 0 }}" style="display:none"></div>
+                            <div id="lost-found-meta" data-latest-id="{{ optional($lostAndFoundItems->first())->id ?? 0 }}" data-student-id="{{ Auth::guard('student')->user()->student->id ?? 0 }}" style="display:none"></div>
                             <div id="announcements-meta" data-latest-id="{{ optional($announcements->first())->id ?? 0 }}" data-student-id="{{ Auth::guard('student')->user()->student->id ?? 0 }}" style="display:none"></div>
 
                             <!-- Tab panes -->
@@ -330,28 +340,24 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileSelect.value = key;
     });
   }
-  var tab = document.getElementById('announcements-tab');
-  var badge = document.getElementById('announcements-badge');
-  var meta = document.getElementById('announcements-meta');
-  var latestId = 0;
-  var studentId = 0;
-  if (meta) {
-    latestId = parseInt(meta.dataset.latestId || '0', 10);
-    studentId = parseInt(meta.dataset.studentId || '0', 10);
-  }
-  var key = 'hb_last_seen_announcement_id_' + studentId;
-  var seenId = parseInt(localStorage.getItem(key) || '0', 10);
-  if (badge && latestId && seenId >= latestId) {
-    badge.style.display = 'none';
-  }
-  function markSeen() {
-    if (badge) badge.style.display = 'none';
-    if (latestId) localStorage.setItem(key, String(latestId));
-  }
-  if (tab) {
-    tab.addEventListener('shown.bs.tab', markSeen);
-    tab.addEventListener('click', markSeen);
-  }
+  ['events', 'lost-found', 'announcements'].forEach(function(key) {
+    var t = document.getElementById(key + '-tab');
+    var b = document.getElementById(key + '-badge');
+    var m = document.getElementById(key + '-meta');
+    if (!t || !b || !m) return;
+    var latestId = parseInt(m.dataset.latestId || '0', 10);
+    var studentId = parseInt(m.dataset.studentId || '0', 10);
+    var storageKey = 'hb_session_hide_badge_' + key + '_' + studentId + '_' + latestId;
+    if (sessionStorage.getItem(storageKey) === '1') {
+      b.style.display = 'none';
+    }
+    var hide = function() {
+      b.style.display = 'none';
+      sessionStorage.setItem(storageKey, '1');
+    };
+    t.addEventListener('shown.bs.tab', hide);
+    t.addEventListener('click', hide);
+  });
 
   var modalEl = document.getElementById('announcementModal');
   var modalTitle = document.getElementById('announcementModalTitle');

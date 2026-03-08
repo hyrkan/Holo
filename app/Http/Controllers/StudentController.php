@@ -28,6 +28,38 @@ class StudentController extends Controller
         return view('admin.students.index', compact('students'));
     }
 
+    public function exportCsv(Request $request)
+    {
+        $query = Student::with('user');
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+        $students = $query->latest()->get();
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="students.csv"',
+        ];
+        $callback = function () use ($students) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Student Number', 'First Name', 'Last Name', 'Program', 'Year Level', 'Type', 'Status', 'Email', 'Joined At']);
+            foreach ($students as $s) {
+                fputcsv($handle, [
+                    $s->student_number,
+                    $s->first_name,
+                    $s->last_name,
+                    $s->program,
+                    $s->year_level,
+                    $s->student_type,
+                    $s->status,
+                    optional($s->user)->email,
+                    optional($s->created_at)->toDateTimeString(),
+                ]);
+            }
+            fclose($handle);
+        };
+        return response()->streamDownload($callback, 'students.csv', $headers);
+    }
+
     public function approve(Request $request, Student $student)
     {
         $request->validate([

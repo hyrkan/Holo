@@ -34,6 +34,11 @@
                         <div>
                             <input id="programFilter" type="text" class="form-control form-control-sm" placeholder="Filter Program">
                         </div>
+                        <div>
+                            <a id="exportCsvBtn" href="{{ route('admin.students.export') }}" class="btn btn-sm btn-light">
+                                <i class="feather-download me-1"></i> Download CSV
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body custom-card-action p-0">
@@ -259,6 +264,16 @@
             var val = $(this).val();
             table.column(4).search(val === 'all' ? '' : val, true, false).draw();
         }).trigger('change');
+
+        $('#exportCsvBtn').on('click', function(e) {
+            e.preventDefault();
+            var status = $('#statusFilter').val();
+            var url = $(this).attr('href');
+            if (status && status !== 'all') {
+                url += (url.indexOf('?') === -1 ? '?' : '&') + 'status=' + encodeURIComponent(status);
+            }
+            window.location.href = url;
+        });
 
         // Type filter (column index 3)
         $('#typeFilter').on('change', function() {

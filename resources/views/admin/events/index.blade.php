@@ -14,6 +14,9 @@
                                 <button class="btn btn-outline-secondary" type="submit"><i class="feather-search"></i></button>
                             </div>
                         </form>
+                        <a id="exportEventsCsvBtn" href="{{ route('admin.events.export') }}" class="btn btn-light me-2">
+                            <i class="feather-download me-2"></i> Download CSV
+                        </a>
                         <a href="{{ route('admin.events.create') }}" class="btn btn-primary">
                             <i class="feather-plus me-2"></i> Create Event
                         </a>
@@ -125,4 +128,23 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('exportEventsCsvBtn');
+  var searchInput = document.querySelector('input[name="search"]');
+  if (btn && searchInput) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var url = btn.getAttribute('href');
+      var q = searchInput.value.trim();
+      if (q) {
+        url += (url.indexOf('?') === -1 ? '?' : '&') + 'search=' + encodeURIComponent(q);
+      }
+      window.location.href = url;
+    });
+  }
+});
+</script>
+@endpush
 @endsection
