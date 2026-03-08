@@ -19,6 +19,9 @@ class Student extends Model
         'student_type',
         'approved_at',
         'expired_at',
+        'id_front_path',
+        'id_back_path',
+        'face_photo_path',
     ];
 
     protected $casts = [

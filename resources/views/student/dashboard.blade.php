@@ -23,7 +23,15 @@
                     <div class="row g-4">
                         <div class="col-lg-12">
                             <!-- Nav tabs -->
-                            <ul class="nav nav-pills custom-tabs-pill mb-4" id="dashboardTabs" role="tablist">
+                            <div class="d-sm-none mb-3">
+                                <select id="mobileTabsSelect" class="form-select">
+                                    <option value="events" selected>Events & Projects</option>
+                                    <option value="lost-found">Lost & Found</option>
+                                    <option value="announcements">Announcements</option>
+                                    <option value="analytics">Analytics</option>
+                                </select>
+                            </div>
+                            <ul class="nav nav-pills custom-tabs-pill mb-4 d-none d-sm-flex" id="dashboardTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">
                                         <i class="feather-calendar me-2"></i>Events & Projects
@@ -301,6 +309,27 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  var mobileSelect = document.getElementById('mobileTabsSelect');
+  function showTabByKey(key) {
+    var btn = document.getElementById(key + '-tab');
+    if (!btn) return;
+    var tab = new bootstrap.Tab(btn);
+    tab.show();
+  }
+  if (mobileSelect) {
+    mobileSelect.addEventListener('change', function() {
+      showTabByKey(this.value);
+    });
+  }
+  var tabsList = document.getElementById('dashboardTabs');
+  if (tabsList && mobileSelect) {
+    tabsList.addEventListener('click', function(e) {
+      var btn = e.target.closest('button[role="tab"]');
+      if (!btn) return;
+      var key = btn.id.replace('-tab', '');
+      mobileSelect.value = key;
+    });
+  }
   var tab = document.getElementById('announcements-tab');
   var badge = document.getElementById('announcements-badge');
   var meta = document.getElementById('announcements-meta');

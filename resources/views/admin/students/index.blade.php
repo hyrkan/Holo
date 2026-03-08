@@ -51,7 +51,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($students as $student)
+                                @forelse ($students as $student)
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
@@ -81,26 +81,44 @@
                                     </td>
                                     <td>{{ $student->created_at->format('d M, Y') }}</td>
                                     <td class="text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            @if($student->status === 'pending')
-                                                <button type="button" class="btn btn-sm btn-soft-success" data-bs-toggle="modal" data-bs-target="#approveModal{{ $student->id }}">
-                                                    Approve
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-soft-danger" data-bs-toggle="modal" data-bs-target="#denyModal{{ $student->id }}">
-                                                    Deny
-                                                </button>
-                                            @endif
-                                            <a href="{{ route('admin.students.edit', $student) }}" class="btn btn-sm btn-soft-info">Edit</a>
-                                            <a href="{{ route('admin.students.show', $student) }}" class="btn btn-sm btn-soft-primary">View</a>
-                                            @if($student->status !== 'inactive')
-                                                <button type="button" class="btn btn-sm btn-soft-danger" title="Set Inactive" data-bs-toggle="modal" data-bs-target="#deactivateModal{{ $student->id }}">
-                                                    <i class="feather-trash-2"></i>
-                                                </button>
-                                            @endif
+                                        <div class="dropdown d-inline-block">
+                                            <a href="javascript:void(0);" class="btn btn-light btn-icon btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="feather-more-vertical"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                @if($student->status === 'pending')
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#approveModal{{ $student->id }}">
+                                                        <i class="feather-check-circle me-2"></i> Approve
+                                                    </button>
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#denyModal{{ $student->id }}">
+                                                        <i class="feather-x-circle me-2"></i> Deny
+                                                    </button>
+                                                    <div class="dropdown-divider"></div>
+                                                @endif
+                                                <a href="{{ route('admin.students.edit', $student) }}" class="dropdown-item">
+                                                    <i class="feather-edit-2 me-2"></i> Edit
+                                                </a>
+                                                <a href="{{ route('admin.students.show', $student) }}" class="dropdown-item">
+                                                    <i class="feather-eye me-2"></i> View
+                                                </a>
+                                                @if($student->status !== 'inactive')
+                                                    <div class="dropdown-divider"></div>
+                                                    <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deactivateModal{{ $student->id }}">
+                                                        <i class="feather-trash-2 me-2"></i> Set Inactive
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <i class="feather-users fs-1 text-muted"></i>
+                                        <p class="text-muted mt-2">No students found.</p>
+                                    </td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

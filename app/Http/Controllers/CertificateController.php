@@ -7,7 +7,9 @@ use App\Models\Certificate;
 use App\Models\Student;
 use App\Models\CertificateSignatory;
 use App\Models\EventRegistration;
+use App\Mail\CertificateAwardedMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
@@ -175,6 +177,13 @@ class CertificateController extends Controller
         $eventCertificateIds = $event->certificates()->pluck('id')->toArray();
         $validCertificateIds = array_intersect($certificateIds, $eventCertificateIds);
         
+        // Determine newly awarded certificates for this event
+        $currentEventCertIds = $student->certificates()
+            ->whereIn('certificate_id', $eventCertificateIds)
+            ->pluck('certificates.id')
+            ->toArray();
+        $newlyAwardedIds = array_values(array_diff($validCertificateIds, $currentEventCertIds));
+
         // Get student's current certificates NOT in this event
         $otherEventCertificates = $student->certificates()
             ->whereNotIn('certificate_id', $eventCertificateIds)
@@ -183,6 +192,16 @@ class CertificateController extends Controller
             
         // Sync the combination
         $student->certificates()->sync(array_merge($otherEventCertificates, $validCertificateIds));
+
+        // Send notification if any new awards were granted
+        if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
+            $awardedCertificates = Certificate::whereIn('id', $newlyAwardedIds)->get()->all();
+            try {
+                Mail::to($student->user->email)->send(new CertificateAwardedMail($student, $event, $awardedCertificates));
+            } catch (\Throwable $e) {
+                \Log::error('Failed to send certificate awarded email: ' . $e->getMessage());
+            }
+        }
 
         return response()->json(['success' => true]);
     }
@@ -202,7 +221,26 @@ class CertificateController extends Controller
 
         foreach ($students as $student) {
             if ($request->action === 'award') {
+                // Compute newly awarded for this student
+                $newlyAwardedIds = [];
+                if (!empty($certificateIds)) {
+                    $already = $student->certificates()
+                        ->whereIn('certificate_id', $certificateIds)
+                        ->pluck('certificates.id')
+                        ->toArray();
+                    $newlyAwardedIds = array_values(array_diff($certificateIds, $already));
+                }
+
                 $student->certificates()->syncWithoutDetaching($certificateIds);
+
+                if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
+                    $awardedCertificates = Certificate::whereIn('id', $newlyAwardedIds)->get()->all();
+                    try {
+                        Mail::to($student->user->email)->send(new CertificateAwardedMail($student, $event, $awardedCertificates));
+                    } catch (\Throwable $e) {
+                        \Log::error('Failed to send certificate awarded email: ' . $e->getMessage());
+                    }
+                }
             } else {
                 $student->certificates()->detach($certificateIds);
             }

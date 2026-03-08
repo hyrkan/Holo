@@ -95,7 +95,7 @@
                                                 <h5 class="mb-1 text-dark">{{ $student->first_name }} {{ $student->last_name }}</h5>
                                                 <p class="small text-muted mb-0">{{ $student->student_number }}</p>
                                             </div>
-                                            {!! QrCode::size(250)->generate($student->uuid) !!}
+                                            <div class="qr-responsive">{!! QrCode::size(250)->generate($student->uuid) !!}</div>
                                             <div class="mt-3">
                                                 <p class="small fw-bold text-primary mb-0">HOLO BOARD STUDENT ID</p>
                                             </div>
@@ -237,5 +237,30 @@
         });
     }
 </script>
+@endpush
+
+@push('styles')
+<style>
+    #qr-printable {
+        max-width: 100%;
+        overflow: hidden;
+    }
+    #qr-printable .qr-responsive svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+    @media (max-width: 480px) {
+        #qr-printable {
+            padding: 1rem !important;
+            border-radius: 12px;
+        }
+        #qr-printable .qr-responsive svg {
+            max-width: 85vw;
+        }
+    }
+</style>
 @endpush
 @endsection

@@ -48,11 +48,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'role:admin|employee'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // Resources and access control
+        // Resources accessible by both admin and employee?
+        // Based on seeder: employee can manage students.
+        // Let's assume announcements and events are admin only for now.
         Route::post('students/{student}/approve', [\App\Http\Controllers\StudentController::class, 'approve'])->name('students.approve');
         Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
-        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('permission:manage announcements');
+        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
         Route::get('/events/{event}/attendance', [\App\Http\Controllers\EventController::class, 'attendance'])->name('events.attendance')->middleware('role:admin');
@@ -74,16 +76,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
         Route::get('/attendance/scanner', [\App\Http\Controllers\AttendanceController::class, 'showScanner'])->name('attendance.scanner');
 
-        // Admin Lost and Found (permission gated)
-        Route::middleware('permission:manage lost and found')->group(function () {
-            Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'adminIndex'])->name('lost-and-found.index');
-            Route::get('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminCreate'])->name('lost-and-found.create');
-            Route::post('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.admin-store');
-            Route::get('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'adminShow'])->name('lost-and-found.show');
-            Route::get('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'resolve'])->name('lost-and-found.resolve');
-            Route::post('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'storeResolution'])->name('lost-and-found.store-resolution');
-            Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
-        });
+        // Admin Lost and Found
+        Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'adminIndex'])->name('lost-and-found.index');
+        Route::get('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminCreate'])->name('lost-and-found.create');
+        Route::post('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.admin-store');
+        Route::get('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'adminShow'])->name('lost-and-found.show');
+        Route::get('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'resolve'])->name('lost-and-found.resolve');
+        Route::post('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'storeResolution'])->name('lost-and-found.store-resolution');
+        Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
         
 
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile');

@@ -86,8 +86,11 @@ class StudentAuthController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'student_number' => ['nullable', 'required_if:student_type,regular', 'string', 'max:255', 'unique:students,student_number'],
+            'student_number' => ['required', 'string', 'max:255', 'unique:students,student_number'],
             'student_type' => ['required', 'string', 'in:regular,guest'],
+            'id_front' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
+            'id_back' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
+            'face_image' => ['required', 'string'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -105,20 +108,39 @@ class StudentAuthController extends Controller
         }
 
         $studentNumber = $request->student_number;
-        if ($request->student_type === \App\Models\Student::TYPE_GUEST && empty($studentNumber)) {
-            do {
-                $candidate = 'GUEST-' . strtoupper(\Illuminate\Support\Str::random(8));
-            } while (\App\Models\Student::where('student_number', $candidate)->exists());
-            $studentNumber = $candidate;
-        }
 
-        $user->student()->create([
+        $student = $user->student()->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'student_number' => $studentNumber,
             'student_type' => $request->student_type,
             'status' => \App\Models\Student::STATUS_PENDING,
             'expired_at' => $expiredAt,
+        ]);
+        
+        $idDir = 'students/ids/' . $student->uuid;
+        $faceDir = 'students/faces/' . $student->uuid;
+        $idFrontPath = null;
+        $idBackPath = null;
+        $facePhotoPath = null;
+        if ($request->file('id_front')) {
+            $idFrontPath = \Illuminate\Support\Facades\Storage::disk('public')->putFile($idDir, $request->file('id_front'));
+        }
+        if ($request->file('id_back')) {
+            $idBackPath = \Illuminate\Support\Facades\Storage::disk('public')->putFile($idDir, $request->file('id_back'));
+        }
+        if ($request->face_image) {
+            $photoData = $request->face_image;
+            $photoData = preg_replace('/^data:image\/\w+;base64,/', '', $photoData);
+            $photoData = str_replace(' ', '+', $photoData);
+            $photoName = 'face_' . time() . '_' . $student->id . '.jpg';
+            $facePhotoPath = $faceDir . '/' . $photoName;
+            \Illuminate\Support\Facades\Storage::disk('public')->put($facePhotoPath, base64_decode($photoData));
+        }
+        $student->update([
+            'id_front_path' => $idFrontPath,
+            'id_back_path' => $idBackPath,
+            'face_photo_path' => $facePhotoPath,
         ]);
 
         return redirect()->route('student.login')->with('success', 'Registration successful! Your account is pending approval by the admin.');

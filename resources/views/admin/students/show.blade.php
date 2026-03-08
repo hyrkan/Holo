@@ -72,86 +72,139 @@
         </div>
 
         <div class="col-lg-8">
-            <!-- Events Participation -->
             <div class="card stretch stretch-full">
-                <div class="card-header">
-                    <h5 class="card-title">Events Participation</h5>
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0">Student Details</h5>
+                    <ul class="nav nav-pills custom-tabs-pill" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-verification" data-bs-toggle="tab" data-bs-target="#pane-verification" type="button" role="tab" aria-controls="pane-verification" aria-selected="true">
+                                Verification Images
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-participation" data-bs-toggle="tab" data-bs-target="#pane-participation" type="button" role="tab" aria-controls="pane-participation" aria-selected="false">
+                                Events Participation
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-logs" data-bs-toggle="tab" data-bs-target="#pane-logs" type="button" role="tab" aria-controls="pane-logs" aria-selected="false">
+                                Event Logs
+                            </button>
+                        </li>
+                    </ul>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Joined On</th>
-                                    <th>Status</th>
-                                    <th>Attendance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($student->events as $event)
-                                    <tr>
-                                        <td>
-                                            <h6 class="mb-0 text-truncate" style="max-width: 200px;">{{ $event->name }}</h6>
-                                        </td>
-                                        <td>{{ $event->pivot->created_at->format('M d, Y') }}</td>
-                                        <td>
-                                            <span class="badge bg-soft-{{ $event->pivot->status === 'registered' ? 'success' : 'danger' }} text-{{ $event->pivot->status === 'registered' ? 'success' : 'danger' }}">
-                                                {{ ucfirst($event->pivot->status) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @php
-                                                $attendanceCount = $student->attendances
-                                                    ->whereIn('event_date_id', $event->eventDates->pluck('id'))
-                                                    ->count();
-                                                $totalDates = $event->eventDates->count();
-                                            @endphp
-                                            <span class="badge bg-soft-info text-info">
-                                                {{ $attendanceCount }} / {{ $totalDates }} Days
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">No events joined yet.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Attendance History -->
-            <div class="card stretch stretch-full mb-4">
-                <div class="card-header">
-                    <h5 class="card-title">Recent Attendance Logs</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Date</th>
-                                    <th>Time Scanned</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($student->attendances->sortByDesc('scanned_at')->take(10) as $attendance)
-                                    <tr>
-                                        <td>{{ $attendance->eventDate->event->name }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($attendance->eventDate->date)->format('M d, Y') }}</td>
-                                        <td>{{ $attendance->scanned_at ? \Carbon\Carbon::parse($attendance->scanned_at)->format('h:i A') : 'N/A' }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center py-4 text-muted">No attendance recorded yet.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="pane-verification" role="tabpanel" aria-labelledby="tab-verification">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="border rounded-4 p-2 text-center">
+                                        <h6 class="small text-muted mb-2">ID Front</h6>
+                                        @if($student->id_front_path)
+                                            <img src="{{ asset('storage/' . $student->id_front_path) }}" class="img-fluid rounded" alt="ID Front">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
+                                                <i class="feather-image fs-2 text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="border rounded-4 p-2 text-center">
+                                        <h6 class="small text-muted mb-2">ID Back</h6>
+                                        @if($student->id_back_path)
+                                            <img src="{{ asset('storage/' . $student->id_back_path) }}" class="img-fluid rounded" alt="ID Back">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
+                                                <i class="feather-image fs-2 text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="border rounded-4 p-2 text-center">
+                                        <h6 class="small text-muted mb-2">Face Photo</h6>
+                                        @if($student->face_photo_path)
+                                            <img src="{{ asset('storage/' . $student->face_photo_path) }}" class="img-fluid rounded" alt="Face Photo">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
+                                                <i class="feather-user fs-2 text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="pane-participation" role="tabpanel" aria-labelledby="tab-participation">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Event</th>
+                                            <th>Joined On</th>
+                                            <th>Status</th>
+                                            <th>Attendance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($student->events as $event)
+                                            <tr>
+                                                <td>
+                                                    <h6 class="mb-0 text-truncate" style="max-width: 200px;">{{ $event->name }}</h6>
+                                                </td>
+                                                <td>{{ $event->pivot->created_at->format('M d, Y') }}</td>
+                                                <td>
+                                                    <span class="badge bg-soft-{{ $event->pivot->status === 'registered' ? 'success' : 'danger' }} text-{{ $event->pivot->status === 'registered' ? 'success' : 'danger' }}">
+                                                        {{ ucfirst($event->pivot->status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $attendanceCount = $student->attendances
+                                                            ->whereIn('event_date_id', $event->eventDates->pluck('id'))
+                                                            ->count();
+                                                        $totalDates = $event->eventDates->count();
+                                                    @endphp
+                                                    <span class="badge bg-soft-info text-info">
+                                                        {{ $attendanceCount }} / {{ $totalDates }} Days
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4 text-muted">No events joined yet.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="pane-logs" role="tabpanel" aria-labelledby="tab-logs">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Event</th>
+                                            <th>Date</th>
+                                            <th>Time Scanned</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($student->attendances->sortByDesc('scanned_at')->take(10) as $attendance)
+                                            <tr>
+                                                <td>{{ $attendance->eventDate->event->name }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($attendance->eventDate->date)->format('M d, Y') }}</td>
+                                                <td>{{ $attendance->scanned_at ? \Carbon\Carbon::parse($attendance->scanned_at)->format('h:i A') : 'N/A' }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4 text-muted">No attendance recorded yet.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

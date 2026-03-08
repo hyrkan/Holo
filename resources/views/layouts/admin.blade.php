@@ -75,7 +75,7 @@
     <!--! BEGIN: Vendors JS !-->
     <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
     <!-- vendors.min.js {always must need to be top} -->
-    <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    <!-- Removed theme common-init to avoid core.js payload error -->
     <!--! END: Apps Init !-->
     
     <!--! Toast Container !-->

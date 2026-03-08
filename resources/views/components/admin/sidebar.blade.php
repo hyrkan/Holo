@@ -53,23 +53,19 @@
                         <span class="nxl-mtext">Speakers</span>
                     </a>
                 </li>
-                @endrole
-                @can('manage announcements')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.announcements.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-bell"></i></span>
                         <span class="nxl-mtext">Announcements</span>
                     </a>
                 </li>
-                @endcan
-                @can('manage lost and found')
+                @endrole
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.lost-and-found.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-search"></i></span>
                         <span class="nxl-mtext">Lost & Found</span>
                     </a>
                 </li>
-                @endcan
                 @role('admin')
                 <li class="nxl-item nxl-caption">
                     <label>Access Control</label>

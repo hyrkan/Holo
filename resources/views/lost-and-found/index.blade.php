@@ -8,7 +8,15 @@
         <div class="row mb-50">
             <div class="col-lg-12">
                 <div class="lost-found-tabs d-flex align-items-center justify-content-start" style="border-bottom: 2px solid #eee; padding-bottom: 20px;">
-                    <ul class="nav nav-pills custom-tabs">
+                    <div class="d-sm-none me-3" style="width: 220px;">
+                        <select id="lf-mobile-select" class="form-select">
+                            <option value="{{ route('lost-and-found.index', ['type' => 'all']) }}" {{ $type == 'all' ? 'selected' : '' }}>All Reports</option>
+                            <option value="{{ route('lost-and-found.index', ['type' => 'lost']) }}" {{ $type == 'lost' ? 'selected' : '' }}>Lost Items</option>
+                            <option value="{{ route('lost-and-found.index', ['type' => 'found']) }}" {{ $type == 'found' ? 'selected' : '' }}>Found Items</option>
+                            <option value="{{ route('lost-and-found.index', ['type' => 'returned']) }}" {{ $type == 'returned' ? 'selected' : '' }}>Recently Returned</option>
+                        </select>
+                    </div>
+                    <ul class="nav nav-pills custom-tabs d-none d-sm-flex">
                         <li class="nav-item">
                             <a href="{{ route('lost-and-found.index', ['type' => 'all']) }}" class="nav-link {{ $type == 'all' ? 'active' : '' }}">All Reports</a>
                         </li>
@@ -152,4 +160,18 @@
         color: white;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('lf-mobile-select');
+  if (sel) {
+    sel.addEventListener('change', function() {
+      var url = this.value;
+      if (url) window.location.href = url;
+    });
+  }
+});
+</script>
 @endpush

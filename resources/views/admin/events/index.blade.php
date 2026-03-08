@@ -108,7 +108,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-5">
+                                    <td colspan="6" class="text-center py-5">
                                         <i class="feather-calendar fs-1 text-muted"></i>
                                         <p class="text-muted mt-2">No events found.</p>
                                     </td>
