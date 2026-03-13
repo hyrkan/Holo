@@ -21,7 +21,6 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
-       
         $query = Student::with('user');
 
         if ($request->has('status') && $request->status !== 'all') {
@@ -29,7 +28,15 @@ class StudentController extends Controller
         }
 
         $students = $query->latest()->get();
-        return view('admin.students.index', compact('students'));
+        $statuses = EnrollmentStatus::orderBy('label')->get();
+        $classifications = Classification::orderBy('label')->get();
+        $statusMap = $statuses->mapWithKeys(function($s){
+            return [strtolower($s->name) => $s->label];
+        })->toArray();
+        $classificationMap = $classifications->mapWithKeys(function($c){
+            return [strtolower($c->name) => $c->label];
+        })->toArray();
+        return view('admin.students.index', compact('students', 'statusMap', 'classificationMap'));
     }
 
     public function exportCsv(Request $request)
@@ -286,7 +293,10 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return view('admin.students.edit', compact('student'));
+        $programs = Program::active()->orderBy('name')->get();
+        $statuses = EnrollmentStatus::active()->orderBy('label')->get();
+        $classifications = Classification::active()->orderBy('label')->get();
+        return view('admin.students.edit', compact('student', 'programs', 'statuses', 'classifications'));
     }
 
     /**

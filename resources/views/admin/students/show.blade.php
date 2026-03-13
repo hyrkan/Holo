@@ -463,23 +463,27 @@
     (function () {
         var yearSel = document.getElementById('show_year_level');
         var classSel = document.getElementById('show_classification');
-        if (yearSel && classSel) {
-            yearSel.addEventListener('change', function () {
-                if (this.value === '1st Year') {
-                    var hasFreshie = Array.from(classSel.options).some(function(o){ return o.value === 'freshie'; });
-                    if (hasFreshie) {
-                        classSel.value = 'freshie';
-                    } else {
-                        showToast('Freshie classification not available', 'warning');
-                    }
-                }
-            });
+        function autoSelectClassification() {
+            if (!yearSel || !classSel) return;
             if (yearSel.value === '1st Year') {
-                var hasFreshieInit = Array.from(classSel.options).some(function(o){ return o.value === 'freshie'; });
-                if (hasFreshieInit) {
-                    classSel.value = 'freshie';
+                var opts = Array.from(classSel.options || []);
+                var freshieOpt = opts.find(function(o){ return o.value === 'freshie'; }) || opts.find(function(o){ return (o.textContent || '').trim().toLowerCase() === 'freshie'; });
+                if (freshieOpt) {
+                    classSel.value = freshieOpt.value;
                 }
             }
+        }
+        if (yearSel && classSel) {
+            yearSel.addEventListener('change', function () {
+                autoSelectClassification();
+            });
+            autoSelectClassification();
+        }
+        var approveModal = document.getElementById('approveModal');
+        if (approveModal) {
+            approveModal.addEventListener('show.bs.modal', function(){
+                autoSelectClassification();
+            });
         }
 
         var csrf = document.getElementById('csrf_token') ? document.getElementById('csrf_token').value : '';

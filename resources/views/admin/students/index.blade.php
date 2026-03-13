@@ -1,9 +1,19 @@
-﻿﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Students List || Holo Board')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<style>
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .nxl-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+</style>
 @endpush
 
 @section('content')
@@ -49,6 +59,8 @@
                                     <th scope="row">Name</th>
                                     <th>Student Number</th>
                                     <th>Program</th>
+                                    <th>Enrollment Status</th>
+                                    <th>Classification</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Joined At</th>
@@ -68,6 +80,46 @@
                                     </td>
                                     <td>{{ $student->student_number }}</td>
                                     <td>{{ $student->program ?? 'Not Assigned' }}</td>
+                                    <td>
+                                        @php 
+                                            $es = $student->enrollment_status;
+                                            $esKey = strtolower((string)$es);
+                                            $esLabel = $statusMap[$esKey] ?? null;
+                                        @endphp
+                                        @if($esLabel)
+                                            @if($esKey === 'enrolled')
+                                                <span class="badge bg-soft-success text-success">{{ $esLabel }}</span>
+                                            @elseif($esKey === 'graduate')
+                                                <span class="badge bg-soft-primary text-primary">{{ $esLabel }}</span>
+                                            @else
+                                                <span class="badge bg-soft-secondary text-secondary">{{ $esLabel }}</span>
+                                            @endif
+                                        @elseif(!empty($es))
+                                            <span class="badge bg-soft-secondary text-secondary">{{ ucwords(str_replace('_',' ', $es)) }}</span>
+                                        @else
+                                            <span class="text-muted small">Not set</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php 
+                                            $cls = $student->classification;
+                                            $clsKey = strtolower((string)$cls);
+                                            $clsLabel = $classificationMap[$clsKey] ?? null;
+                                        @endphp
+                                        @if($clsKey === 'freshie')
+                                            <span class="badge bg-soft-info text-info">{{ $clsLabel ?? 'Freshie' }}</span>
+                                        @elseif($clsKey === 'cross_enrollee')
+                                            <span class="badge bg-soft-warning text-warning">{{ $clsLabel ?? 'Cross Enrollee' }}</span>
+                                        @elseif($clsKey === 'enrolled')
+                                            <span class="badge bg-soft-success text-success">{{ $clsLabel ?? 'Enrolled' }}</span>
+                                        @elseif($clsLabel)
+                                            <span class="badge bg-soft-secondary text-secondary">{{ $clsLabel }}</span>
+                                        @elseif(!empty($cls))
+                                            <span class="badge bg-soft-secondary text-secondary">{{ ucwords(str_replace('_',' ', $cls)) }}</span>
+                                        @else
+                                            <span class="text-muted small">Not set</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <span class="badge bg-soft-info text-info">{{ ucfirst($student->student_type) }}</span>
                                     </td>
@@ -91,15 +143,7 @@
                                                 <i class="feather-more-vertical"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                @if($student->status === 'pending')
-                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#approveModal{{ $student->id }}">
-                                                        <i class="feather-check-circle me-2"></i> Approve
-                                                    </button>
-                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#denyModal{{ $student->id }}">
-                                                        <i class="feather-x-circle me-2"></i> Deny
-                                                    </button>
-                                                    <div class="dropdown-divider"></div>
-                                                @endif
+                                                
                                                 <a href="{{ route('admin.students.edit', $student) }}" class="dropdown-item">
                                                     <i class="feather-edit-2 me-2"></i> Edit
                                                 </a>
@@ -235,7 +279,7 @@
 <script>
     $(document).ready(function() {
         var table = $('#students-table').DataTable({
-            order: [[5, 'desc']],
+            order: [[7, 'desc']],
             pageLength: 10,
             dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6 d-flex justify-content-end'f>>" +
                  "<'row'<'col-sm-12'tr>>" +
@@ -259,10 +303,10 @@
         var initStatus = "{{ request('status', 'all') }}";
         $('#statusFilter').val(initStatus);
 
-        // Status filter (column index 4)
+        // Status filter (column index 6)
         $('#statusFilter').on('change', function() {
             var val = $(this).val();
-            table.column(4).search(val === 'all' ? '' : val, true, false).draw();
+            table.column(6).search(val === 'all' ? '' : val, true, false).draw();
         }).trigger('change');
 
         $('#exportCsvBtn').on('click', function(e) {
@@ -275,10 +319,10 @@
             window.location.href = url;
         });
 
-        // Type filter (column index 3)
+        // Type filter (column index 5)
         $('#typeFilter').on('change', function() {
             var val = $(this).val();
-            table.column(3).search(val === 'all' ? '' : val, true, false).draw();
+            table.column(5).search(val === 'all' ? '' : val, true, false).draw();
         });
 
         // Program filter (column index 2, plain text)
