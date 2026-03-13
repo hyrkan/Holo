@@ -78,6 +78,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
         Route::get('/attendance/scanner', [\App\Http\Controllers\AttendanceController::class, 'showScanner'])->name('attendance.scanner');
 
+        Route::get('/programs', [\App\Http\Controllers\ProgramController::class, 'index'])->name('programs.index');
+        Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
+        Route::post('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
+        Route::post('/programs/{program}/archive', [\App\Http\Controllers\ProgramController::class, 'archive'])->name('programs.archive');
+        Route::post('/programs/{program}/restore', [\App\Http\Controllers\ProgramController::class, 'restore'])->name('programs.restore');
+
+        Route::get('/enrollment-statuses', [\App\Http\Controllers\EnrollmentStatusController::class, 'index'])->name('enrollment-statuses.index');
+        Route::post('/enrollment-statuses', [\App\Http\Controllers\EnrollmentStatusController::class, 'store'])->name('enrollment-statuses.store');
+        Route::post('/enrollment-statuses/{enrollmentStatus}', [\App\Http\Controllers\EnrollmentStatusController::class, 'update'])->name('enrollment-statuses.update');
+        Route::post('/enrollment-statuses/{enrollmentStatus}/archive', [\App\Http\Controllers\EnrollmentStatusController::class, 'archive'])->name('enrollment-statuses.archive');
+        Route::post('/enrollment-statuses/{enrollmentStatus}/restore', [\App\Http\Controllers\EnrollmentStatusController::class, 'restore'])->name('enrollment-statuses.restore');
+
+        Route::get('/classifications', [\App\Http\Controllers\ClassificationController::class, 'index'])->name('classifications.index');
+        Route::post('/classifications', [\App\Http\Controllers\ClassificationController::class, 'store'])->name('classifications.store');
+        Route::post('/classifications/{classification}', [\App\Http\Controllers\ClassificationController::class, 'update'])->name('classifications.update');
+        Route::post('/classifications/{classification}/archive', [\App\Http\Controllers\ClassificationController::class, 'archive'])->name('classifications.archive');
+        Route::post('/classifications/{classification}/restore', [\App\Http\Controllers\ClassificationController::class, 'restore'])->name('classifications.restore');
+
         // Admin Lost and Found
         Route::get('/lost-and-found', [\App\Http\Controllers\LostAndFoundController::class, 'adminIndex'])->name('lost-and-found.index');
         Route::get('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminCreate'])->name('lost-and-found.create');

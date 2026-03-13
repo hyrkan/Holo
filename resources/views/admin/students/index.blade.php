@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿﻿@extends('layouts.admin')
 
 @section('title', 'Students List || Holo Board')
 
@@ -289,6 +289,21 @@
             programDebounce = setTimeout(function(){
                 table.column(2).search(val).draw();
             }, 250);
+        });
+        // Auto-set Classification when Year Level changes (index page modals)
+        document.querySelectorAll('.year-level-sel').forEach(function(sel) {
+            var studentId = sel.getAttribute('data-student');
+            sel.addEventListener('change', function () {
+                var classSel = document.getElementById('classification_' + studentId);
+                if (classSel && this.value === '1st Year') {
+                    classSel.value = 'freshie';
+                }
+            });
+            // Init
+            var classSel = document.getElementById('classification_' + sel.getAttribute('data-student'));
+            if (classSel && sel.value === '1st Year') {
+                classSel.value = 'freshie';
+            }
         });
     });
 </script>

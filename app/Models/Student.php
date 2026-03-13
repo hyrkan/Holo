@@ -15,6 +15,8 @@ class Student extends Model
         'middle_name',
         'program',
         'year_level',
+        'enrollment_status',
+        'classification',
         'status',
         'student_type',
         'approved_at',
@@ -37,6 +39,18 @@ class Student extends Model
 
     const TYPE_REGULAR = 'regular';
     const TYPE_GUEST = 'guest';
+
+    // Programs
+    const PROGRAMS = ['BSCS', 'BSIT'];
+
+    // Enrollment Status
+    const ENROLLMENT_STATUS_ENROLLED = 'enrolled';
+    const ENROLLMENT_STATUS_GRADUATE = 'graduate';
+
+    // Classification
+    const CLASSIFICATION_FRESHIE = 'freshie';
+    const CLASSIFICATION_CROSS_ENROLLEE = 'cross_enrollee';
+    const CLASSIFICATION_ENROLLED = 'enrolled';
 
     protected static function boot()
     {

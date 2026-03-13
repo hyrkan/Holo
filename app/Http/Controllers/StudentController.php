@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Program;
+use App\Models\EnrollmentStatus;
 use App\Models\Event;
 use App\Models\Announcement;
 use App\Models\LostAndFound;
@@ -12,12 +14,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentStatusMail;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
+use App\Models\Classification;
 
 class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        // For admin usage to list students
+       
         $query = Student::with('user');
 
         if ($request->has('status') && $request->status !== 'all') {
@@ -63,15 +67,36 @@ class StudentController extends Controller
     public function approve(Request $request, Student $student)
     {
         $request->validate([
-            'program' => ['required', 'string', 'max:255'],
-            'year_level' => ['required', 'string', 'max:255'],
+            'program'           => [
+                'required',
+                'string',
+                Rule::exists('programs', 'name')->where('is_active', true),
+            ],
+            'year_level'        => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year,N/A'],
+            'enrollment_status' => [
+                'required',
+                'string',
+                Rule::exists('enrollment_statuses', 'name')->where('is_active', true),
+            ],
+            'classification'    => [
+                'required',
+                'string',
+                Rule::exists('classifications', 'name')->where('is_active', true),
+            ],
         ]);
 
+        // Auto-override classification: 1st Year students are always Freshies
+        $classification = $request->year_level === '1st Year'
+            ? Student::CLASSIFICATION_FRESHIE
+            : $request->classification;
+
         $student->update([
-            'program' => $request->program,
-            'year_level' => $request->year_level,
-            'status' => Student::STATUS_APPROVED,
-            'approved_at' => now(),
+            'program'           => $request->program,
+            'year_level'        => $request->year_level,
+            'enrollment_status' => $request->enrollment_status,
+            'classification'    => $classification,
+            'status'            => Student::STATUS_APPROVED,
+            'approved_at'       => now(),
         ]);
 
         Mail::to($student->user->email)->send(new StudentStatusMail($student, Student::STATUS_APPROVED));
@@ -250,7 +275,10 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         $student->load(['user', 'events', 'attendances.eventDate.event']);
-        return view('admin.students.show', compact('student'));
+        $programs = Program::orderBy('name')->get();
+        $statuses = EnrollmentStatus::orderBy('label')->get();
+        $classifications = Classification::orderBy('label')->get();
+        return view('admin.students.show', compact('student', 'programs', 'statuses', 'classifications'));
     }
 
     /**
@@ -267,9 +295,23 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
             $validated = $request->validate([
-                'program' => ['nullable', 'string', 'max:255'],
-                'year_level' => ['nullable', 'string', 'max:255'],
-                'status' => ['required', 'in:pending,approved,denied,expired,inactive'],
+                'program'           => [
+                    'nullable',
+                    'string',
+                    Rule::exists('programs', 'name')->where('is_active', true),
+                ],
+                'year_level'        => ['nullable', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year,N/A'],
+                'enrollment_status' => [
+                    'nullable',
+                    'string',
+                    Rule::exists('enrollment_statuses', 'name')->where('is_active', true),
+                ],
+                'classification'    => [
+                    'nullable',
+                    'string',
+                    Rule::exists('classifications', 'name')->where('is_active', true),
+                ],
+                'status'            => ['required', 'in:pending,approved,denied,expired,inactive'],
             ]);
 
             $student->update($validated);
