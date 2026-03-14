@@ -34,42 +34,7 @@
 		<![endif]-->
     
     @stack('styles')
-    <style>
-      @media (max-width: 767.98px) {
-        .nxl-navigation {
-          position: fixed;
-          top: 0;
-          left: -280px;
-          width: 280px;
-          height: 100vh;
-          z-index: 1050;
-          transition: left .3s ease;
-          background: #ffffff;
-          box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
-        }
-        .mobile-nav-open .nxl-navigation {
-          left: 0;
-        }
-        .mobile-nav-overlay {
-          display: none;
-        }
-        .mobile-nav-open .mobile-nav-overlay {
-          display: block;
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,.35);
-          z-index: 1049;
-        }
-      }
-      html.sidebar-minified .nxl-navigation {
-        width: 80px;
-      }
-      html.sidebar-minified .nxl-navigation .nxl-mtext,
-      html.sidebar-minified .nxl-navigation .nxl-arrow,
-      html.sidebar-minified .nxl-navigation .nxl-submenu {
-        display: none;
-      }
-    </style>
+    <style></style>
 </head>
 
 <body>
@@ -85,7 +50,6 @@
     <!--! [Start] Header !-->
     <!--! ================================================================ !-->
     @include('components.admin.header')
-    <div id="mobileNavOverlay" class="mobile-nav-overlay"></div>
     <!--! ================================================================ !-->
     <!--! [End] Header !-->
     <!--! ================================================================ !-->
@@ -115,57 +79,7 @@
     <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
     <script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
     <!--! END: Apps Init !-->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var html = document.documentElement;
-        var miniBtn = document.getElementById('menu-mini-button');
-        var expandBtn = document.getElementById('menu-expend-button');
-        var burger = document.getElementById('mobile-collapse');
-        var overlay = document.getElementById('mobileNavOverlay');
-        var saved = localStorage.getItem('holoboard-admin-sidebar');
-        if (saved === 'min') {
-          html.classList.add('sidebar-minified');
-          if (miniBtn) miniBtn.style.display = 'none';
-          if (expandBtn) expandBtn.style.display = 'inline-block';
-        } else {
-          html.classList.remove('sidebar-minified');
-          if (expandBtn) expandBtn.style.display = 'none';
-          if (miniBtn) miniBtn.style.display = 'inline-block';
-        }
-        if (miniBtn) {
-          miniBtn.addEventListener('click', function() {
-            html.classList.add('sidebar-minified');
-            miniBtn.style.display = 'none';
-            if (expandBtn) expandBtn.style.display = 'inline-block';
-            localStorage.setItem('holoboard-admin-sidebar', 'min');
-          });
-        }
-        if (expandBtn) {
-          expandBtn.addEventListener('click', function() {
-            html.classList.remove('sidebar-minified');
-            expandBtn.style.display = 'none';
-            if (miniBtn) miniBtn.style.display = 'inline-block';
-            localStorage.setItem('holoboard-admin-sidebar', 'full');
-          });
-        }
-        function toggleMobileNav() {
-          document.body.classList.toggle('mobile-nav-open');
-        }
-        if (burger) {
-          burger.addEventListener('click', toggleMobileNav);
-        }
-        if (overlay) {
-          overlay.addEventListener('click', function() {
-            document.body.classList.remove('mobile-nav-open');
-          });
-        }
-        window.addEventListener('resize', function() {
-          if (window.innerWidth >= 768) {
-            document.body.classList.remove('mobile-nav-open');
-          }
-        });
-      });
-    </script>
+    <script></script>
     
     <!--! Toast Container !-->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;">

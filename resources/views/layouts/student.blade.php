@@ -37,32 +37,6 @@
             color: #fff !important;
             box-shadow: 0 4px 6px -1px rgba(71, 0, 200, 0.2);
         }
-        @media (max-width: 767.98px) {
-            .nxl-navigation {
-                position: fixed;
-                top: 0;
-                left: -280px;
-                width: 280px;
-                height: 100vh;
-                z-index: 1050;
-                transition: left .3s ease;
-                background: #ffffff;
-                box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
-            }
-            .mobile-nav-open .nxl-navigation {
-                left: 0;
-            }
-            .mobile-nav-overlay {
-                display: none;
-            }
-            .mobile-nav-open .mobile-nav-overlay {
-                display: block;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.35);
-                z-index: 1049;
-            }
-        }
     </style>
 </head>
 
@@ -72,8 +46,6 @@
     
     <!--! Header !-->
     @include('components.student.header')
-    
-    <div id="mobileNavOverlay" class="mobile-nav-overlay"></div>
     
     <main class="nxl-container d-flex flex-column justify-content-between">
         <div class="nxl-content">
@@ -132,25 +104,6 @@
                 return new bootstrap.Toast(toastEl, { delay: 5000 });
             })
             toastList.forEach(toast => toast.show());
-            
-            var burger = document.getElementById('mobile-collapse');
-            var overlay = document.getElementById('mobileNavOverlay');
-            function toggleMobileNav() {
-                document.body.classList.toggle('mobile-nav-open');
-            }
-            if (burger) {
-                burger.addEventListener('click', toggleMobileNav);
-            }
-            if (overlay) {
-                overlay.addEventListener('click', function() {
-                    document.body.classList.remove('mobile-nav-open');
-                });
-            }
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    document.body.classList.remove('mobile-nav-open');
-                }
-            });
         });
     </script>
     

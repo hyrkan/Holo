@@ -6,23 +6,7 @@
 
 <header class="nxl-header">
     <div class="header-wrapper">
-        <div class="header-left d-flex align-items-center gap-4">
-            <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse">
-                <div class="hamburger hamburger--arrowturn">
-                    <div class="hamburger-box">
-                        <div class="hamburger-inner"></div>
-                    </div>
-                </div>
-            </a>
-            <div class="nxl-navigation-toggle">
-                <a href="javascript:void(0);" id="menu-mini-button">
-                    <i class="feather-align-left"></i>
-                </a>
-                <a href="javascript:void(0);" id="menu-expend-button" style="display: none">
-                    <i class="feather-arrow-right"></i>
-                </a>
-            </div>
-        </div>
+        <div class="header-left d-flex align-items-center gap-4"></div>
         
         <div class="header-right ms-auto">
             <div class="d-flex align-items-center">

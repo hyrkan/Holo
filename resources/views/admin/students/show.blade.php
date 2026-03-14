@@ -158,6 +158,46 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="pane-participation" role="tabpanel" aria-labelledby="tab-participation">
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-4">
+                                    <input id="evp-search" type="text" class="form-control" placeholder="Search event name">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="evp-period" class="form-select">
+                                        <option value="all">All time</option>
+                                        <option value="this_week">This week</option>
+                                        <option value="this_month">This month</option>
+                                        <option value="this_year">This year</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input id="evp-start" type="date" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <input id="evp-end" type="date" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="evp-attendance" class="form-select">
+                                        <option value="any">All</option>
+                                        <option value="any_present">Any Present</option>
+                                        <option value="fully_present">Fully Present</option>
+                                        <option value="partial">Partially Present</option>
+                                        <option value="fully_absent">Fully Absent</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="evp-date-mode">
+                                        <label class="form-check-label small" for="evp-date-mode">Use event dates</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex justify-content-end">
+                                    <button id="evp-download" data-student-id="{{ $student->id }}" type="button" class="btn btn-outline-primary btn-sm">
+                                        <i class="feather-download me-2"></i>Download CSV
+                                    </button>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
                                     <thead>
@@ -168,9 +208,16 @@
                                             <th>Attendance</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="evp-tbody">
                                         @forelse($student->events as $event)
-                                            <tr>
+                                            @php
+                                                $attendanceCount = $student->attendances
+                                                    ->whereIn('event_date_id', $event->eventDates->pluck('id'))
+                                                    ->count();
+                                                $totalDates = $event->eventDates->count();
+                                                $joinedISO = optional($event->pivot->created_at)->format('Y-m-d');
+                                            @endphp
+                                            <tr data-joined="{{ $joinedISO }}" data-total="{{ $totalDates }}" data-present="{{ $attendanceCount }}">
                                                 <td>
                                                     <h6 class="mb-0 text-truncate" style="max-width: 200px;">{{ $event->name }}</h6>
                                                 </td>
@@ -181,15 +228,13 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    @php
-                                                        $attendanceCount = $student->attendances
-                                                            ->whereIn('event_date_id', $event->eventDates->pluck('id'))
-                                                            ->count();
-                                                        $totalDates = $event->eventDates->count();
-                                                    @endphp
                                                     <span class="badge bg-soft-info text-info">
                                                         {{ $attendanceCount }} / {{ $totalDates }} Days
                                                     </span>
+                                                    @foreach($event->eventDates as $eventDate)
+                                                        @php $has = $student->attendances->contains('event_date_id', $eventDate->id); @endphp
+                                                        <span class="d-none evp-session" data-date="{{ \Carbon\Carbon::parse($eventDate->date)->format('Y-m-d') }}" data-present="{{ $has ? 1 : 0 }}"></span>
+                                                    @endforeach
                                                 </td>
                                             </tr>
                                         @empty
@@ -229,15 +274,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('modals')
-@if($student->status === 'pending')
     <!-- Approve Modal -->
     <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -456,8 +498,7 @@
             </div>
         </div>
     </div>
-@endif
-
+ 
 @push('scripts')
 <script>
     (function () {
@@ -950,3 +991,163 @@
 </script>
 @endpush
 @endsection
+@push('scripts')
+<script>
+(function(){
+  var search = document.getElementById('evp-search');
+  var start = document.getElementById('evp-start');
+  var end = document.getElementById('evp-end');
+  var attendanceSel = document.getElementById('evp-attendance');
+  var dateMode = document.getElementById('evp-date-mode');
+  var tbody = document.getElementById('evp-tbody');
+  var dlBtn = document.getElementById('evp-download');
+  var period = document.getElementById('evp-period');
+  function toISODate(text){
+    if (!text) return '';
+    var map = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+    var t = text.replace(',', '').trim().split(/\s+/);
+    if (t.length === 3 && map[t[0]]) {
+      var d = t[1];
+      if (d.length === 1) d = '0' + d;
+      return t[2] + '-' + map[t[0]] + '-' + d;
+    }
+    var d2 = new Date(text);
+    if (!isNaN(d2)) return d2.toISOString().slice(0,10);
+    return '';
+  }
+  function fmt(d){
+    var y = d.getFullYear();
+    var m = (d.getMonth() + 1).toString().padStart(2, '0');
+    var day = d.getDate().toString().padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+  function setDatesDisabled(disabled){
+    if (start) start.disabled = disabled;
+    if (end) end.disabled = disabled;
+  }
+  function applyPeriod(){
+    if (!period) { applyFilters(); return; }
+    var v = period.value || 'all';
+    if (v === 'all') {
+      if (start) start.value = '';
+      if (end) end.value = '';
+      setDatesDisabled(true);
+      applyFilters();
+      return;
+    }
+    if (v === 'custom') {
+      setDatesDisabled(false);
+      applyFilters();
+      return;
+    }
+    var now = new Date();
+    var s, e;
+    if (v === 'this_week') {
+      var dow = now.getDay();
+      var diff = dow === 0 ? 6 : (dow - 1);
+      s = new Date(now);
+      s.setDate(now.getDate() - diff);
+      e = new Date(s);
+      e.setDate(s.getDate() + 6);
+    } else if (v === 'this_month') {
+      s = new Date(now.getFullYear(), now.getMonth(), 1);
+      e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    } else if (v === 'this_year') {
+      s = new Date(now.getFullYear(), 0, 1);
+      e = new Date(now.getFullYear(), 11, 31);
+    } else {
+      s = '';
+      e = '';
+    }
+    if (start) start.value = s ? fmt(s) : '';
+    if (end) end.value = e ? fmt(e) : '';
+    setDatesDisabled(true);
+    applyFilters();
+  }
+  function applyFilters(){
+    if (!tbody) return;
+    var term = (search && search.value ? search.value : '').trim().toLowerCase();
+    var s = start && start.value ? start.value : '';
+    var e = end && end.value ? end.value : '';
+    var stat = attendanceSel && attendanceSel.value ? attendanceSel.value : 'any';
+    var rows = tbody.querySelectorAll('tr');
+    rows.forEach(function(row){
+      var nameText = row.cells[0] ? row.cells[0].innerText.toLowerCase() : '';
+      var joinedISO = row.getAttribute('data-joined') || '';
+      var ok = true;
+      if (term && nameText.indexOf(term) === -1) ok = false;
+      if (dateMode && dateMode.checked) {
+        var sessions = Array.from(row.querySelectorAll('.evp-session'));
+        var inRange = sessions.filter(function(ses){
+          var d = ses.getAttribute('data-date') || '';
+          if (s && (!d || d < s)) return false;
+          if (e && (!d || d > e)) return false;
+          return true;
+        });
+        var totalInRange = (s || e) ? inRange.length : sessions.length;
+        var presentInRange = (s || e ? inRange : sessions).filter(function(ses){
+          return ses.getAttribute('data-present') === '1';
+        }).length;
+        if (s || e) {
+          if (totalInRange === 0) ok = false;
+        }
+        if (stat === 'any_present' && presentInRange <= 0) ok = false;
+        if (stat === 'fully_present' && !(totalInRange > 0 && presentInRange === totalInRange)) ok = false;
+        if (stat === 'fully_absent' && !(totalInRange > 0 && presentInRange === 0)) ok = false;
+        if (stat === 'partial' && !(presentInRange > 0 && presentInRange < totalInRange)) ok = false;
+      } else {
+        if (s || e) {
+          if (s && (!joinedISO || joinedISO < s)) ok = false;
+          if (e && (!joinedISO || joinedISO > e)) ok = false;
+        }
+        var presentCount = parseInt(row.getAttribute('data-present') || '0', 10);
+        var totalCount = parseInt(row.getAttribute('data-total') || '0', 10);
+        if (stat === 'any_present' && presentCount <= 0) ok = false;
+        if (stat === 'fully_present' && !(totalCount > 0 && presentCount === totalCount)) ok = false;
+        if (stat === 'fully_absent' && !(totalCount > 0 && presentCount === 0)) ok = false;
+        if (stat === 'partial' && !(presentCount > 0 && presentCount < totalCount)) ok = false;
+      }
+      row.style.display = ok ? '' : 'none';
+    });
+  }
+  function downloadCSV(){
+    if (!tbody) return;
+    var rows = Array.from(tbody.querySelectorAll('tr')).filter(function(r){ return r.style.display !== 'none'; });
+    var data = [['Event','Joined On','Status','Attendance']];
+    rows.forEach(function(r){
+      var cells = r.querySelectorAll('td');
+      if (cells.length >= 4) {
+        var eventName = cells[0].innerText.replace(/\s+/g,' ').trim();
+        var joined = cells[1].innerText.trim();
+        var status = cells[2].innerText.replace(/\s+/g,' ').trim();
+        var attendance = cells[3].innerText.trim();
+        data.push([eventName, joined, status, attendance]);
+      }
+    });
+    var csv = data.map(function(row){
+      return row.map(function(field){
+        var v = ('' + field).replace(/"/g, '""');
+        return '"' + v + '"';
+      }).join(',');
+    }).join('\r\n');
+    var id = dlBtn ? (dlBtn.getAttribute('data-student-id') || 'student') : 'student';
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'student-' + id + '-events.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+  if (search) search.addEventListener('input', applyFilters);
+  if (start) start.addEventListener('change', function(){ if (period) period.value = 'custom'; setDatesDisabled(false); applyFilters(); });
+  if (end) end.addEventListener('change', function(){ if (period) period.value = 'custom'; setDatesDisabled(false); applyFilters(); });
+  if (attendanceSel) attendanceSel.addEventListener('change', applyFilters);
+  if (dateMode) dateMode.addEventListener('change', applyFilters);
+  if (period) period.addEventListener('change', applyPeriod);
+  if (dlBtn) dlBtn.addEventListener('click', downloadCSV);
+  applyPeriod();
+})();
+</script>
+@endpush
