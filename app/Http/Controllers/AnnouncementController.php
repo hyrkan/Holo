@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\AnnouncementAttachment;
+use App\Jobs\SendAnnouncementNotifications;
 use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
@@ -64,8 +65,11 @@ class AnnouncementController extends Controller
             }
         }
 
+        // Dispatch queued email notifications to targeted students
+        SendAnnouncementNotifications::dispatch($announcement);
+
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Announcement created successfully.');
+            ->with('success', 'Announcement created and notifications queued successfully.');
     }
 
     public function show(Announcement $announcement)
