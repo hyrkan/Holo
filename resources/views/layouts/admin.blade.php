@@ -115,6 +115,32 @@
         @endif
     </div>
 
+    <!--! Confirmation Modal !-->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i id="confirmModalIcon" class="feather-help-circle fs-1 text-primary me-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p id="confirmModalMessage" class="mb-0 fs-14 text-dark fw-medium"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmModalActionBtn" class="btn btn-primary px-4">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var toastElList = [].slice.call(document.querySelectorAll('.toast'))
@@ -122,6 +148,45 @@
                 return new bootstrap.Toast(toastEl, { delay: 5000 });
             })
             toastList.forEach(toast => toast.show());
+
+            // Generic Confirmation Modal Handler
+            const confirmModal = document.getElementById('confirmationModal');
+            const confirmModalActionBtn = document.getElementById('confirmModalActionBtn');
+            const confirmModalMessage = document.getElementById('confirmModalMessage');
+            const confirmModalIcon = document.getElementById('confirmModalIcon');
+            const confirmModalLabel = document.getElementById('confirmationModalLabel');
+            let currentForm = null;
+
+            // Trigger buttons with data-confirm-message
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('[data-confirm-message]');
+                if (target) {
+                    e.preventDefault();
+                    currentForm = target.closest('form');
+                    const message = target.getAttribute('data-confirm-message') || 'Are you sure you want to proceed?';
+                    const title = target.getAttribute('data-confirm-title') || 'Confirm Action';
+                    const type = target.getAttribute('data-confirm-type') || 'primary'; // primary, danger, warning, success
+                    const icon = target.getAttribute('data-confirm-icon') || 'help-circle';
+                    const btnText = target.getAttribute('data-confirm-btn-text') || 'Confirm';
+
+                    confirmModalLabel.innerText = title;
+                    confirmModalMessage.innerText = message;
+                    confirmModalActionBtn.innerText = btnText;
+                    
+                    // Set color based on type
+                    confirmModalActionBtn.className = `btn btn-${type} px-4`;
+                    confirmModalIcon.className = `feather-${icon} fs-1 text-${type} me-3`;
+
+                    const modal = new bootstrap.Modal(confirmModal);
+                    modal.show();
+                }
+            });
+
+            confirmModalActionBtn.addEventListener('click', function() {
+                if (currentForm) {
+                    currentForm.submit();
+                }
+            });
         });
     </script>
     

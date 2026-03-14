@@ -2,19 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LandingPageController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    if (Auth::guard('student')->check()) {
-        return redirect()->route('student.dashboard');
-    }
-
-    return redirect()->route('student.login');
-});
+Route::get('/', [LandingPageController::class, 'index'])->name('welcome');
 
 // Default login route alias to satisfy auth middleware redirects
 Route::get('/login', function () {
@@ -55,6 +51,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('students/{student}/approve', [\App\Http\Controllers\StudentController::class, 'approve'])->name('students.approve');
         Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
+        Route::get('announcements/export', [\App\Http\Controllers\AnnouncementController::class, 'exportCsv'])->name('announcements.export')->middleware('role:admin');
+        Route::get('announcements/archived', [\App\Http\Controllers\AnnouncementController::class, 'archived'])->name('announcements.archived')->middleware('role:admin');
+        Route::post('announcements/{announcement}/restore', [\App\Http\Controllers\AnnouncementController::class, 'restore'])->name('announcements.restore')->middleware('role:admin');
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
         Route::delete('announcements/attachments/{attachment}', [\App\Http\Controllers\AnnouncementController::class, 'deleteAttachment'])->name('announcements.attachments.destroy')->middleware('role:admin');
         Route::get('events/export', [\App\Http\Controllers\EventController::class, 'exportCsv'])->name('events.export')->middleware('role:admin');

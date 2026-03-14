@@ -14,8 +14,14 @@ class AnnouncementController extends Controller
      */
     public function index()
     {
-        $announcements = Announcement::latest()->paginate(10);
+        $announcements = Announcement::where('is_archived', false)->latest()->paginate(10);
         return view('admin.announcements.index', compact('announcements'));
+    }
+
+    public function archived()
+    {
+        $announcements = Announcement::where('is_archived', true)->latest()->paginate(10);
+        return view('admin.announcements.archived', compact('announcements'));
     }
 
     /**
@@ -126,19 +132,18 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement)
     {
-        if ($announcement->image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($announcement->image);
-        }
-
-        // Delete attachments
-        foreach ($announcement->attachments as $attachment) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
-        }
-        
-        $announcement->delete();
+        $announcement->update(['is_archived' => true]);
 
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Announcement deleted successfully.');
+            ->with('success', 'Announcement archived successfully.');
+    }
+
+    public function restore(Announcement $announcement)
+    {
+        $announcement->update(['is_archived' => false]);
+
+        return redirect()->route('admin.announcements.archived')
+            ->with('success', 'Announcement restored successfully.');
     }
 
     public function deleteAttachment(AnnouncementAttachment $attachment)

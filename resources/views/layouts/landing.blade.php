@@ -101,13 +101,7 @@
                                 <a href="{{ url('/') }}"><h2 class="text-white mb-0">Holo Board</h2></a>
                             </div>
                             <div class="footer-text mb-20">
-                                <p>The issue with any content strategy is time. Time to sit down and think about what kind of content should be created, time to stop and write, or record, edit and publish, and time to engage with your audience to promote the content you created.</p>
-                            </div>
-                            <div class="footer-social">                                    
-                                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#"><i class="fab fa-twitter"></i></a>
-                                <a href="#"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-google-plus-g"></i></a>
+                                <p>Holo Board - Student Management System. Stay updated with the latest campus announcements and events.</p>
                             </div>
                         </div>
                     </div>
@@ -119,15 +113,7 @@
                 <div class="row">
                     <div class="col-12">						
                         <div class="copyright-text text-center">
-                            <div class="footer-link">
-                                <ul>
-                                    <li><a href="#">About</a></li>
-                                    <li><a href="#">Blog</a></li>
-                                    <li><a href="#">Contact</a></li>
-                                    <li><a href="#">Tickets</a></li>
-                                    <li><a href="#">Venue</a></li>
-                                </ul>
-                            </div>                              
+                            <p class="text-white">© {{ date('Y') }} Holo Board. All rights reserved.</p>
                         </div>
                     </div>
                 </div>

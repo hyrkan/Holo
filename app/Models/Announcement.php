@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Announcement extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -16,6 +17,7 @@ class Announcement extends Model
         'end_date' => 'datetime',
         'is_active' => 'boolean',
         'is_draft' => 'boolean',
+        'is_archived' => 'boolean',
         'target_year_levels' => 'array',
     ];
 

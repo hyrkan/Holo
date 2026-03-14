@@ -6,13 +6,10 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header">
-                    <h5 class="card-title">Announcements</h5>
+                    <h5 class="card-title">Archived Announcements</h5>
                     <div class="card-header-action">
-                        <a href="{{ route('admin.announcements.archived') }}" class="btn btn-secondary me-2">
-                            <i class="feather-archive me-2"></i> Archived
-                        </a>
-                        <a href="{{ route('admin.announcements.create') }}" class="btn btn-primary">
-                            <i class="feather-plus me-2"></i> Create Announcement
+                        <a href="{{ route('admin.announcements.index') }}" class="btn btn-secondary">
+                            <i class="feather-arrow-left me-2"></i> Back to Announcements
                         </a>
                     </div>
                 </div>
@@ -22,7 +19,6 @@
                             <thead>
                                 <tr class="border-b">
                                     <th scope="row">Title</th>
-                                    <th>Status</th>
                                     <th>Target</th>
                                     <th>Duration</th>
                                     <th class="text-end">Actions</th>
@@ -39,15 +35,6 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($announcement->is_draft)
-                                            <span class="badge bg-soft-warning text-warning">Draft</span>
-                                        @elseif($announcement->is_active)
-                                            <span class="badge bg-soft-success text-success">Active</span>
-                                        @else
-                                            <span class="badge bg-soft-secondary text-secondary">Inactive</span>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <div class="fs-12">
                                             <span class="fw-bold">{{ ucfirst($announcement->target_audience) }}</span>
                                             @if($announcement->target_audience == 'students' && $announcement->target_year_levels)
@@ -60,20 +47,15 @@
                                     </td>
                                     <td class="text-end">
                                         <div class="hstack gap-3 justify-content-end">
-                                            <a href="{{ route('admin.announcements.edit', $announcement) }}" class="text-secondary" data-bs-toggle="tooltip" title="Edit">
-                                                <i class="feather-edit-3 fs-16"></i>
-                                            </a>
-                                            <form action="{{ route('admin.announcements.destroy', $announcement) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.announcements.restore', $announcement) }}" method="POST" class="d-inline">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-warning border-0 bg-transparent p-0" 
-                                                    data-confirm-title="Archive Announcement"
-                                                    data-confirm-message="Are you sure you want to archive '{{ $announcement->title }}'?"
-                                                    data-confirm-type="warning"
-                                                    data-confirm-icon="archive"
-                                                    data-confirm-btn-text="Archive"
-                                                    data-bs-toggle="tooltip" title="Archive">
-                                                    <i class="feather-archive fs-16"></i>
+                                                <button type="submit" class="btn btn-sm btn-soft-success" 
+                                                    data-confirm-title="Restore Announcement"
+                                                    data-confirm-message="Are you sure you want to restore '{{ $announcement->title }}'?"
+                                                    data-confirm-type="success"
+                                                    data-confirm-icon="rotate-ccw"
+                                                    data-confirm-btn-text="Restore">
+                                                    <i class="feather-rotate-ccw me-1"></i> Restore
                                                 </button>
                                             </form>
                                         </div>
@@ -82,8 +64,8 @@
                                 @empty
                                 <tr>
                                     <td colspan="4" class="text-center py-5">
-                                        <i class="feather-bell fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No announcements found.</p>
+                                        <i class="feather-archive fs-1 text-muted"></i>
+                                        <p class="text-muted mt-2">No archived announcements found.</p>
                                     </td>
                                 </tr>
                                 @endforelse
