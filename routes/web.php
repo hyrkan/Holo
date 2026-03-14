@@ -119,6 +119,10 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/register', [\App\Http\Controllers\StudentAuthController::class, 'register'])->name('register');
     Route::post('/register', [\App\Http\Controllers\StudentAuthController::class, 'store'])->name('register.post');
     Route::post('/logout', [\App\Http\Controllers\StudentAuthController::class, 'logout'])->name('logout');
+    Route::get('/forgot-password', [\App\Http\Controllers\StudentPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\StudentPasswordController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\StudentPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\StudentPasswordController::class, 'reset'])->name('password.store');
 
     Route::get('/dashboard', [\App\Http\Controllers\StudentController::class, 'dashboard'])->middleware(['auth:student', 'role:student'])->name('dashboard');
 
