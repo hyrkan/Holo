@@ -16,5 +16,11 @@ class Announcement extends Model
         'end_date' => 'datetime',
         'is_active' => 'boolean',
         'is_draft' => 'boolean',
+        'target_year_levels' => 'array',
     ];
+
+    public function attachments()
+    {
+        return $this->hasMany(AnnouncementAttachment::class);
+    }
 }

@@ -191,8 +191,15 @@
                                                  data-title="{{ $announcement->title }}"
                                                  data-body="{{ $announcement->body }}"
                                                  data-image="{{ $announcement->image ? asset('storage/' . $announcement->image) : '' }}"
-                                                 data-start="{{ optional($announcement->start_date)->format('M d, Y H:i') }}"
-                                                 data-end="{{ optional($announcement->end_date)->format('M d, Y H:i') }}"
+                                                 data-created="{{ $announcement->created_at->format('M d, Y') }}"
+                                                 data-attachments="{{ json_encode($announcement->attachments->map(function($a) { 
+                                                     return [
+                                                         'name' => $a->file_name,
+                                                         'url' => Storage::url($a->file_path),
+                                                         'type' => $a->file_type,
+                                                         'size' => number_format($a->file_size / 1024, 2) . ' KB'
+                                                     ];
+                                                 })) }}"
                                                  role="button" tabindex="0">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center gap-3 mb-3">
@@ -206,10 +213,7 @@
                                                         <div class="overflow-hidden">
                                                             <h6 class="text-truncate mb-0">{{ $announcement->title }}</h6>
                                                             <small class="text-muted">
-                                                                {{ optional($announcement->start_date)->format('M d, Y') }}
-                                                                @if($announcement->end_date)
-                                                                    - {{ optional($announcement->end_date)->format('M d, Y') }}
-                                                                @endif
+                                                                {{ $announcement->created_at->format('M d, Y') }}
                                                             </small>
                                                         </div>
                                                     </div>
@@ -234,11 +238,15 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <div id="announcementModalImageWrap" class="mb-3" style="display:none;">
-                                                    <img id="announcementModalImage" src="" alt="" class="img-fluid rounded-3" />
+                                                <div id="announcementModalDates" class="text-muted small mb-3 text-end"></div>
+                                                <div id="announcementModalImageWrap" class="mb-3 text-center" style="display:none;">
+                                                    <img id="announcementModalImage" src="" alt="" class="img-fluid rounded-3" style="max-height: 400px; width: 100%; object-fit: cover;" />
                                                 </div>
-                                                <div id="announcementModalDates" class="text-muted mb-2"></div>
-                                                <div id="announcementModalBodyText" class="fs-6"></div>
+                                                <div id="announcementModalBodyText" class="fs-6 mb-4" style="white-space: pre-wrap;"></div>
+                                                <div id="announcementModalAttachments" style="display:none;">
+                                                    <h6 class="mb-3">Downloadable Files:</h6>
+                                                    <div id="attachmentsList" class="row g-2"></div>
+                                                </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -365,6 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
   var modalDates = document.getElementById('announcementModalDates');
   var modalImgWrap = document.getElementById('announcementModalImageWrap');
   var modalImg = document.getElementById('announcementModalImage');
+  var attachmentsContainer = document.getElementById('announcementModalAttachments');
+  var attachmentsList = document.getElementById('attachmentsList');
   var clickable = document.querySelectorAll('[data-announcement="true"]');
   if (modalEl && modalTitle && modalBody && modalDates) {
     if (modalEl.parentNode !== document.body) {
@@ -375,17 +385,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var title = card.getAttribute('data-title') || '';
         var body = card.getAttribute('data-body') || '';
         var image = card.getAttribute('data-image') || '';
-        var start = card.getAttribute('data-start') || '';
-        var end = card.getAttribute('data-end') || '';
+        var created = card.getAttribute('data-created') || '';
+        var attachmentsRaw = card.getAttribute('data-attachments') || '[]';
+        var attachments = JSON.parse(attachmentsRaw);
+
         modalTitle.textContent = title;
         modalBody.textContent = body;
-        if (start && end) {
-          modalDates.textContent = start + ' - ' + end;
-        } else if (start) {
-          modalDates.textContent = start;
-        } else {
-          modalDates.textContent = '';
-        }
+        modalDates.textContent = 'Posted on: ' + created;
+
         if (image) {
           modalImg.src = image;
           modalImgWrap.style.display = '';
@@ -393,6 +400,40 @@ document.addEventListener('DOMContentLoaded', function() {
           modalImg.src = '';
           modalImgWrap.style.display = 'none';
         }
+
+        // Clear and fill attachments
+        attachmentsList.innerHTML = '';
+        if (attachments.length > 0) {
+          attachmentsContainer.style.display = '';
+          attachments.forEach(function(att) {
+            var col = document.createElement('div');
+            col.className = 'col-md-6 mb-2';
+            col.innerHTML = `
+              <div class="card bg-light border-0">
+                <div class="card-body p-2">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center overflow-hidden">
+                      <div class="avatar-text avatar-xs bg-primary text-white rounded me-2 flex-shrink-0">
+                        <i class="feather-file fs-12"></i>
+                      </div>
+                      <div class="overflow-hidden">
+                        <h6 class="mb-0 text-truncate small">${att.name}</h6>
+                        <small class="text-muted text-uppercase fs-10">${att.type} • ${att.size}</small>
+                      </div>
+                    </div>
+                    <a href="${att.url}" target="_blank" class="btn btn-xs btn-outline-primary ms-2" download>
+                      <i class="feather-download"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+            attachmentsList.appendChild(col);
+          });
+        } else {
+          attachmentsContainer.style.display = 'none';
+        }
+
         var modal = new bootstrap.Modal(modalEl);
         modal.show();
       });

@@ -31,21 +31,16 @@
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="datetime-local" name="start_date" class="form-control" required value="{{ old('start_date') }}">
-                                @error('start_date')
+                                <label class="form-label">Target Audience</label>
+                                <select name="target_audience" id="target_audience" class="form-control" required>
+                                    <option value="all" {{ old('target_audience') == 'all' ? 'selected' : '' }}>Everyone</option>
+                                    <option value="students" {{ old('target_audience') == 'students' ? 'selected' : '' }}>Students Only</option>
+                                    <option value="guests" {{ old('target_audience') == 'guests' ? 'selected' : '' }}>Guests Only</option>
+                                </select>
+                                @error('target_audience')
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">End Date</label>
-                                <input type="datetime-local" name="end_date" class="form-control" required value="{{ old('end_date') }}">
-                                @error('end_date')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label">Image</label>
                                 <input type="file" name="image" class="form-control">
@@ -53,17 +48,38 @@
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 pt-4">
-                                <div class="form-check form-check-inline">
-                                    <input type="hidden" name="is_active" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" {{ old('is_active') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="isActive">Active</label>
+                        </div>
+
+                        <div class="row mb-4" id="year_level_container" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="p-3 bg-light rounded border">
+                                    <label class="form-label d-flex justify-content-between">
+                                        Target Year Levels (For Students)
+                                        <small><a href="javascript:void(0)" id="selectAllYears" class="text-primary">Select All</a></small>
+                                    </label>
+                                    <div class="d-flex flex-wrap gap-4 mt-2">
+                                        @foreach(['1st Year', '2nd Year', '3rd Year', '4th Year'] as $year)
+                                            <div class="form-check">
+                                                <input class="form-check-input year-checkbox" type="checkbox" name="target_year_levels[]" value="{{ $year }}" id="year_{{ $loop->index }}" {{ is_array(old('target_year_levels')) && in_array($year, old('target_year_levels')) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="year_{{ $loop->index }}">{{ $year }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @error('target_year_levels')
+                                        <div class="text-danger mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input type="hidden" name="is_draft" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_draft" id="isDraft" value="1" {{ old('is_draft', '1') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="isDraft">Draft</label>
-                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Downloadable Files (PDF, Word, Excel, Images)</label>
+                                <input type="file" name="attachments[]" class="form-control" multiple>
+                                <small class="text-muted">You can select multiple files. Allowed types: pdf, doc, docx, xls, xlsx, jpeg, png, jpg, gif</small>
+                                @error('attachments.*')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row mt-4">
@@ -81,3 +97,33 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const targetAudience = document.getElementById('target_audience');
+        const yearLevelContainer = document.getElementById('year_level_container');
+
+        function toggleYearLevel() {
+            if (targetAudience.value === 'students') {
+                yearLevelContainer.style.display = 'block';
+            } else {
+                yearLevelContainer.style.display = 'none';
+            }
+        }
+
+        targetAudience.addEventListener('change', toggleYearLevel);
+        toggleYearLevel(); // Initial check
+
+        const selectAllLink = document.getElementById('selectAllYears');
+        if (selectAllLink) {
+            selectAllLink.addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('.year-checkbox');
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                checkboxes.forEach(cb => cb.checked = !allChecked);
+                this.textContent = allChecked ? 'Select All' : 'Deselect All';
+            });
+        }
+    });
+</script>
+@endpush

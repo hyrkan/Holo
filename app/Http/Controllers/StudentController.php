@@ -151,12 +151,37 @@ class StudentController extends Controller
                 return in_array($student->program, $departments);
             });
 
-        $announcements = Announcement::whereYear('start_date', $currentYear)
+        $announcements = Announcement::with('attachments')->whereYear('start_date', $currentYear)
             ->whereMonth('start_date', $currentMonth)
             ->where('is_active', true)
             ->latest()
-            ->take(5)
-            ->get();
+            ->get()
+            ->filter(function ($announcement) use ($student) {
+                // Target Audience filtering
+                if ($announcement->target_audience === 'all') {
+                    return true;
+                }
+
+                if ($announcement->target_audience === 'guests') {
+                    return $student->student_type === 'guest';
+                }
+
+                if ($announcement->target_audience === 'students') {
+                    if ($student->student_type !== 'regular') {
+                        return false;
+                    }
+
+                    // If target year levels are specified, check if student matches
+                    if ($announcement->target_year_levels && count($announcement->target_year_levels) > 0) {
+                        return in_array($student->year_level, $announcement->target_year_levels);
+                    }
+
+                    return true;
+                }
+
+                return false;
+            })
+            ->take(5);
 
         $lostAndFoundItems = LostAndFound::where('status', 'active')
             ->latest()

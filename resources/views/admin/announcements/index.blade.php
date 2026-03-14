@@ -20,6 +20,7 @@
                                 <tr class="border-b">
                                     <th scope="row">Title</th>
                                     <th>Status</th>
+                                    <th>Target</th>
                                     <th>Duration</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
@@ -42,6 +43,14 @@
                                         @else
                                             <span class="badge bg-soft-secondary text-secondary">Inactive</span>
                                         @endif
+                                    </td>
+                                    <td>
+                                        <div class="fs-12">
+                                            <span class="fw-bold">{{ ucfirst($announcement->target_audience) }}</span>
+                                            @if($announcement->target_audience == 'students' && $announcement->target_year_levels)
+                                                <br><small class="text-muted">{{ implode(', ', $announcement->target_year_levels) }}</small>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>
                                         {{ $announcement->start_date->format('d M, Y H:i') }} - {{ $announcement->end_date->format('d M, Y H:i') }}

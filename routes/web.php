@@ -56,6 +56,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
+        Route::delete('announcements/attachments/{attachment}', [\App\Http\Controllers\AnnouncementController::class, 'deleteAttachment'])->name('announcements.attachments.destroy')->middleware('role:admin');
         Route::get('events/export', [\App\Http\Controllers\EventController::class, 'exportCsv'])->name('events.export')->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');

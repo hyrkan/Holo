@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\AnnouncementAttachment;
 use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
@@ -24,23 +25,44 @@ class AnnouncementController extends Controller
         return view('admin.announcements.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active' => 'boolean',
-            'is_draft' => 'boolean',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,png,jpg,gif|max:10240',
+            'target_audience' => 'required|string|in:all,students,guests',
+            'target_year_levels' => 'nullable|array',
+            'target_year_levels.*' => 'string',
         ]);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('announcements', 'public');
         }
 
-        Announcement::create($validated);
+        $validated['start_date'] = now();
+        $validated['end_date'] = now();
+        $validated['is_active'] = true;
+        $validated['is_draft'] = false;
+
+        $announcementData = collect($validated)->except(['attachments'])->toArray();
+        $announcement = Announcement::create($announcementData);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('announcement_attachments', 'public');
+                $announcement->attachments()->create([
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Announcement created successfully.');
@@ -61,11 +83,11 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active' => 'boolean',
-            'is_draft' => 'boolean',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,png,jpg,gif|max:10240',
+            'target_audience' => 'required|string|in:all,students,guests',
+            'target_year_levels' => 'nullable|array',
+            'target_year_levels.*' => 'string',
         ]);
 
         if ($request->hasFile('image')) {
@@ -76,7 +98,23 @@ class AnnouncementController extends Controller
             $validated['image'] = $request->file('image')->store('announcements', 'public');
         }
 
-        $announcement->update($validated);
+        $validated['is_active'] = $request->has('is_active');
+        $validated['is_draft'] = $request->has('is_draft');
+
+        $announcementData = collect($validated)->except(['attachments'])->toArray();
+        $announcement->update($announcementData);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('announcement_attachments', 'public');
+                $announcement->attachments()->create([
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Announcement updated successfully.');
@@ -87,10 +125,23 @@ class AnnouncementController extends Controller
         if ($announcement->image) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($announcement->image);
         }
+
+        // Delete attachments
+        foreach ($announcement->attachments as $attachment) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
+        }
         
         $announcement->delete();
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Announcement deleted successfully.');
+    }
+
+    public function deleteAttachment(AnnouncementAttachment $attachment)
+    {
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
+        $attachment->delete();
+
+        return response()->json(['success' => true]);
     }
 }
