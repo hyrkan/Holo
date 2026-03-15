@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('announcements', function (Blueprint $table) {
-            $table->string('target_audience')->default('all')->after('image'); // all, students, guests
-            $table->json('target_year_levels')->nullable()->after('target_audience'); // ['1st Year', '2nd Year', etc.]
+            $table->string('target_audience')->default('all'); // all, students, guests
+            $table->json('target_year_levels')->nullable(); // ['1st Year', '2nd Year', etc.]
         });
     }
 

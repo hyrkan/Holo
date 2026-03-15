@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('lost_and_founds', function (Blueprint $table) {
         if (!Schema::hasColumn('lost_and_founds', 'returned_by_name')) {
-            $table->string('returned_by_name')->nullable()->after('owner_name');
+            $table->string('returned_by_name')->nullable();
         }
         });
     }

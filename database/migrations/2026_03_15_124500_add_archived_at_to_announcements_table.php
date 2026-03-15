@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('announcements', function (Blueprint $table) {
             if (!Schema::hasColumn('announcements', 'archived_at')) {
-                $table->timestamp('archived_at')->nullable()->after('is_archived');
+                $table->timestamp('archived_at')->nullable();
             }
         });
     }

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE `lost_and_founds` MODIFY `status` ENUM('pending','active','resolved') NOT NULL DEFAULT 'pending'");
+        Schema::table('lost_and_founds', function ($table) {
+            $table->enum('status', ['pending', 'active', 'resolved'])->default('pending')->change();
+        });
     }
 
     /**
@@ -18,7 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE `lost_and_founds` MODIFY `status` ENUM('active','resolved') NOT NULL DEFAULT 'active'");
+        Schema::table('lost_and_founds', function ($table) {
+            $table->enum('status', ['active', 'resolved'])->default('active')->change();
+        });
     }
 };
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('announcements', function (Blueprint $table) {
-            $table->boolean('is_archived')->default(false)->after('is_draft');
+            $table->boolean('is_archived')->default(false);
         });
     }
 

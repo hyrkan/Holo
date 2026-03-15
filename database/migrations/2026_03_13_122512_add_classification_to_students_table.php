@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('enrollment_status')->nullable()->after('year_level');
 
             // Classification: freshie, cross_enrollee, enrolled
-            $table->string('classification')->nullable()->after('enrollment_status');
+            $table->string('classification')->nullable();
         });
     }
 

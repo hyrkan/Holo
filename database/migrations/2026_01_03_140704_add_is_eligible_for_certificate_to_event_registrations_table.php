@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('event_registrations', function (Blueprint $table) {
-            $table->boolean('is_eligible_for_certificate')->default(false)->after('status');
+            $table->boolean('is_eligible_for_certificate')->default(false);
         });
     }
 

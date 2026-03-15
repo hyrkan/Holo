@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('lost_and_founds', function (Blueprint $table) {
-            $table->string('reporter_name')->nullable()->after('user_id');
-            $table->string('owner_name')->nullable()->after('reporter_name');
+            $table->string('reporter_name')->nullable();
+            $table->string('owner_name')->nullable();
         });
     }
 

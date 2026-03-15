@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->string('id_front_path')->nullable()->after('expired_at');
-            $table->string('id_back_path')->nullable()->after('id_front_path');
-            $table->string('face_photo_path')->nullable()->after('id_back_path');
+            $table->string('id_front_path')->nullable();
+            $table->string('id_back_path')->nullable();
+            $table->string('face_photo_path')->nullable();
         });
     }
 

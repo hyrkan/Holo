@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->string('status')->default('pending')->after('year_level'); // pending, approved, denied, expired
-            $table->string('student_type')->default('regular')->after('status'); // regular, guest
-            $table->timestamp('approved_at')->nullable()->after('student_type');
-            $table->timestamp('expired_at')->nullable()->after('approved_at');
+            $table->string('status')->default('pending'); // pending, approved, denied, expired
+            $table->string('student_type')->default('regular'); // regular, guest
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->string('program')->nullable()->change();
             $table->string('year_level')->nullable()->change();
         });

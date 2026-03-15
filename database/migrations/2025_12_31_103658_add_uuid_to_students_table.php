@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->after('id')->unique();
+            $table->uuid('uuid')->nullable()->unique();
         });
 
         $students = DB::table('students')->get();
