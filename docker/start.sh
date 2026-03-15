@@ -42,6 +42,10 @@ if [[ "${RUN_MIGRATIONS:-false}" == "true" ]]; then
   php artisan migrate --force || true
 fi
 
+if [[ "${RUN_SEEDERS:-false}" == "true" ]]; then
+  php artisan db:seed --force || true
+fi
+
 php artisan config:clear || true
 php artisan config:cache || true
 php artisan route:cache || true
