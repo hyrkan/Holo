@@ -91,35 +91,45 @@
                                     </td>
                                     <td>{{ $item->date_reported->format('M d, Y') }}</td>
                                     <td class="text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            @if($item->status == 'active')
-                                                <a href="{{ route('admin.lost-and-found.resolve', $item) }}" class="btn btn-sm btn-soft-primary" title="Mark as Resolved">
-                                                    <i class="feather-check-circle"></i> Resolve
-                                                </a>
-                                            @else
-                                                <div class="btn-group">
-                                                    <button class="btn btn-sm btn-soft-success" title="Resolved" disabled>
-                                                        <i class="feather-check"></i> Resolved
-                                                    </button>
-                                                    @if($item->handover_image_path)
-                                                        <a href="{{ asset('storage/' . $item->handover_image_path) }}" target="_blank" class="btn btn-sm btn-soft-success" title="View Handover Proof">
-                                                            <i class="feather-image"></i> Proof
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            @endif
-
-                                            <a href="{{ route('admin.lost-and-found.show', $item) }}" class="btn btn-sm btn-soft-info" title="View Details">
-                                                <i class="feather-eye"></i> View
+                                        <div class="dropdown d-inline-block">
+                                            <a href="javascript:void(0);" class="btn btn-light btn-icon btn-sm" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                                <i class="feather-more-vertical"></i>
                                             </a>
-                                            
-                                            <form action="{{ route('admin.lost-and-found.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this report?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-soft-danger">
-                                                    <i class="feather-trash-2"></i>
-                                                </button>
-                                            </form>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                @if($item->status == 'pending')
+                                                    <form action="{{ route('admin.lost-and-found.approve', $item) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="feather-check me-2"></i> Approve & Publish
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                @if($item->status == 'active')
+                                                    <a href="{{ route('admin.lost-and-found.resolve', $item) }}" class="dropdown-item">
+                                                        <i class="feather-check-circle me-2"></i> Resolve
+                                                    </a>
+                                                @endif
+
+                                                <a href="{{ route('admin.lost-and-found.show', $item) }}" class="dropdown-item">
+                                                    <i class="feather-eye me-2"></i> View Details
+                                                </a>
+
+                                                @if(strtolower($item->status) == 'resolved' && $item->handover_image_path)
+                                                    <a href="{{ asset('storage/' . $item->handover_image_path) }}" target="_blank" class="dropdown-item">
+                                                        <i class="feather-image me-2"></i> View Proof
+                                                    </a>
+                                                @endif
+
+                                                <div class="dropdown-divider"></div>
+                                                <form action="{{ route('admin.lost-and-found.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this report?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="feather-trash-2 me-2"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

@@ -203,7 +203,7 @@ class StudentController extends Controller
     {
         $items = LostAndFound::where('user_id', Auth::id())
             ->latest()
-            ->paginate(10);
+            ->get();
         
         return view('student.lost-and-found.my-reports', compact('items'));
     }

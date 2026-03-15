@@ -101,6 +101,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminCreate'])->name('lost-and-found.create');
         Route::post('/lost-and-found/create', [\App\Http\Controllers\LostAndFoundController::class, 'adminStore'])->name('lost-and-found.admin-store');
         Route::get('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'adminShow'])->name('lost-and-found.show');
+        Route::post('/lost-and-found/{lost_and_found}/approve', [\App\Http\Controllers\LostAndFoundController::class, 'adminApprove'])->name('lost-and-found.approve');
         Route::get('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'resolve'])->name('lost-and-found.resolve');
         Route::post('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'storeResolution'])->name('lost-and-found.store-resolution');
         Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
@@ -132,6 +133,8 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');
         Route::get('/events/joined', [\App\Http\Controllers\StudentController::class, 'joinedEvents'])->name('events.joined');
         Route::get('/lost-and-found/my-reports', [\App\Http\Controllers\StudentController::class, 'myLostAndFoundReports'])->name('lost-and-found.my-reports');
+        Route::get('/lost-and-found/{lost_and_found}/edit', [\App\Http\Controllers\LostAndFoundController::class, 'studentEdit'])->name('lost-and-found.edit');
+        Route::put('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'studentUpdate'])->name('lost-and-found.update');
         Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
     });
 });

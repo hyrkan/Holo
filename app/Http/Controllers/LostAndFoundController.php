@@ -39,6 +39,11 @@ class LostAndFoundController extends Controller
 
     public function show(LostAndFound $lostAndFound)
     {
+        $isAdmin = Auth::check();
+        $isOwnerStudent = Auth::guard('student')->check() && Auth::guard('student')->id() === $lostAndFound->user_id;
+        if (!in_array($lostAndFound->status, ['active', 'resolved']) && !$isAdmin && !$isOwnerStudent) {
+            return redirect()->route('lost-and-found.index')->with('error', 'This report is not available.');
+        }
         return view('lost-and-found.show', compact('lostAndFound'));
     }
 
@@ -101,12 +106,12 @@ class LostAndFoundController extends Controller
             $validated['user_id'] = Auth::id();
         }
 
-        $validated['status'] = 'active';
         $validated['date_reported'] = now();
 
         LostAndFound::create($validated);
 
         if (Auth::guard('student')->check()) {
+            // Student reports start as pending in DB, but we still allow showing a generic success message.
             return redirect()->route('student.lost-and-found.my-reports')
                 ->with('success', 'Your report has been submitted successfully.');
         }
@@ -185,15 +190,15 @@ class LostAndFoundController extends Controller
             $lost_and_found->handover_image_path = $request->file('handover_image')->store('handovers', 'public');
         }
 
-        $lost_and_found->matched_item_id = $validated['matched_item_id'];
-        $lost_and_found->returned_by_name = $validated['returned_by_name'];
+        $lost_and_found->matched_item_id = $validated['matched_item_id'] ?? null;
+        $lost_and_found->returned_by_name = $validated['returned_by_name'] ?? null;
         $lost_and_found->status = 'resolved';
         $lost_and_found->resolved_at = now();
         $lost_and_found->resolved_by = Auth::id();
         $lost_and_found->save();
 
         // Notify reporter if email is provided
-        $recipient = trim($lost_and_found->contact_info);
+        $recipient = trim((string) $lost_and_found->contact_info);
         if ($recipient && filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
             try {
                 Mail::to($recipient)->send(new LostAndFoundResolvedMail($lost_and_found));
@@ -204,9 +209,9 @@ class LostAndFoundController extends Controller
         }
 
         // If a matching report was selected, resolve it too
-        if ($validated['matched_item_id']) {
+        if (!empty($validated['matched_item_id'])) {
             $matchedItem = LostAndFound::find($validated['matched_item_id']);
-            if ($matchedItem->status == 'active') {
+            if ($matchedItem && $matchedItem->status == 'active') {
                 $matchedItem->status = 'resolved';
                 $matchedItem->resolved_at = now();
                 $matchedItem->resolved_by = Auth::id();
@@ -215,7 +220,7 @@ class LostAndFoundController extends Controller
                 $matchedItem->save();
 
                 // Notify reporter of the matched item too if email is provided
-                $matchedRecipient = trim($matchedItem->contact_info);
+                $matchedRecipient = trim((string) $matchedItem->contact_info);
                 if ($matchedRecipient && filter_var($matchedRecipient, FILTER_VALIDATE_EMAIL)) {
                     try {
                         Mail::to($matchedRecipient)->send(new LostAndFoundResolvedMail($matchedItem));
@@ -243,5 +248,58 @@ class LostAndFoundController extends Controller
 
         return redirect()->route('admin.lost-and-found.index')
             ->with('success', 'Report deleted successfully.');
+    }
+
+    public function adminApprove(LostAndFound $lost_and_found)
+    {
+        if ($lost_and_found->status !== 'active') {
+            $lost_and_found->status = 'active';
+            if (!$lost_and_found->date_reported) {
+                $lost_and_found->date_reported = now();
+            }
+            $lost_and_found->save();
+        }
+        return redirect()->route('admin.lost-and-found.index')->with('success', 'Report approved and published.');
+    }
+
+    public function studentEdit(LostAndFound $lost_and_found)
+    {
+        $studentId = Auth::guard('student')->id();
+        if ($lost_and_found->user_id !== $studentId || $lost_and_found->status !== 'active') {
+            return redirect()->route('student.lost-and-found.my-reports')->with('error', 'You can only edit your active reports.');
+        }
+        $mode = 'edit';
+        return view('lost-and-found.create', compact('lost_and_found', 'mode'));
+    }
+
+    public function studentUpdate(Request $request, LostAndFound $lost_and_found)
+    {
+        $studentId = Auth::guard('student')->id();
+        if ($lost_and_found->user_id !== $studentId || $lost_and_found->status !== 'active') {
+            return redirect()->route('student.lost-and-found.my-reports')->with('error', 'You can only edit your active reports.');
+        }
+
+        $validated = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'contact_info' => 'required|email|max:255',
+            'reporter_name' => 'required|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($lost_and_found->image_path) {
+                Storage::disk('public')->delete($lost_and_found->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
+        }
+
+        unset($validated['image']);
+
+        $lost_and_found->update($validated);
+
+        return redirect()->route('student.lost-and-found.my-reports')->with('success', 'Report updated successfully.');
     }
 }
