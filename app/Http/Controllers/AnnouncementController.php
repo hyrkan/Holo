@@ -14,7 +14,7 @@ class AnnouncementController extends Controller
      */
     public function index()
     {
-        $announcements = Announcement::where('is_archived', false)->latest()->paginate(10);
+        $announcements = Announcement::where('is_archived', false)->latest()->get();
         return view('admin.announcements.index', compact('announcements'));
     }
 
@@ -132,7 +132,10 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement)
     {
-        $announcement->update(['is_archived' => true]);
+        $announcement->update([
+            'is_archived' => true,
+            'archived_at' => now(),
+        ]);
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Announcement archived successfully.');
@@ -140,7 +143,10 @@ class AnnouncementController extends Controller
 
     public function restore(Announcement $announcement)
     {
-        $announcement->update(['is_archived' => false]);
+        $announcement->update([
+            'is_archived' => false,
+            'archived_at' => null,
+        ]);
 
         return redirect()->route('admin.announcements.archived')
             ->with('success', 'Announcement restored successfully.');

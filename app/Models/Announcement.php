@@ -18,6 +18,7 @@ class Announcement extends Model
         'is_active' => 'boolean',
         'is_draft' => 'boolean',
         'is_archived' => 'boolean',
+        'archived_at' => 'datetime',
         'target_year_levels' => 'array',
     ];
 

@@ -20,7 +20,8 @@
                                 <tr class="border-b">
                                     <th scope="row">Title</th>
                                     <th>Target</th>
-                                    <th>Duration</th>
+                                    <th>Date Created</th>
+                                    <th>Date Archived</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -42,9 +43,8 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td>
-                                        {{ $announcement->start_date->format('d M, Y H:i') }} - {{ $announcement->end_date->format('d M, Y H:i') }}
-                                    </td>
+                                    <td>{{ $announcement->created_at->format('d M, Y H:i') }}</td>
+                                    <td>{{ optional($announcement->archived_at)->format('d M, Y H:i') ?? '—' }}</td>
                                     <td class="text-end">
                                         <div class="hstack gap-3 justify-content-end">
                                             <form action="{{ route('admin.announcements.restore', $announcement) }}" method="POST" class="d-inline">

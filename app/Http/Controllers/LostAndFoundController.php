@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Mail\LostAndFoundResolvedMail;
+use App\Jobs\SendAnnouncementNotifications;
+use App\Models\Announcement;
 use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -231,6 +233,36 @@ class LostAndFoundController extends Controller
             }
         }
 
+        if ($lost_and_found->type === 'lost') {
+            $title = 'Lost Item Resolved: ' . $lost_and_found->item_name;
+            $body = '<p>A previously reported lost item has been marked as resolved.</p>'
+                . '<ul>'
+                . '<li><strong>Item:</strong> ' . e($lost_and_found->item_name) . '</li>'
+                . '<li><strong>Location:</strong> ' . e($lost_and_found->location) . '</li>'
+                . '<li><strong>Resolved Date:</strong> ' . e(optional($lost_and_found->resolved_at)->format('M d, Y')) . '</li>'
+                . ($lost_and_found->returned_by_name ? '<li><strong>Returned By:</strong> ' . e($lost_and_found->returned_by_name) . '</li>' : '')
+                . '</ul>'
+                . '<p>Thank you to everyone who helped. Please check with the office for any follow-up.</p>';
+
+            $announcement = Announcement::create([
+                'title' => $title,
+                'body' => $body,
+                'image' => $lost_and_found->image_path,
+                'is_active' => true,
+                'is_draft' => false,
+                'is_archived' => false,
+                'start_date' => now(),
+                'end_date' => now()->addDays(14),
+                'target_audience' => 'all',
+                'target_year_levels' => null,
+            ]);
+
+            try {
+                dispatch(new SendAnnouncementNotifications($announcement));
+            } catch (\Throwable $e) {
+            }
+        }
+
         return redirect()->route('admin.lost-and-found.index')
             ->with('success', 'Item and its matching report (if any) have been marked as resolved.');
     }
@@ -252,12 +284,44 @@ class LostAndFoundController extends Controller
 
     public function adminApprove(LostAndFound $lost_and_found)
     {
+        $shouldAnnounce = ($lost_and_found->status !== 'active') && ($lost_and_found->type === 'lost');
         if ($lost_and_found->status !== 'active') {
             $lost_and_found->status = 'active';
             if (!$lost_and_found->date_reported) {
                 $lost_and_found->date_reported = now();
             }
             $lost_and_found->save();
+        }
+        if ($shouldAnnounce) {
+            $title = 'Lost Item Reported: ' . $lost_and_found->item_name;
+            $reporter = $lost_and_found->is_anonymous ? 'Anonymous' : ($lost_and_found->reporter_name ?: 'Reporter');
+            $body = '<p>A lost item has been reported and approved for posting.</p>'
+                . '<ul>'
+                . '<li><strong>Item:</strong> ' . e($lost_and_found->item_name) . '</li>'
+                . '<li><strong>Location:</strong> ' . e($lost_and_found->location) . '</li>'
+                . '<li><strong>Reported by:</strong> ' . e($reporter) . '</li>'
+                . '<li><strong>Date Reported:</strong> ' . e(optional($lost_and_found->date_reported)->format('M d, Y')) . '</li>'
+                . '</ul>'
+                . '<p>If you have any information or found this item, please reach out to the office.</p>';
+
+            $announcement = Announcement::create([
+                'title' => $title,
+                'body' => $body,
+                'image' => $lost_and_found->image_path,
+                'is_active' => true,
+                'is_draft' => false,
+                'is_archived' => false,
+                'start_date' => now(),
+                'end_date' => now()->addDays(14),
+                'target_audience' => 'all',
+                'target_year_levels' => null,
+            ]);
+
+            try {
+                dispatch(new SendAnnouncementNotifications($announcement));
+            } catch (\Throwable $e) {
+                // ignore dispatch failure; announcement remains posted
+            }
         }
         return redirect()->route('admin.lost-and-found.index')->with('success', 'Report approved and published.');
     }
