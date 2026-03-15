@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    
     /**
      * Register any application services.
      */
@@ -19,8 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') !== 'local') {
+            \URL::forceScheme('https');
+        }
         \Illuminate\Support\Facades\Gate::before(function ($user, $capability) {
             return $user->hasRole('admin') ? true : null;
         });
+
     }
 }
