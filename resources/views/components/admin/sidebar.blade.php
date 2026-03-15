@@ -46,20 +46,22 @@
                     </a>
                 </li>
                 @endcan
-                @role('admin')
+                @can('manage speakers')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.speakers.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-mic"></i></span>
                         <span class="nxl-mtext">Speakers</span>
                     </a>
                 </li>
+                @endcan
+                @can('manage announcements')
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.announcements.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-bell"></i></span>
                         <span class="nxl-mtext">Announcements</span>
                     </a>
                 </li>
-                @endrole
+                @endcan
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.lost-and-found.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-search"></i></span>

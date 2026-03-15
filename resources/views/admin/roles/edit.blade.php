@@ -37,9 +37,9 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4 d-flex align-items-center gap-2 flex-wrap">
                             <button type="submit" class="btn btn-primary">Update Role</button>
-                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-outline-secondary d-inline-block" style="width:auto;">Cancel</a>
                         </div>
                     </form>
                 </div>

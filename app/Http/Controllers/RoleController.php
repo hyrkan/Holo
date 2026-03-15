@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-class RoleController extends Controller
+class RoleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth'),
+            new Middleware('role:admin'),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -33,14 +43,20 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'array'
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
         $role = Role::create(['name' => $request->name]);
         
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        }
+        $ids = collect($request->input('permissions', []))
+            ->filter()
+            ->map(fn($v) => (int) $v)
+            ->unique()
+            ->values()
+            ->all();
+        $perms = Permission::whereIn('id', $ids)->get();
+        $role->syncPermissions($perms);
 
         return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
     }
@@ -62,16 +78,20 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'array'
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
         $role->update(['name' => $request->name]);
         
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        } else {
-            $role->syncPermissions([]);
-        }
+        $ids = collect($request->input('permissions', []))
+            ->filter()
+            ->map(fn($v) => (int) $v)
+            ->unique()
+            ->values()
+            ->all();
+        $perms = Permission::whereIn('id', $ids)->get();
+        $role->syncPermissions($perms);
 
         return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
     }

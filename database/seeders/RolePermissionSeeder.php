@@ -21,6 +21,9 @@ class RolePermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'manage students']);
         Permission::firstOrCreate(['name' => 'manage employees']);
         Permission::firstOrCreate(['name' => 'view dashboard']);
+        // Aggregate permissions
+        Permission::firstOrCreate(['name' => 'manage announcements']);
+        Permission::firstOrCreate(['name' => 'manage speakers']);
 
         // Create roles and assign created permissions
 

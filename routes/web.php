@@ -53,9 +53,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('students', \App\Http\Controllers\StudentController::class);
         Route::get('announcements/export', [\App\Http\Controllers\AnnouncementController::class, 'exportCsv'])->name('announcements.export')->middleware('role:admin');
         Route::get('announcements/archived', [\App\Http\Controllers\AnnouncementController::class, 'archived'])->name('announcements.archived')->middleware('role:admin');
-        Route::post('announcements/{announcement}/restore', [\App\Http\Controllers\AnnouncementController::class, 'restore'])->name('announcements.restore')->middleware('role:admin');
-        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('role:admin');
-        Route::delete('announcements/attachments/{attachment}', [\App\Http\Controllers\AnnouncementController::class, 'deleteAttachment'])->name('announcements.attachments.destroy')->middleware('role:admin');
+        Route::post('announcements/{announcement}/restore', [\App\Http\Controllers\AnnouncementController::class, 'restore'])->name('announcements.restore')->middleware('permission:manage announcements');
+        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('permission:manage announcements');
+        Route::delete('announcements/attachments/{attachment}', [\App\Http\Controllers\AnnouncementController::class, 'deleteAttachment'])->name('announcements.attachments.destroy')->middleware('permission:manage announcements');
         Route::get('events/export', [\App\Http\Controllers\EventController::class, 'exportCsv'])->name('events.export')->middleware('role:admin');
         Route::resource('events', \App\Http\Controllers\EventController::class)->middleware('role:admin');
         Route::get('/events/{event}/participants', [\App\Http\Controllers\EventController::class, 'participants'])->name('events.participants')->middleware('role:admin');
@@ -69,8 +69,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/certificates/{certificate}/preview', [\App\Http\Controllers\CertificateController::class, 'preview'])->name('events.certificate.preview')->middleware('role:admin');
         Route::post('/events/{event}/certificate/update-eligibility/{student}', [\App\Http\Controllers\CertificateController::class, 'updateEligibility'])->name('events.certificate.update-eligibility')->middleware('role:admin');
         Route::post('/events/{event}/certificate/bulk', [\App\Http\Controllers\CertificateController::class, 'bulkEligibility'])->name('events.certificate.bulk')->middleware('role:admin');
-        Route::get('/speakers/{speaker}/events', [\App\Http\Controllers\SpeakerController::class, 'events'])->name('speakers.events')->middleware('role:admin');
-        Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('role:admin');
+        Route::get('/speakers/{speaker}/events', [\App\Http\Controllers\SpeakerController::class, 'events'])->name('speakers.events')->middleware('permission:manage speakers');
+        Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('permission:manage speakers');
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('role:admin');
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
         Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
