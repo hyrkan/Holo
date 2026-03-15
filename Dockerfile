@@ -23,10 +23,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     curl \
     ca-certificates \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
-  && docker-php-ext-install -j$(nproc) pdo_mysql zip gd opcache \
+  && docker-php-ext-install -j$(nproc) pdo_pgsql pdo_mysql zip gd opcache \
   && rm -rf /var/lib/apt/lists/*
 
 RUN printf "upload_max_filesize=16M\npost_max_size=18M\n" > /usr/local/etc/php/conf.d/uploads.ini
