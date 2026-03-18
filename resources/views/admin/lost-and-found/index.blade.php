@@ -67,7 +67,7 @@
                                     </td>
                                     <td>{{ $item->location }}</td>
                                     <td>
-                                        {{ $item->is_anonymous ? 'Anonymous' : ($item->user ? $item->user->name : 'Staff') }}
+                                        {{ $item->is_anonymous ? 'Anonymous' : ($item->reporter_name ?: ($item->user ? ($item->user->employee ? trim(($item->user->employee->first_name ?? '').' '.($item->user->employee->last_name ?? '')) : ($item->user->student ? $item->user->student->full_name : '')) : 'Staff')) }}
                                         @if($item->contact_info)
                                             <br><small class="text-muted">{{ $item->contact_info }}</small>
                                         @endif

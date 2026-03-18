@@ -1,12 +1,20 @@
 {{-- Header Component --}}
 @php
-    $userName = Auth::user()->name ?? 'Admin User';
-    $nameParts = explode(' ', $userName);
+    $user = Auth::user();
+    $fullName = null;
+    if ($user && $user->employee) {
+        $fullName = trim(($user->employee->first_name ?? '') . ' ' . ($user->employee->last_name ?? ''));
+    } elseif ($user && method_exists($user, 'student') && $user->student) {
+        $fullName = $user->student->full_name;
+    } else {
+        $fullName = 'Admin User';
+    }
+    $nameParts = explode(' ', $fullName);
     $initials = '';
     if (count($nameParts) > 1) {
         $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
     } else {
-        $initials = strtoupper(substr($userName, 0, 2));
+        $initials = strtoupper(substr($fullName, 0, 2));
     }
 @endphp
 
@@ -35,7 +43,7 @@
                                     {{ $initials }}
                                 </div>
                                 <div>
-                                    <h6 class="text-dark mb-0">{{ Auth::user()->name ?? 'Admin User' }}</h6>
+                                    <h6 class="text-dark mb-0">{{ $fullName }}</h6>
                                     <span class="fs-12 fw-medium text-muted">{{ Auth::user()->email ?? 'admin@example.com' }}</span>
                                 </div>
                             </div>

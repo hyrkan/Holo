@@ -22,7 +22,6 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        // If user is admin/employee, update their employee record
         if ($user->hasRole('employee') || $user->hasRole('admin')) {
              $request->validate([
                 'first_name' => ['required', 'string', 'max:255'],
@@ -32,13 +31,10 @@ class ProfileController extends Controller
                 'address' => ['required', 'string', 'max:255'],
             ]);
 
-            // Update user email
             $user->update([
-                'name' => $request->first_name . ' ' . $request->last_name,
                 'email' => $request->email,
             ]);
 
-            // Update or create employee record
             $user->employee()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -49,14 +45,11 @@ class ProfileController extends Controller
                 ]
             );
         } else {
-            // Fallback for other roles (though currently only students use separate table)
             $request->validate([
-                'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             ]);
     
             $user->update([
-                'name' => $request->name,
                 'email' => $request->email,
             ]);
         }

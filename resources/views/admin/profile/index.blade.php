@@ -25,19 +25,19 @@
                 <div class="card-body">
                     <div class="text-center">
                         @php
-                            $userName = $user->name ?? 'Admin User';
-                            $nameParts = explode(' ', $userName);
+                            $fullName = $user->employee ? trim(($user->employee->first_name ?? '') . ' ' . ($user->employee->last_name ?? '')) : 'Admin User';
+                            $nameParts = explode(' ', $fullName);
                             $initials = '';
                             if (count($nameParts) > 1) {
                                 $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
                             } else {
-                                $initials = strtoupper(substr($userName, 0, 2));
+                                $initials = strtoupper(substr($fullName, 0, 2));
                             }
                         @endphp
                         <div class="avatar-text bg-soft-primary text-primary d-inline-flex align-items-center justify-content-center fw-bold mb-3" style="width: 100px; height: 100px; font-size: 32px; border-radius: 50%;">
                             {{ $initials }}
                         </div>
-                        <h4 class="mb-1">{{ $user->name ?? 'Admin User' }}</h4>
+                        <h4 class="mb-1">{{ $fullName }}</h4>
                         <p class="text-muted fs-12 mb-3">{{ $user->email }}</p>
                         <div class="badge bg-soft-primary text-primary text-uppercase">
                             {{ $user->getRoleNames()->first() ?? 'User' }}
@@ -58,14 +58,14 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">First Name</label>
-                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" value="{{ old('first_name', $user->employee->first_name ?? explode(' ', $user->name)[0]) }}" required>
+                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" value="{{ old('first_name', $user->employee->first_name ?? '') }}" required>
                                 @error('first_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Last Name</label>
-                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('last_name', $user->employee->last_name ?? explode(' ', $user->name)[1] ?? '') }}" required>
+                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('last_name', $user->employee->last_name ?? '') }}" required>
                                 @error('last_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

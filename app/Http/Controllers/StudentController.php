@@ -240,11 +240,6 @@ class StudentController extends Controller
             'year_level' => $request->year_level,
         ]);
 
-        // Sync updates to users table
-        $user->update([
-            'name' => $request->first_name . ' ' . $request->last_name,
-        ]);
-
         return back()->with('success', 'Profile updated successfully.');
     }
 
