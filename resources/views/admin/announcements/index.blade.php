@@ -103,12 +103,7 @@
                                     </td>
                                 </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-5">
-                                        <i class="feather-bell fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No announcements found.</p>
-                                    </td>
-                                </tr>
+                                
                                 @endforelse
                             </tbody>
                         </table>
@@ -135,7 +130,8 @@
       language: {
         search: '',
         searchPlaceholder: 'Search announcements...',
-        lengthMenu: '_MENU_ per page'
+        lengthMenu: '_MENU_ per page',
+        emptyTable: 'No announcements found.'
       },
       columnDefs: [
         { targets: [4], visible: false, searchable: false } // hide Created At column
