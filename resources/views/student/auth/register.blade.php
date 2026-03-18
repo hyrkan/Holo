@@ -143,7 +143,8 @@
                             <div id="step-3" class="d-none">
                                 <div class="mb-4">
                                     <label class="form-label fs-12 fw-bold text-muted">Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" name="email" class="form-control" placeholder="Email Address" value="{{ old('email') }}" required>
+                                    <input type="email" name="email" class="form-control" placeholder="name@usa.edu.ph" value="{{ old('email') }}" required pattern="^[^@\s]+@usa\.edu\.ph$" title="Use your usa.edu.ph email address">
+                                    <small class="text-muted d-block mt-1">Only usa.edu.ph email addresses are allowed.</small>
                                 </div>
                                 <div class="mb-4">
                                     <div class="input-group">

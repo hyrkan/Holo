@@ -91,8 +91,10 @@ class StudentAuthController extends Controller
             'id_front' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
             'id_back' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
             'face_image' => ['required', 'string'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[^@\\s]+@usa\\.edu\\.ph$/i'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'email.regex' => 'Email address must end with @usa.edu.ph.',
         ]);
 
         $user = \App\Models\User::create([
