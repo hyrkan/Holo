@@ -109,6 +109,7 @@ class LostAndFoundController extends Controller
         }
 
         $validated['date_reported'] = now();
+        $validated['status'] = 'pending';
 
         LostAndFound::create($validated);
 
