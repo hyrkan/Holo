@@ -95,7 +95,7 @@ class LostAndFoundController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
+            $validated['image_path'] = ImageStorage::upload($request->file('image'), 'lost-and-found');
         }
 
         unset($validated['image']);
@@ -147,7 +147,7 @@ class LostAndFoundController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
+            $validated['image_path'] = ImageStorage::upload($request->file('image'), 'lost-and-found');
         }
 
         unset($validated['image']);
