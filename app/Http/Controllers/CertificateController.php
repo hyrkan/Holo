@@ -97,10 +97,14 @@ class CertificateController extends Controller
                     }
                 }
 
-                $signatory = $certificate->signatories()->updateOrCreate(
-                    ['id' => $signatoryId],
-                    $updateData
-                );
+                if ($signatoryId) {
+                    $signatory = $certificate->signatories()->updateOrCreate(
+                        ['id' => $signatoryId],
+                        $updateData
+                    );
+                } else {
+                    $signatory = $certificate->signatories()->create($updateData);
+                }
                 
                 $submittedSignatoryIds[] = $signatory->id;
             }

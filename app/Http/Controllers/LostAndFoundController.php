@@ -29,7 +29,7 @@ class LostAndFoundController extends Controller
             }
         }
 
-        $items = $query->paginate(12);
+        $items = $query->with('user')->get();
 
         $recentlyResolved = LostAndFound::where('status', 'resolved')
             ->latest('resolved_at')
