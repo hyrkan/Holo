@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Certificate extends Model
 {
+    use \App\Traits\HasImage;
+
     protected $guarded = [];
+
+    public function getBackgroundImageUrlAttribute()
+    {
+        return $this->getImageUrl('background_image');
+    }
 
     public function event()
     {

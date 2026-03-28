@@ -28,5 +28,11 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('admin') ? true : null;
         });
 
+        // Register Brevo Mailer Transport
+        \Illuminate\Support\Facades\Mail::extend('brevo', function (array $config) {
+            return new \Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport(
+                $config['key']
+            );
+        });
     }
 }

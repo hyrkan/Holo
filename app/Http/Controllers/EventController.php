@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -92,7 +93,7 @@ class EventController extends Controller
 
         $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
 
-        $imagePath = $request->file('image')->store('events', 'public');
+        $imagePath = ImageStorage::upload($request->file('image'), 'events');
 
         $event = Event::create([
             'name' => $request->name,
@@ -172,10 +173,8 @@ class EventController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            if ($event->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($event->image);
-            }
-            $data['image'] = $request->file('image')->store('events', 'public');
+            ImageStorage::delete($event->image);
+            $data['image'] = ImageStorage::upload($request->file('image'), 'events');
         }
 
         $event->update($data);

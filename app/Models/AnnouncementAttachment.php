@@ -12,4 +12,9 @@ class AnnouncementAttachment extends Model
     {
         return $this->belongsTo(Announcement::class);
     }
+
+    public function getFileUrlAttribute()
+    {
+        return \App\Helpers\ImageStorage::url($this->file_path);
+    }
 }

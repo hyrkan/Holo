@@ -26,6 +26,23 @@ class Student extends Model
         'face_photo_path',
     ];
 
+    use \App\Traits\HasImage;
+
+    public function getIdFrontUrlAttribute()
+    {
+        return $this->getImageUrl('id_front_path');
+    }
+
+    public function getIdBackUrlAttribute()
+    {
+        return $this->getImageUrl('id_back_path');
+    }
+
+    public function getFacePhotoUrlAttribute()
+    {
+        return $this->getImageUrl('face_photo_path');
+    }
+
     protected $casts = [
         'approved_at' => 'datetime',
         'expired_at' => 'datetime',

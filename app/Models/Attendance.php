@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
+    use \App\Traits\HasImage;
+
     protected $guarded = [];
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->getImageUrl('photo');
+    }
 
     protected $casts = [
         'scanned_at' => 'datetime',

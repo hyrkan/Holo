@@ -55,10 +55,11 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
+        ],
+
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('MAIL_PASSWORD'),
         ],
 
         'resend' => [

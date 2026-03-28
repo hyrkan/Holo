@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Speaker extends Model
 {
+    use \App\Traits\HasImage;
+
     protected $guarded = [];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl('image');
+    }
 
     public function events()
     {

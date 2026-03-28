@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Announcement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, \App\Traits\HasImage;
 
     protected $guarded = [];
 
@@ -21,6 +21,11 @@ class Announcement extends Model
         'archived_at' => 'datetime',
         'target_year_levels' => 'array',
     ];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl('image');
+    }
 
     public function attachments()
     {

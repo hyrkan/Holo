@@ -4,7 +4,7 @@
             <div class="event-item mb-30 shadow-sm" style="border-radius: 15px; overflow: hidden; height: 100%; display: flex; flex-direction: column;">
                 <div class="event-img" style="height: 200px; overflow: hidden;">
                     @if($announcement->image)
-                        <img src="{{ asset('storage/' . $announcement->image) }}" alt="{{ $announcement->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ $announcement->image_url }}" alt="{{ $announcement->title }}" style="width: 100%; height: 100%; object-fit: cover;">
                     @else
                         <div class="d-flex align-items-center justify-content-center bg-light" style="width: 100%; height: 100%;">
                             <i class="fas fa-bullhorn fa-3x text-muted"></i>
@@ -27,7 +27,7 @@
                     <h3 class="mb-3"><a href="javascript:void(0)" class="text-dark hover-primary view-announcement" 
                         data-title="{{ $announcement->title }}" 
                         data-body="{{ $announcement->body }}" 
-                        data-image="{{ $announcement->image ? asset('storage/' . $announcement->image) : '' }}"
+                        data-image="{{ $announcement->image ? $announcement->image_url : '' }}"
                         data-date="{{ $announcement->start_date->format('d M, Y') }}"
                         data-time="{{ $announcement->start_date->format('h:i A') }}"
                         data-audience="{{ ucfirst($announcement->target_audience) }}"
@@ -35,7 +35,7 @@
                                     data-attachments="{{ $announcement->attachments->map(function($a) { 
                                         return [
                                             'name' => $a->file_name, 
-                                            'url' => asset('storage/' . $a->file_path),
+                                            'url' => $a->file_url,
                                             'type' => $a->file_type
                                         ]; 
                                     })->toJson() }}">
@@ -46,7 +46,7 @@
                         <a href="javascript:void(0)" class="btn-read-more view-announcement"
                             data-title="{{ $announcement->title }}" 
                             data-body="{{ $announcement->body }}" 
-                            data-image="{{ $announcement->image ? asset('storage/' . $announcement->image) : '' }}"
+                            data-image="{{ $announcement->image ? $announcement->image_url : '' }}"
                             data-date="{{ $announcement->start_date->format('d M, Y') }}"
                             data-time="{{ $announcement->start_date->format('h:i A') }}"
                             data-audience="{{ ucfirst($announcement->target_audience) }}"
@@ -54,7 +54,7 @@
                             data-attachments="{{ $announcement->attachments->map(function($a) { 
                                 return [
                                     'name' => $a->file_name, 
-                                    'url' => asset('storage/' . $a->file_path),
+                                    'url' => $a->file_url,
                                     'type' => $a->file_type
                                 ]; 
                             })->toJson() }}">

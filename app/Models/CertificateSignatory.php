@@ -12,4 +12,11 @@ class CertificateSignatory extends Model
     {
         return $this->belongsTo(Certificate::class);
     }
+
+    use \App\Traits\HasImage;
+
+    public function getSignatureImageUrlAttribute()
+    {
+        return $this->getImageUrl('signature_image');
+    }
 }

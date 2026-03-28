@@ -6,11 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
+    use \App\Traits\HasImage;
+
     protected $guarded = [];
     protected $casts = [
         'tags' => 'array',
         'departments' => 'array',
     ];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl('image');
+    }
 
     public function speakers()
     {

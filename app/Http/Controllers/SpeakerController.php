@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Speaker;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 
 class SpeakerController extends Controller
@@ -56,7 +57,7 @@ class SpeakerController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('speakers', 'public');
+            $validated['image'] = ImageStorage::upload($request->file('image'), 'speakers');
         }
 
         $speaker = Speaker::create($validated);
@@ -110,10 +111,8 @@ class SpeakerController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($speaker->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($speaker->image);
-            }
-            $validated['image'] = $request->file('image')->store('speakers', 'public');
+            ImageStorage::delete($speaker->image);
+            $validated['image'] = ImageStorage::upload($request->file('image'), 'speakers');
         }
 
         $speaker->update($validated);

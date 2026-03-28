@@ -8,8 +8,9 @@ use App\Models\Student;
 use App\Models\CertificateSignatory;
 use App\Models\EventRegistration;
 use App\Mail\CertificateAwardedMail;
+use App\Helpers\Messenger;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
@@ -62,10 +63,8 @@ class CertificateController extends Controller
         $data['event_id'] = $event->id;
 
         if ($request->hasFile('background_image')) {
-            if ($certificate->background_image) {
-                Storage::disk('public')->delete($certificate->background_image);
-            }
-            $data['background_image'] = $request->file('background_image')->store('certificates', 'public');
+            ImageStorage::delete($certificate->background_image);
+            $data['background_image'] = ImageStorage::upload($request->file('background_image'), 'certificates');
         }
 
         $certificate->fill($data);
@@ -86,14 +85,12 @@ class CertificateController extends Controller
 
                 if (isset($sigData['signature_image'])) {
                     $file = $sigData['signature_image'];
-                    $path = $file->store('signatures', 'public');
+                    $path = ImageStorage::upload($file, 'signatures');
                     $updateData['signature_image'] = $path;
 
                     if ($signatoryId) {
                         $oldSignatory = CertificateSignatory::find($signatoryId);
-                        if ($oldSignatory && $oldSignatory->signature_image) {
-                            Storage::disk('public')->delete($oldSignatory->signature_image);
-                        }
+                        ImageStorage::delete($oldSignatory->signature_image);
                     }
                 }
 
@@ -114,9 +111,7 @@ class CertificateController extends Controller
         if (!empty($toDelete)) {
             $signatoriesToDelete = CertificateSignatory::whereIn('id', $toDelete)->get();
             foreach ($signatoriesToDelete as $sig) {
-                if ($sig->signature_image) {
-                    Storage::disk('public')->delete($sig->signature_image);
-                }
+                ImageStorage::delete($sig->signature_image);
                 $sig->delete();
             }
         }
@@ -126,14 +121,10 @@ class CertificateController extends Controller
 
     public function destroy(Event $event, Certificate $certificate)
     {
-        if ($certificate->background_image) {
-            Storage::disk('public')->delete($certificate->background_image);
-        }
+        ImageStorage::delete($certificate->background_image);
         
         foreach ($certificate->signatories as $sig) {
-            if ($sig->signature_image) {
-                Storage::disk('public')->delete($sig->signature_image);
-            }
+            ImageStorage::delete($sig->signature_image);
         }
         
         $certificate->delete();
@@ -200,11 +191,7 @@ class CertificateController extends Controller
         // Send notification if any new awards were granted
         if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
             $awardedCertificates = Certificate::whereIn('id', $newlyAwardedIds)->get()->all();
-            try {
-                Mail::to($student->user->email)->send(new CertificateAwardedMail($student, $event, $awardedCertificates));
-            } catch (\Throwable $e) {
-                \Log::error('Failed to send certificate awarded email: ' . $e->getMessage());
-            }
+            Messenger::send($student->user->email, new CertificateAwardedMail($student, $event, $awardedCertificates));
         }
 
         return response()->json(['success' => true]);
@@ -239,11 +226,7 @@ class CertificateController extends Controller
 
                 if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
                     $awardedCertificates = Certificate::whereIn('id', $newlyAwardedIds)->get()->all();
-                    try {
-                        Mail::to($student->user->email)->send(new CertificateAwardedMail($student, $event, $awardedCertificates));
-                    } catch (\Throwable $e) {
-                        \Log::error('Failed to send certificate awarded email: ' . $e->getMessage());
-                    }
+                    Messenger::send($student->user->email, new CertificateAwardedMail($student, $event, $awardedCertificates));
                 }
             } else {
                 $student->certificates()->detach($certificateIds);

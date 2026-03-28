@@ -7,7 +7,7 @@ use App\Models\Student;
 use App\Mail\AnnouncementNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Mail;
+use App\Helpers\Messenger;
 
 class SendAnnouncementNotifications implements ShouldQueue
 {
@@ -45,8 +45,8 @@ class SendAnnouncementNotifications implements ShouldQueue
         // Process students in chunks to handle large numbers efficiently
         $query->chunk(50, function ($students) {
             foreach ($students as $student) {
-                if ($student->user) {
-                    Mail::to($student->user->email)->send(new AnnouncementNotification($this->announcement));
+                if ($student->user && $student->user->email) {
+                    Messenger::queue($student->user->email, new AnnouncementNotification($this->announcement));
                 }
             }
         });

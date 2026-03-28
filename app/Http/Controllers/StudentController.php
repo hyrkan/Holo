@@ -11,7 +11,7 @@ use App\Models\LostAndFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use App\Helpers\Messenger;
 use App\Mail\StudentStatusMail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
@@ -106,7 +106,7 @@ class StudentController extends Controller
             'approved_at'       => now(),
         ]);
 
-        Mail::to($student->user->email)->send(new StudentStatusMail($student, Student::STATUS_APPROVED));
+        Messenger::send($student->user->email, new StudentStatusMail($student, Student::STATUS_APPROVED));
 
         return back()->with('success', "Student {$student->full_name} has been approved and assigned to {$student->program}.");
     }
@@ -121,7 +121,7 @@ class StudentController extends Controller
             'status' => Student::STATUS_DENIED,
         ]);
 
-        Mail::to($student->user->email)->send(new StudentStatusMail($student, Student::STATUS_DENIED, $request->reason));
+        Messenger::send($student->user->email, new StudentStatusMail($student, Student::STATUS_DENIED, $request->reason));
 
         return back()->with('success', "Student {$student->full_name} has been denied.");
     }

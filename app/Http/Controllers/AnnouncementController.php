@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\AnnouncementAttachment;
 use App\Jobs\SendAnnouncementNotifications;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
@@ -48,7 +49,7 @@ class AnnouncementController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('announcements', 'public');
+            $validated['image'] = ImageStorage::upload($request->file('image'), 'announcements');
         }
 
         $validated['start_date'] = now();
@@ -61,7 +62,7 @@ class AnnouncementController extends Controller
 
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('announcement_attachments', 'public');
+                $path = ImageStorage::upload($file, 'announcement_attachments');
                 $announcement->attachments()->create([
                     'file_path' => $path,
                     'file_name' => $file->getClientOriginalName(),
@@ -102,10 +103,8 @@ class AnnouncementController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($announcement->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($announcement->image);
-            }
-            $validated['image'] = $request->file('image')->store('announcements', 'public');
+            ImageStorage::delete($announcement->image);
+            $validated['image'] = ImageStorage::upload($request->file('image'), 'announcements');
         }
 
         $validated['is_active'] = $request->has('is_active');
@@ -116,7 +115,7 @@ class AnnouncementController extends Controller
 
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('announcement_attachments', 'public');
+                $path = ImageStorage::upload($file, 'announcement_attachments');
                 $announcement->attachments()->create([
                     'file_path' => $path,
                     'file_name' => $file->getClientOriginalName(),
@@ -154,7 +153,7 @@ class AnnouncementController extends Controller
 
     public function deleteAttachment(AnnouncementAttachment $attachment)
     {
-        \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->file_path);
+        ImageStorage::delete($attachment->file_path);
         $attachment->delete();
 
         return response()->json(['success' => true]);

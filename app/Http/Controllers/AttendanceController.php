@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Event;
 use App\Models\EventDate;
 use App\Models\Student;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -99,12 +100,7 @@ class AttendanceController extends Controller
         // Handle Photo Upload
         $photoPath = null;
         if ($request->photo) {
-            $photoData = $request->photo;
-            $photoData = str_replace('data:image/jpeg;base64,', '', $photoData);
-            $photoData = str_replace(' ', '+', $photoData);
-            $photoName = 'attendance_' . time() . '_' . $student->id . '.jpg';
-            $photoPath = 'attendance/' . $photoName;
-            \Storage::disk('public')->put($photoPath, base64_decode($photoData));
+            $photoPath = ImageStorage::uploadBase64($request->photo, 'attendance');
         }
 
         if ($attendance) {

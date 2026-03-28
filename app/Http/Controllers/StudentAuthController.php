@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -125,20 +126,17 @@ class StudentAuthController extends Controller
         $idFrontPath = null;
         $idBackPath = null;
         $facePhotoPath = null;
+
         if ($request->file('id_front')) {
-            $idFrontPath = \Illuminate\Support\Facades\Storage::disk('public')->putFile($idDir, $request->file('id_front'));
+            $idFrontPath = ImageStorage::upload($request->file('id_front'), $idDir);
         }
         if ($request->file('id_back')) {
-            $idBackPath = \Illuminate\Support\Facades\Storage::disk('public')->putFile($idDir, $request->file('id_back'));
+            $idBackPath = ImageStorage::upload($request->file('id_back'), $idDir);
         }
         if ($request->face_image) {
-            $photoData = $request->face_image;
-            $photoData = preg_replace('/^data:image\/\w+;base64,/', '', $photoData);
-            $photoData = str_replace(' ', '+', $photoData);
-            $photoName = 'face_' . time() . '_' . $student->id . '.jpg';
-            $facePhotoPath = $faceDir . '/' . $photoName;
-            \Illuminate\Support\Facades\Storage::disk('public')->put($facePhotoPath, base64_decode($photoData));
+            $facePhotoPath = ImageStorage::uploadBase64($request->face_image, $faceDir);
         }
+
         $student->update([
             'id_front_path' => $idFrontPath,
             'id_back_path' => $idBackPath,

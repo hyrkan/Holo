@@ -36,7 +36,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="avatar-image">
-                                                <img src="{{ $speaker->image ? asset('storage/'.$speaker->image) : asset('assets/images/no-image.png') }}" alt="" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;">
+                                                <img src="{{ $speaker->image_url }}" alt="" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;">
                                             </div>
                                             <a href="{{ route('admin.speakers.show', $speaker) }}">
                                                 <span class="d-block fw-bold">{{ $speaker->first_name }} {{ $speaker->last_name }}</span>

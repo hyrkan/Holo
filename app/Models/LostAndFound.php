@@ -6,7 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class LostAndFound extends Model
 {
+    use \App\Traits\HasImage;
+
     protected $guarded = [];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl('image_path');
+    }
+
+    public function getHandoverImageUrlAttribute()
+    {
+        return $this->getImageUrl('handover_image_path');
+    }
 
     protected $casts = [
         'date_reported' => 'datetime',

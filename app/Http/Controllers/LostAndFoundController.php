@@ -6,9 +6,10 @@ use App\Mail\LostAndFoundResolvedMail;
 use App\Jobs\SendAnnouncementNotifications;
 use App\Models\Announcement;
 use App\Models\LostAndFound;
+use App\Helpers\Messenger;
+use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class LostAndFoundController extends Controller
@@ -190,7 +191,7 @@ class LostAndFoundController extends Controller
         ]);
 
         if ($request->hasFile('handover_image')) {
-            $lost_and_found->handover_image_path = $request->file('handover_image')->store('handovers', 'public');
+            $lost_and_found->handover_image_path = ImageStorage::upload($request->file('handover_image'), 'handovers');
         }
 
         $lost_and_found->matched_item_id = $validated['matched_item_id'] ?? null;
@@ -203,12 +204,7 @@ class LostAndFoundController extends Controller
         // Notify reporter if email is provided
         $recipient = trim((string) $lost_and_found->contact_info);
         if ($recipient && filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-            try {
-                Mail::to($recipient)->send(new LostAndFoundResolvedMail($lost_and_found));
-            } catch (\Exception $e) {
-                // Log error or ignore if mail fails
-                \Log::error("Failed to send Lost and Found resolution email to {$recipient}: ".$e->getMessage());
-            }
+            Messenger::send($recipient, new LostAndFoundResolvedMail($lost_and_found));
         }
 
         // If a matching report was selected, resolve it too
@@ -225,11 +221,7 @@ class LostAndFoundController extends Controller
                 // Notify reporter of the matched item too if email is provided
                 $matchedRecipient = trim((string) $matchedItem->contact_info);
                 if ($matchedRecipient && filter_var($matchedRecipient, FILTER_VALIDATE_EMAIL)) {
-                    try {
-                        Mail::to($matchedRecipient)->send(new LostAndFoundResolvedMail($matchedItem));
-                    } catch (\Exception $e) {
-                        \Log::error("Failed to send matched Lost and Found resolution email to {$matchedRecipient}: ".$e->getMessage());
-                    }
+                    Messenger::send($matchedRecipient, new LostAndFoundResolvedMail($matchedItem));
                 }
             }
         }
@@ -270,12 +262,8 @@ class LostAndFoundController extends Controller
 
     public function destroy(LostAndFound $lost_and_found)
     {
-        if ($lost_and_found->image_path) {
-            Storage::disk('public')->delete($lost_and_found->image_path);
-        }
-        if ($lost_and_found->handover_image_path) {
-            Storage::disk('public')->delete($lost_and_found->handover_image_path);
-        }
+        ImageStorage::delete($lost_and_found->image_path);
+        ImageStorage::delete($lost_and_found->handover_image_path);
 
         $lost_and_found->delete();
 
@@ -355,10 +343,8 @@ class LostAndFoundController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($lost_and_found->image_path) {
-                Storage::disk('public')->delete($lost_and_found->image_path);
-            }
-            $validated['image_path'] = $request->file('image')->store('lost-and-found', 'public');
+            ImageStorage::delete($lost_and_found->image_path);
+            $validated['image_path'] = ImageStorage::upload($request->file('image'), 'lost-and-found');
         }
 
         unset($validated['image']);
