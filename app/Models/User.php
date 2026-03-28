@@ -60,9 +60,12 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\CanRese
 
     public function sendPasswordResetNotification($token)
     {
-        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($notifiable, $token) {
-            return route('student.password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()]);
+        $role = $this->hasAnyRole(['admin', 'employee']) ? 'admin' : 'student';
+        
+        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($notifiable, $token) use ($role) {
+            return route($role . '.password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()]);
         });
+        
         $this->notify(new \Illuminate\Auth\Notifications\ResetPassword($token));
     }
 }

@@ -41,6 +41,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'authenticate'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
+    // Password Reset Routes
+    Route::get('/forgot-password', [\App\Http\Controllers\AdminPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\AdminPasswordController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\AdminPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\AdminPasswordController::class, 'reset'])->name('password.store');
+
     Route::middleware(['auth', 'role:admin|employee'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
 
