@@ -31,7 +31,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-image avatar-md me-3">
-                                                    <img src="{{ $event->image ? asset('storage/'.$event->image) : asset('assets/images/no-image.png') }}" alt="" class="img-fluid rounded">
+                                                    <img src="{{ $event->image_url }}" alt="" class="img-fluid rounded">
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-0">{{ $event->name }}</h6>

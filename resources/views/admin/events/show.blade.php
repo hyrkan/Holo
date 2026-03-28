@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="{{ $event->image ? asset('storage/'.$event->image) : asset('assets/images/no-image.png') }}" class="img-fluid rounded mb-3" alt="{{ $event->name }}">
+                            <img src="{{ $event->image_url }}" class="img-fluid rounded mb-3" alt="{{ $event->name }}">
                         </div>
                         <div class="col-md-8">
                             <h2 class="mb-3">{{ $event->name }}</h2>
@@ -133,7 +133,7 @@
                                             <div class="col-md-6 mb-3">
                                                 <div class="d-flex align-items-center gap-3 border p-3 rounded cursor-pointer" data-bs-toggle="modal" data-bs-target="#speakerModal{{ $speaker->id }}" style="cursor: pointer; transition: all 0.2s; background-color: #fff;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='#fff'">
                                                     <div class="avatar-image">
-                                                        <img src="{{ $speaker->image ? asset('storage/'.$speaker->image) : asset('assets/images/no-image.png') }}" alt="" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <img src="{{ $speaker->image_url }}" alt="" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0">{{ $speaker->first_name }} {{ $speaker->last_name }}</h6>
@@ -153,7 +153,7 @@
                                                         </div>
                                                         <div class="modal-body text-center">
                                                             <div class="mb-3">
-                                                                <img src="{{ $speaker->image ? asset('storage/'.$speaker->image) : asset('assets/images/no-image.png') }}" alt="" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                                                <img src="{{ $speaker->image_url }}" alt="" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                                                             </div>
                                                             <h4 class="mb-1">{{ $speaker->first_name }} {{ $speaker->middle_name }} {{ $speaker->last_name }}</h4>
                                                             <p class="text-muted mb-2">{{ $speaker->title ?? 'N/A' }} @if($speaker->company) at {{ $speaker->company }} @endif</p>

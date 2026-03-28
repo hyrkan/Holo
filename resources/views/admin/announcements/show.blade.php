@@ -63,7 +63,7 @@
                                                                     <small class="text-muted text-uppercase">{{ $attachment->file_type }} • {{ number_format($attachment->file_size / 1024, 2) }} KB</small>
                                                                 </div>
                                                             </div>
-                                                            <a href="{{ Storage::url($attachment->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary ms-3" download>
+                                                            <a href="{{ $attachment->file_url }}" target="_blank" class="btn btn-sm btn-outline-primary ms-3" download>
                                                                 <i class="feather-download me-1"></i> Download
                                                             </a>
                                                         </div>
@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-md-4">
                             @if($announcement->image)
-                                <img src="{{ Storage::url($announcement->image) }}" alt="{{ $announcement->title }}" class="img-fluid rounded">
+                                <img src="{{ $announcement->image_url }}" alt="{{ $announcement->title }}" class="img-fluid rounded">
                             @else
                                 <div class="p-5 bg-light text-center rounded text-muted">
                                     No Image

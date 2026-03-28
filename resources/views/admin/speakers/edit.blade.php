@@ -79,7 +79,7 @@
                             <label for="image" class="form-label">Profile Image</label>
                             @if($speaker->image)
                                 <div class="mb-2">
-                                    <img src="{{ asset('storage/'.$speaker->image) }}" alt="Current Image" style="height: 100px; border-radius: 5px; object-fit: cover;">
+                                    <img src="{{ $speaker->image_url }}" alt="Current Image" style="height: 100px; border-radius: 5px; object-fit: cover;">
                                 </div>
                             @endif
                             <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">

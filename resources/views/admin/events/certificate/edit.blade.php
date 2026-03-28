@@ -60,7 +60,7 @@
                                     <label for="background_image" class="form-label">Background Template</label>
                                     @if($certificate->background_image)
                                         <div class="mb-2 text-center">
-                                            <img src="{{ asset('storage/' . $certificate->background_image) }}" alt="Background Template" class="img-fluid rounded border mb-2" style="max-height: 150px;">
+                                            <img src="{{ $certificate->background_image_url }}" alt="Background Template" class="img-fluid rounded border mb-2" style="max-height: 150px;">
                                         </div>
                                     @endif
                                     <input type="file" class="form-control @error('background_image') is-invalid @enderror" id="background_image" name="background_image" accept="image/*">
@@ -116,8 +116,12 @@
                                             <div class="mb-0">
                                                 <label class="form-label small fw-bold">Signature Image</label>
                                                 @if(isset($signatory['signature_image']) && !is_object($signatory['signature_image']))
+                                                    @php
+                                                        $sigModel = $certificate->signatories ? $certificate->signatories->where('id', $signatory['id'] ?? null)->first() : null;
+                                                        $sigUrl = $sigModel ? $sigModel->signature_url : asset('storage/' . $signatory['signature_image']);
+                                                    @endphp
                                                     <div class="mb-2 text-center bg-light p-2 rounded">
-                                                        <img src="{{ asset('storage/' . $signatory['signature_image']) }}" alt="Signature" style="max-height: 40px;">
+                                                        <img src="{{ $sigUrl }}" alt="Signature" style="max-height: 40px;">
                                                     </div>
                                                 @endif
                                                 <input type="file" name="signatories[{{ $index }}][signature_image]" class="form-control form-control-sm" accept="image/*">

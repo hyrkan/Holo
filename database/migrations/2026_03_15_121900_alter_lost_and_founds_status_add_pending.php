@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lost_and_founds', function ($table) {
-            $table->enum('status', ['pending', 'active', 'resolved'])->default('pending')->change();
-        });
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE lost_and_founds DROP CONSTRAINT IF EXISTS lost_and_founds_status_check');
+            DB::statement("ALTER TABLE lost_and_founds ALTER COLUMN status TYPE VARCHAR(255) USING status::VARCHAR");
+            DB::statement("ALTER TABLE lost_and_founds ALTER COLUMN status SET DEFAULT 'pending'");
+            DB::statement("ALTER TABLE lost_and_founds ADD CONSTRAINT lost_and_founds_status_check CHECK (status IN ('pending', 'active', 'resolved'))");
+        } else {
+            Schema::table('lost_and_founds', function ($table) {
+                $table->enum('status', ['pending', 'active', 'resolved'])->default('pending')->change();
+            });
+        }
     }
 
     /**
@@ -21,9 +28,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lost_and_founds', function ($table) {
-            $table->enum('status', ['active', 'resolved'])->default('active')->change();
-        });
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE lost_and_founds DROP CONSTRAINT IF EXISTS lost_and_founds_status_check');
+            DB::statement("ALTER TABLE lost_and_founds ALTER COLUMN status TYPE VARCHAR(255) USING status::VARCHAR");
+            DB::statement("ALTER TABLE lost_and_founds ALTER COLUMN status SET DEFAULT 'active'");
+            DB::statement("ALTER TABLE lost_and_founds ADD CONSTRAINT lost_and_founds_status_check CHECK (status IN ('active', 'resolved'))");
+        } else {
+            Schema::table('lost_and_founds', function ($table) {
+                $table->enum('status', ['active', 'resolved'])->default('active')->change();
+            });
+        }
     }
 };
-

@@ -83,7 +83,7 @@
                             <label for="image" class="form-label">Event Image</label>
                             @if($event->image)
                                 <div class="mb-2">
-                                    <img src="{{ asset('storage/'.$event->image) }}" alt="Current Image" style="height: 100px; border-radius: 5px;">
+                                    <img src="{{ $event->image_url }}" alt="Current Image" style="height: 100px; border-radius: 5px;">
                                 </div>
                             @endif
                             <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">

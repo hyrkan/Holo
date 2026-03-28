@@ -48,7 +48,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
                                             @if($item->image_path)
-                                                <img src="{{ asset('storage/' . $item->image_path) }}" alt="" class="img-fluid rounded-circle" style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #eee;">
+                                                <img src="{{ $item->image_url }}" alt="" class="img-fluid rounded-circle" style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #eee;">
                                             @else
                                                 <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
                                                     <i class="feather-image"></i>
@@ -116,7 +116,7 @@
                                                 </a>
 
                                                 @if(strtolower($item->status) == 'resolved' && $item->handover_image_path)
-                                                    <a href="{{ asset('storage/' . $item->handover_image_path) }}" target="_blank" class="dropdown-item">
+                                                    <a href="{{ $item->handover_image_url }}" target="_blank" class="dropdown-item">
                                                         <i class="feather-image me-2"></i> View Proof
                                                     </a>
                                                 @endif

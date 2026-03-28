@@ -34,7 +34,7 @@
             padding: 40px;
             box-sizing: border-box;
             @if($certificate->background_image)
-                background-image: url("{{ asset('storage/' . $certificate->background_image) }}");
+                background-image: url("{{ $certificate->background_image_url }}");
                 background-size: cover;
                 background-position: center;
             @endif
@@ -218,7 +218,7 @@
                     <div class="signatory-column">
                         <div class="signatory-wrapper">
                             @if($signatory->signature_image)
-                                <img src="{{ asset('storage/' . $signatory->signature_image) }}" class="signature-img" alt="Signature">
+                                <img src="{{ $signatory->signature_url }}" class="signature-img" alt="Signature">
                             @else
                                 <div style="height: 55px;"></div>
                             @endif

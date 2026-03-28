@@ -121,10 +121,10 @@
                                                     <div class="d-flex flex-column align-items-center">
                                                         <div class="d-flex align-items-center gap-2 mb-1">
                                                             @if($attendance->photo)
-                                                                <img src="{{ asset('storage/' . $attendance->photo) }}" 
+                                                                <img src="{{ $attendance->photo_url }}" 
                                                                      class="photo-preview" 
                                                                      alt="Student Photo"
-                                                                     onclick="showPhoto('{{ asset('storage/' . $attendance->photo) }}', '{{ $student->first_name }} {{ $student->last_name }}')"
+                                                                     onclick="showPhoto('{{ $attendance->photo_url }}', '{{ $student->first_name }} {{ $student->last_name }}')"
                                                                 >
                                                             @endif
                                                             <span class="present-box" title="Recorded">

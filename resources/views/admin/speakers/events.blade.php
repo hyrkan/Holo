@@ -32,7 +32,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="avatar-image">
-                                                <img src="{{ $event->image ? asset('storage/'.$event->image) : asset('assets/images/no-image.png') }}" alt="" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;">
+                                                <img src="{{ $event->image_url }}" alt="" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;">
                                             </div>
                                             <a href="{{ route('admin.events.show', $event) }}">
                                                 <span class="d-block fw-bold">{{ $event->name }}</span>

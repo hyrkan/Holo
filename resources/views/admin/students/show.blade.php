@@ -123,7 +123,7 @@
                                     <div class="border rounded-4 p-2 text-center">
                                         <h6 class="small text-muted mb-2">ID Front</h6>
                                         @if($student->id_front_path)
-                                            <img src="{{ asset('storage/' . $student->id_front_path) }}" class="img-fluid rounded" alt="ID Front">
+                                            <img src="{{ $student->id_front_url }}" class="img-fluid rounded" alt="ID Front">
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
                                                 <i class="feather-image fs-2 text-muted"></i>
@@ -135,7 +135,7 @@
                                     <div class="border rounded-4 p-2 text-center">
                                         <h6 class="small text-muted mb-2">ID Back</h6>
                                         @if($student->id_back_path)
-                                            <img src="{{ asset('storage/' . $student->id_back_path) }}" class="img-fluid rounded" alt="ID Back">
+                                            <img src="{{ $student->id_back_url }}" class="img-fluid rounded" alt="ID Back">
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
                                                 <i class="feather-image fs-2 text-muted"></i>
@@ -147,7 +147,7 @@
                                     <div class="border rounded-4 p-2 text-center">
                                         <h6 class="small text-muted mb-2">Face Photo</h6>
                                         @if($student->face_photo_path)
-                                            <img src="{{ asset('storage/' . $student->face_photo_path) }}" class="img-fluid rounded" alt="Face Photo">
+                                            <img src="{{ $student->face_photo_url }}" class="img-fluid rounded" alt="Face Photo">
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 160px;">
                                                 <i class="feather-user fs-2 text-muted"></i>

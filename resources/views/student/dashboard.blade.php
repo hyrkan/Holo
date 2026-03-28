@@ -85,7 +85,7 @@
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center gap-3 mb-3">
                                                         @if($event->image)
-                                                            <img src="{{ asset('storage/' . $event->image) }}" alt="" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                            <img src="{{ $event->image_url }}" alt="" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
                                                         @else
                                                             <div class="avatar-text avatar-md bg-soft-primary text-primary rounded-3">
                                                                 <i class="feather-calendar"></i>
@@ -154,7 +154,7 @@
                                                     </div>
                                                     <div class="d-flex align-items-center gap-3 mb-3">
                                                         @if($item->image_path)
-                                                            <img src="{{ asset('storage/' . $item->image_path) }}" alt="" class="rounded-3" style="width: 45px; height: 45px; object-fit: cover;">
+                                                            <img src="{{ $item->image_url }}" alt="" class="rounded-3" style="width: 45px; height: 45px; object-fit: cover;">
                                                         @else
                                                             <div class="avatar-text avatar-sm bg-light text-muted rounded-3">
                                                                 <i class="feather-image"></i>
@@ -190,12 +190,12 @@
                                                  data-announcement="true"
                                                  data-title="{{ $announcement->title }}"
                                                  data-body="{{ $announcement->body }}"
-                                                 data-image="{{ $announcement->image ? asset('storage/' . $announcement->image) : '' }}"
+                                                 data-image="{{ $announcement->image_url }}"
                                                  data-created="{{ $announcement->created_at->format('M d, Y') }}"
                                                  data-attachments="{{ json_encode($announcement->attachments->map(function($a) { 
                                                      return [
                                                          'name' => $a->file_name,
-                                                         'url' => Storage::url($a->file_path),
+                                                         'url' => $a->file_url,
                                                          'type' => $a->file_type,
                                                          'size' => number_format($a->file_size / 1024, 2) . ' KB'
                                                      ];
@@ -204,7 +204,7 @@
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center gap-3 mb-3">
                                                         @if($announcement->image)
-                                                            <img src="{{ asset('storage/' . $announcement->image) }}" alt="" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                            <img src="{{ $announcement->image_url }}" alt="" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
                                                         @else
                                                             <div class="avatar-text avatar-md bg-soft-warning text-warning rounded-3">
                                                                 <i class="feather-bell"></i>

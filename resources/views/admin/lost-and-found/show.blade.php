@@ -71,7 +71,7 @@
                     @if($lost_and_found->image_path)
                     <div class="mb-0">
                         <h6 class="text-muted fw-bold small text-uppercase mb-2">Item Photo</h6>
-                        <img src="{{ asset('storage/' . $lost_and_found->image_path) }}" alt="Item Photo" class="img-fluid rounded border shadow-sm" style="max-height: 400px;">
+                        <img src="{{ $lost_and_found->image_url }}" alt="Item Photo" class="img-fluid rounded border shadow-sm" style="max-height: 400px;">
                     </div>
                     @endif
 
@@ -112,8 +112,8 @@
                             @if($lost_and_found->handover_image_path)
                             <div class="col-md-6 border-start ps-md-4">
                                 <h6 class="text-muted fw-bold small text-uppercase mb-2">Handover Photo / Proof</h6>
-                                <a href="{{ asset('storage/' . $lost_and_found->handover_image_path) }}" target="_blank" title="Click to enlarge" class="d-block">
-                                    <img src="{{ asset('storage/' . $lost_and_found->handover_image_path) }}" alt="Handover Proof" class="img-fluid rounded border shadow-sm" style="width: 100%; max-width: 300px; height: 200px; object-fit: cover;">
+                                <a href="{{ $lost_and_found->handover_image_url }}" target="_blank" title="Click to enlarge" class="d-block">
+                                    <img src="{{ $lost_and_found->handover_image_url }}" alt="Handover Proof" class="img-fluid rounded border shadow-sm" style="width: 100%; max-width: 300px; height: 200px; object-fit: cover;">
                                     <div class="mt-2 small text-muted"><i class="feather-maximize-2 me-1"></i> Click to enlarge</div>
                                 </a>
                             </div>

@@ -46,7 +46,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
                                             @if($item->image_path)
-                                                <img src="{{ asset('storage/' . $item->image_path) }}" alt="" class="img-fluid rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                                <img src="{{ $item->image_url }}" alt="" class="img-fluid rounded" style="width: 40px; height: 40px; object-fit: cover;">
                                             @else
                                                 <div class="bg-soft-primary text-primary rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                                     <i class="feather-image"></i>

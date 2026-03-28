@@ -47,7 +47,7 @@
                                 <input type="file" name="image" class="form-control">
                                 @if($announcement->image)
                                     <div class="mt-2">
-                                        <img src="{{ Storage::url($announcement->image) }}" alt="Current Image" class="img-thumbnail" style="max-height: 150px;">
+                                        <img src="{{ $announcement->image_url }}" alt="Current Image" class="img-thumbnail" style="max-height: 150px;">
                                     </div>
                                 @endif
                                 @error('image')
@@ -119,7 +119,7 @@
                                                         <small class="text-muted">({{ number_format($attachment->file_size / 1024, 2) }} KB)</small>
                                                     </div>
                                                     <div class="d-flex gap-2">
-                                                        <a href="{{ Storage::url($attachment->file_path) }}" target="_blank" class="text-primary" title="Download">
+                                                        <a href="{{ $attachment->file_url }}" target="_blank" class="text-primary" title="Download">
                                                             <i class="feather-download"></i>
                                                         </a>
                                                         <button type="button" class="text-danger border-0 bg-transparent p-0 delete-attachment" data-id="{{ $attachment->id }}" title="Delete">
