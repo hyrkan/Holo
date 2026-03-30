@@ -166,6 +166,16 @@ class CertificateController extends Controller
 
     public function updateEligibility(Request $request, Event $event, Student $student)
     {
+        $event->load('eventDates'); // Ensure event dates are loaded
+
+        // Check if the student has attended all event dates
+        if (!$student->hasAttendedAllEventDates($event)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Student has not attended all event dates and is not eligible for certificates.'
+            ], 403); // Forbidden
+        }
+
         $certificateIds = $request->input('certificate_ids', []);
         
         // Only consider certificates belonging to this event
@@ -207,11 +217,19 @@ class CertificateController extends Controller
             'action' => 'required|in:award,revoke'
         ]);
 
+        $event->load('eventDates'); // Ensure event dates are loaded
         $students = Student::whereIn('id', $request->student_ids)->get();
         $certificateIds = $request->input('certificate_ids', []);
+        $skippedStudents = [];
 
         foreach ($students as $student) {
             if ($request->action === 'award') {
+                // Check if the student has attended all event dates
+                if (!$student->hasAttendedAllEventDates($event)) {
+                    $skippedStudents[] = $student->full_name;
+                    continue; // Skip this student if they haven't attended all dates
+                }
+
                 // Compute newly awarded for this student
                 $newlyAwardedIds = [];
                 if (!empty($certificateIds)) {
@@ -233,6 +251,11 @@ class CertificateController extends Controller
             }
         }
 
-        return back()->with('success', 'Selected participants eligibility updated successfully.');
+        $message = 'Selected participants eligibility updated successfully.';
+        if (!empty($skippedStudents)) {
+            $message .= ' Certificates were not awarded to: ' . implode(', ', $skippedStudents) . ' because they did not attend all event dates.';
+        }
+
+        return back()->with('success', $message);
     }
 }

@@ -48,6 +48,18 @@
 <div class="main-content">
     <div class="row">
         <div class="col-lg-12">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="card stretch stretch-full">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
@@ -206,9 +218,13 @@
         });
 
         // Individual Eligibility Update
-        $('.student-eligibility').on('change', function() {
+        $('.student-eligibility').each(function() {
+            const initialCertIds = $(this).val();
+            $(this).data('original-certificates', initialCertIds);
+        }).on('change', function() {
             const url = $(this).data('url');
             const certificateIds = $(this).val();
+            const $selectElement = $(this); // Store reference to the select element
             
             $.ajax({
                 url: url,
@@ -218,7 +234,22 @@
                     certificate_ids: certificateIds
                 },
                 success: function(response) {
-                    // Optional: Show toast
+                    if (response.success) {
+                        alert('Certificates updated successfully!');
+                        $selectElement.data('original-certificates', certificateIds); // Update original if successful
+                    } else {
+                        alert(response.message || 'An unexpected error occurred.');
+                        $selectElement.val($selectElement.data('original-certificates')).trigger('change.select2'); // Revert on unexpected success error
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 403) {
+                        alert(xhr.responseJSON.message);
+                        $selectElement.val($selectElement.data('original-certificates')).trigger('change.select2'); // Revert on 403
+                    } else {
+                        alert('An error occurred while updating certificates.');
+                        $selectElement.val($selectElement.data('original-certificates')).trigger('change.select2'); // Revert on other errors
+                    }
                 }
             });
         });

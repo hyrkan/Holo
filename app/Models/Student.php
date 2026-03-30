@@ -141,4 +141,25 @@ class Student extends Model
     {
         return $this->belongsToMany(Certificate::class, 'certificate_student');
     }
+
+    /**
+     * Check if the student has attended all dates for a given event.
+     *
+     * @param \App\Models\Event $event
+     * @return bool
+     */
+    public function hasAttendedAllEventDates(Event $event)
+    {
+        $totalDates = $event->eventDates->count();
+
+        if ($totalDates === 0) {
+            return true; // No event dates, so technically attended all
+        }
+
+        $attendedDates = $this->attendances()
+            ->whereIn('event_date_id', $event->eventDates->pluck('id'))
+            ->count();
+
+        return $attendedDates >= $totalDates;
+    }
 }
