@@ -33,7 +33,7 @@ class RolePermissionSeeder extends Seeder
 
         // Employee role
         $role = Role::firstOrCreate(['name' => 'employee']);
-        $role->givePermissionTo(['view dashboard', 'manage students']);
+        $role->givePermissionTo(['view dashboard', 'manage students', 'manage events', 'manage employees']);
 
         // Student role
         $role = Role::firstOrCreate(['name' => 'student']);

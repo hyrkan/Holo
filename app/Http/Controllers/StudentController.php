@@ -151,7 +151,9 @@ class StudentController extends Controller
                 return in_array($student->program, $departments);
             });
 
-        $announcements = Announcement::with('attachments')->whereYear('start_date', $currentYear)
+        $announcements = Announcement::with('attachments')
+            ->where('is_archived', false)
+            ->whereYear('start_date', $currentYear)
             ->whereMonth('start_date', $currentMonth)
             ->where('is_active', true)
             ->latest()

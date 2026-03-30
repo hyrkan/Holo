@@ -12,7 +12,8 @@ class LandingPageController extends Controller
     {
         $query = Announcement::query()
             ->where('is_active', true)
-            ->where('is_draft', false);
+            ->where('is_draft', false)
+            ->where('is_archived', false);
 
         // Filter by Category (Target Audience)
         if ($request->filled('category')) {
