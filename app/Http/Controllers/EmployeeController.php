@@ -45,7 +45,7 @@ class EmployeeController extends Controller
             'password' => 'required|string|min:8',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
-            'role' => 'required|exists:roles,name',
+            'role' => 'required|exists:roles,name|not_in:student',
         ]);
 
         $user = \App\Models\User::create([

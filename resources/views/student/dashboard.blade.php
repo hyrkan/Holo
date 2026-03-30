@@ -367,6 +367,40 @@ document.addEventListener('DOMContentLoaded', function() {
     t.addEventListener('click', hide);
   });
 
+  // Handle tab activation from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get('tab');
+
+  if (activeTab) {
+    const targetTabButton = document.getElementById(activeTab + '-tab');
+    if (targetTabButton) {
+      // Deactivate currently active tab (Events & Projects by default)
+      const currentActiveButton = document.querySelector('#dashboardTabs .nav-link.active');
+      const currentActivePane = document.querySelector('.tab-content .tab-pane.show.active');
+
+      if (currentActiveButton) {
+        currentActiveButton.classList.remove('active');
+        currentActiveButton.setAttribute('aria-selected', 'false');
+      }
+      if (currentActivePane) {
+        currentActivePane.classList.remove('show', 'active');
+      }
+
+      // Activate the target tab
+      targetTabButton.classList.add('active');
+      targetTabButton.setAttribute('aria-selected', 'true');
+      const targetPane = document.getElementById(activeTab);
+      if (targetPane) {
+        targetPane.classList.add('show', 'active');
+      }
+
+      // Update mobile select if it exists
+      if (mobileSelect) {
+        mobileSelect.value = activeTab;
+      }
+    }
+  }
+
   var modalEl = document.getElementById('announcementModal');
   var modalTitle = document.getElementById('announcementModalTitle');
   var modalBody = document.getElementById('announcementModalBodyText');

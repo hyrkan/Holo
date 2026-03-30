@@ -202,7 +202,19 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        //
+        if ($event->image) {
+            ImageStorage::delete($event->image);
+        }
+
+        $event->speakers()->detach();
+        $event->eventDates()->delete();
+        // Students/Registrations and Certificates should ideally cascade, but we'll try to detach/delete them to be safe
+        $event->students()->detach();
+        $event->certificates()->delete();
+        
+        $event->delete();
+
+        return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully.');
     }
 
     /**

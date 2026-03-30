@@ -56,9 +56,11 @@
                                 <select name="role" class="form-control" required>
                                     <option value="">Select Role</option>
                                     @foreach($roles as $role)
-                                        <option value="{{ $role->name }}" {{ old('role', 'employee') == $role->name ? 'selected' : '' }}>
-                                            {{ ucfirst($role->name) }}
-                                        </option>
+                                        @if($role->name !== 'student')
+                                            <option value="{{ $role->name }}" {{ old('role', 'employee') == $role->name ? 'selected' : '' }}>
+                                                {{ ucfirst($role->name) }}
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 @error('role')

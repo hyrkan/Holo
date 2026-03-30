@@ -50,7 +50,7 @@
                     @endif
                     
                     <div class="mt-40">
-                        <a href="{{ route('lost-and-found.index') }}" class="btn btn-outline">Back to List</a>
+                        <a href="{{ route('student.dashboard', ['tab' => 'lost-found']) }}" class="btn btn-outline">Back to List</a>
                     </div>
                 </div>
             </div>
