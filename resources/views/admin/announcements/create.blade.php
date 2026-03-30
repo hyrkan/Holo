@@ -9,7 +9,7 @@
                     <h5 class="card-title">Create Announcement</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data">
+                    <form id="announcementForm" action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row mb-4">
                             <div class="col-md-12">
@@ -87,7 +87,7 @@
                                 <a href="{{ route('admin.announcements.index') }}" class="btn btn-light w-100">Cancel</a>
                             </div>
                             <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary w-100">Create Announcement</button>
+                                <button type="submit" id="submitBtn" class="btn btn-primary w-100">Create Announcement</button>
                             </div>
                         </div>
                     </form>
@@ -96,6 +96,18 @@
         </div>
     </div>
 </div>
+
+{{-- Loading overlay --}}
+<div id="sendingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="background:#fff; border-radius:12px; padding:40px 48px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+        <div class="spinner-border text-primary mb-3" style="width:3rem; height:3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mb-1">Creating Announcement</h5>
+        <p class="text-muted mb-0">Sending email notifications to recipients...<br><small>This may take a moment, please don't close this page.</small></p>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -122,6 +134,21 @@
                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                 checkboxes.forEach(cb => cb.checked = !allChecked);
                 this.textContent = allChecked ? 'Select All' : 'Deselect All';
+            });
+        }
+
+        // Show loading overlay on form submit
+        const announcementForm = document.getElementById('announcementForm');
+        const sendingOverlay = document.getElementById('sendingOverlay');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (announcementForm && sendingOverlay) {
+            announcementForm.addEventListener('submit', function() {
+                sendingOverlay.style.display = 'flex';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Sending...';
+                }
             });
         }
     });

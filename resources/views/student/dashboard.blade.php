@@ -96,7 +96,7 @@
                                                             <small class="text-muted">{{ $event->location }}</small>
                                                         </div>
                                                     </div>
-                                                    <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit($event->description, 80) }}</p>
+                                                    <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit(strip_tags($event->description), 80) }}</p>
                                                     <div class="d-flex align-items-center justify-content-between mt-auto">
                                                         <span class="fs-12 text-muted">
                                                             <i class="feather-clock me-1"></i> 
@@ -217,7 +217,7 @@
                                                             </small>
                                                         </div>
                                                     </div>
-                                                    <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit($announcement->body, 100) }}</p>
+                                                    <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit(strip_tags($announcement->body), 100) }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -242,7 +242,7 @@
                                                 <div id="announcementModalImageWrap" class="mb-3 text-center" style="display:none;">
                                                     <img id="announcementModalImage" src="" alt="" class="img-fluid rounded-3" style="max-height: 400px; width: 100%; object-fit: cover;" />
                                                 </div>
-                                                <div id="announcementModalBodyText" class="fs-6 mb-4" style="white-space: pre-wrap;"></div>
+                                                <div id="announcementModalBodyText" class="fs-6 mb-4"></div>
                                                 <div id="announcementModalAttachments" style="display:none;">
                                                     <h6 class="mb-3">Downloadable Files:</h6>
                                                     <div id="attachmentsList" class="row g-2"></div>
@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var attachments = JSON.parse(attachmentsRaw);
 
         modalTitle.textContent = title;
-        modalBody.textContent = body;
+        modalBody.innerHTML = body;
         modalDates.textContent = 'Posted on: ' + created;
 
         if (image) {

@@ -46,7 +46,7 @@ class SendAnnouncementNotifications implements ShouldQueue
         $query->chunk(50, function ($students) {
             foreach ($students as $student) {
                 if ($student->user && $student->user->email) {
-                    Messenger::queue($student->user->email, new AnnouncementNotification($this->announcement));
+                    Messenger::send($student->user->email, new AnnouncementNotification($this->announcement));
                 }
             }
         });

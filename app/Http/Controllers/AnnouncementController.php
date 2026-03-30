@@ -72,11 +72,11 @@ class AnnouncementController extends Controller
             }
         }
 
-        // Dispatch queued email notifications to targeted students
-        SendAnnouncementNotifications::dispatch($announcement);
+        // Send email notifications synchronously to targeted students
+        SendAnnouncementNotifications::dispatchSync($announcement);
 
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Announcement created and notifications queued successfully.');
+            ->with('success', 'Announcement created and email notifications sent successfully.');
     }
 
     public function show(Announcement $announcement)
@@ -106,9 +106,6 @@ class AnnouncementController extends Controller
             ImageStorage::delete($announcement->image);
             $validated['image'] = ImageStorage::upload($request->file('image'), 'announcements');
         }
-
-        $validated['is_active'] = $request->has('is_active');
-        $validated['is_draft'] = $request->has('is_draft');
 
         $announcementData = collect($validated)->except(['attachments'])->toArray();
         $announcement->update($announcementData);
