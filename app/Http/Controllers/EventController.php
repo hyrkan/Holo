@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Helpers\ImageStorage;
+use App\Jobs\SendEventNotifications;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -113,7 +114,9 @@ class EventController extends Controller
             $event->speakers()->attach($request->speakers);
         }
 
-        return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
+        SendEventNotifications::dispatchSync($event);
+
+        return redirect()->route('admin.events.index')->with('success', 'Event created and email notifications sent successfully.');
     }
 
     /**
