@@ -79,7 +79,31 @@
     <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
     <script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
     <!--! END: Apps Init !-->
-    <script></script>
+    <script>
+        $(document).ready(function() {
+            // Initial check for minimenu class on page load for desktop toggle buttons
+            if ($('html').hasClass('minimenu')) {
+                $('#menu-mini-button').hide();
+                $('#menu-expend-button').show();
+            } else {
+                $('#menu-mini-button').show();
+                $('#menu-expend-button').hide();
+            }
+
+            // Desktop sidebar toggle
+            $('#menu-mini-button').on('click', function() {
+                $('html').addClass('minimenu');
+                $(this).hide();
+                $('#menu-expend-button').show();
+            });
+
+            $('#menu-expend-button').on('click', function() {
+                $('html').removeClass('minimenu');
+                $(this).hide();
+                $('#menu-mini-button').show();
+            });
+        });
+    </script>
     
     <!--! Toast Container !-->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;">
