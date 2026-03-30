@@ -111,6 +111,10 @@
                                                     </a>
                                                 @endif
 
+                                                <a href="{{ route('admin.lost-and-found.edit', $item) }}" class="dropdown-item">
+                                                    <i class="feather-edit me-2"></i> Edit report
+                                                </a>
+
                                                 <a href="{{ route('admin.lost-and-found.show', $item) }}" class="dropdown-item">
                                                     <i class="feather-eye me-2"></i> View Details
                                                 </a>

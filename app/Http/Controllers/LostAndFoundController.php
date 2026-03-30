@@ -353,4 +353,43 @@ class LostAndFoundController extends Controller
 
         return redirect()->route('student.lost-and-found.my-reports')->with('success', 'Report updated successfully.');
     }
+
+    public function adminEdit(LostAndFound $lost_and_found)
+    {
+        return view('admin.lost-and-found.edit', compact('lost_and_found'));
+    }
+
+    public function adminUpdate(Request $request, LostAndFound $lost_and_found)
+    {
+        $validated = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'contact_info' => 'required|email|max:255',
+            'reporter_name' => 'required|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+            'type' => 'required|in:lost,found',
+            'status' => 'required|in:pending,active,resolved',
+        ]);
+
+        if ($request->hasFile('image')) {
+            ImageStorage::delete($lost_and_found->image_path);
+            $lost_and_found->image_path = ImageStorage::upload($request->file('image'), 'lost-and-found');
+        }
+
+        $lost_and_found->item_name = $validated['item_name'];
+        $lost_and_found->description = $validated['description'];
+        $lost_and_found->location = $validated['location'];
+        $lost_and_found->contact_info = $validated['contact_info'];
+        $lost_and_found->reporter_name = $validated['reporter_name'];
+        $lost_and_found->owner_name = $validated['owner_name'];
+        $lost_and_found->type = $validated['type'];
+        $lost_and_found->status = $validated['status'];
+        $lost_and_found->is_anonymous = $request->has('is_anonymous');
+        
+        $lost_and_found->save();
+
+        return redirect()->route('admin.lost-and-found.index')->with('success', 'Report updated successfully.');
+    }
 }

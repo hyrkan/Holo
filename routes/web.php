@@ -110,6 +110,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/lost-and-found/{lost_and_found}/approve', [\App\Http\Controllers\LostAndFoundController::class, 'adminApprove'])->name('lost-and-found.approve');
         Route::get('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'resolve'])->name('lost-and-found.resolve');
         Route::post('/lost-and-found/{lost_and_found}/resolve', [\App\Http\Controllers\LostAndFoundController::class, 'storeResolution'])->name('lost-and-found.store-resolution');
+        Route::get('/lost-and-found/{lost_and_found}/edit', [\App\Http\Controllers\LostAndFoundController::class, 'adminEdit'])->name('lost-and-found.edit');
+        Route::put('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'adminUpdate'])->name('lost-and-found.update');
         Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
         
 
