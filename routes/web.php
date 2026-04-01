@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\LandingPageController;
-
+use Gemini\Laravel\Facades\Gemini;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -113,7 +113,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/lost-and-found/{lost_and_found}/edit', [\App\Http\Controllers\LostAndFoundController::class, 'adminEdit'])->name('lost-and-found.edit');
         Route::put('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'adminUpdate'])->name('lost-and-found.update');
         Route::delete('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'destroy'])->name('lost-and-found.destroy');
-        
+
 
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
         Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -145,4 +145,25 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::put('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'studentUpdate'])->name('lost-and-found.update');
         Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
     });
+});
+
+Route::post('/student/verify-id', [\App\Http\Controllers\StudentAuthController::class, 'verifyId'])->name('student.verify-id');
+
+Route::get('/test-gemini', function () {
+    // These showed up in your specific list!
+    $modelsToTry = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
+    $errors = [];
+
+    foreach ($modelsToTry as $modelName) {
+        try {
+            $result = Gemini::generativeModel(model: $modelName)
+                ->generateContent('Hello! Give me a fun fact about Laravel.');
+
+            return "Success with model [$modelName]: " . $result->text();
+        } catch (\Exception $e) {
+            $errors[] = "Model [$modelName] failed: " . $e->getMessage();
+        }
+    }
+
+    return "All models failed: " . implode(' | ', $errors);
 });
