@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('landing/fontawesome') }}/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     
     @stack('styles')
     <style>
@@ -60,6 +61,17 @@
     <!--! Footer Scripts !-->
     <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        // Safety fallback for toastr
+        window.toastr = window.toastr || {
+            error: function(msg) { console.error('Toastr Error: ' + msg); },
+            success: function(msg) { console.log('Toastr Success: ' + msg); },
+            warning: function(msg) { console.warn('Toastr Warning: ' + msg); },
+            info: function(msg) { console.info('Toastr Info: ' + msg); },
+            options: {}
+        };
+    </script>
     <script>
         $(document).ready(function() {
             // Initial check for minimenu class on page load for desktop toggle buttons
