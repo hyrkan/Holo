@@ -83,13 +83,16 @@ class EventController extends Controller
             'location' => 'required|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'dates' => 'required|array',
-            'dates.*' => 'date',
+            'dates.*.date' => 'required|date',
+            'dates.*.start_time' => 'nullable|date_format:H:i',
+            'dates.*.end_time' => 'nullable|date_format:H:i',
             'speakers' => 'nullable|array',
             'speakers.*' => 'exists:speakers,id',
             'tags' => 'nullable|string',
             'capacity' => 'nullable|integer|min:0',
             'departments' => 'nullable|array',
             'departments.*' => 'string',
+            'attendance_start_buffer' => 'nullable|integer|min:0',
         ]);
 
         $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
@@ -104,10 +107,15 @@ class EventController extends Controller
             'tags' => $tags,
             'capacity' => $request->capacity,
             'departments' => $request->departments,
+            'attendance_start_buffer' => $request->attendance_start_buffer ?? 0,
         ]);
 
-        foreach ($request->dates as $date) {
-            $event->eventDates()->create(['date' => $date]);
+        foreach ($request->dates as $dateData) {
+            $event->eventDates()->create([
+                'date' => $dateData['date'],
+                'start_time' => $dateData['start_time'],
+                'end_time' => $dateData['end_time'],
+            ]);
         }
 
         if ($request->has('speakers')) {
@@ -155,13 +163,16 @@ class EventController extends Controller
             'location' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'dates' => 'required|array',
-            'dates.*' => 'date',
+            'dates.*.date' => 'required|date',
+            'dates.*.start_time' => 'nullable|date_format:H:i',
+            'dates.*.end_time' => 'nullable|date_format:H:i',
             'speakers' => 'nullable|array',
             'speakers.*' => 'exists:speakers,id',
             'tags' => 'nullable|string',
             'capacity' => 'nullable|integer|min:0',
             'departments' => 'nullable|array',
             'departments.*' => 'string',
+            'attendance_start_buffer' => 'nullable|integer|min:0',
         ]);
 
         $tags = $request->tags ? array_map('trim', explode(',', $request->tags)) : [];
@@ -173,6 +184,7 @@ class EventController extends Controller
             'tags' => $tags,
             'capacity' => $request->capacity,
             'departments' => $request->departments,
+            'attendance_start_buffer' => $request->attendance_start_buffer ?? 0,
         ];
 
         if ($request->hasFile('image')) {
@@ -184,8 +196,12 @@ class EventController extends Controller
 
         // Update dates: for simplicity, delete all and recreate or sync
         $event->eventDates()->delete();
-        foreach ($request->dates as $date) {
-            $event->eventDates()->create(['date' => $date]);
+        foreach ($request->dates as $dateData) {
+            $event->eventDates()->create([
+                'date' => $dateData['date'],
+                'start_time' => $dateData['start_time'],
+                'end_time' => $dateData['end_time'],
+            ]);
         }
 
         if ($request->has('speakers')) {

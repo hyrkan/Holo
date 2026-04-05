@@ -15,6 +15,7 @@ class Student extends Model
         'middle_name',
         'program',
         'year_level',
+        'section',
         'enrollment_status',
         'classification',
         'status',

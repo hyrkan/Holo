@@ -97,26 +97,85 @@
                                                         </div>
                                                     </div>
                                                     <p class="text-muted fs-13 mb-3 text-truncate-2-line">{{ Str::limit(strip_tags($event->description), 80) }}</p>
-                                                    <div class="d-flex align-items-center justify-content-between mt-auto">
-                                                        <span class="fs-12 text-muted">
-                                                            <i class="feather-clock me-1"></i> 
-                                                            @if($event->eventDates->first())
-                                                                {{ \Carbon\Carbon::parse($event->eventDates->first()->date)->format('M d, Y') }}
+                                                    <div class="mb-3">
+                                                        <div class="d-flex align-items-center mb-1 text-dark fs-13">
+                                                            <i class="feather-calendar me-2 text-primary"></i>
+                                                            @if($event->eventDates->count() > 1)
+                                                                <span class="fw-medium">Multi-day Event</span>
+                                                            @else
+                                                                <span class="fw-medium">{{ \Carbon\Carbon::parse($event->eventDates->first()->date)->format('M d, Y') }}</span>
                                                             @endif
-                                                        </span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center text-muted fs-12">
+                                                            <i class="feather-clock me-2"></i>
+                                                            @if($event->eventDates->first())
+                                                                {{ \Carbon\Carbon::parse($event->eventDates->first()->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($event->eventDates->first()->end_time)->format('g:i A') }}
+                                                            @else
+                                                                TBA
+                                                            @endif
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
                                                         @php 
                                                             $isJoined = $event->students()->where('student_id', Auth::guard('student')->user()->student->id)->exists();
                                                             $lastDate = $event->eventDates->sortByDesc('date')->first();
                                                             $isPast = $lastDate ? \Carbon\Carbon::parse($lastDate->date)->endOfDay()->isPast() : false;
                                                         @endphp
-                                                        @if($isJoined)
-                                                            <span class="badge bg-soft-success text-success">Joined</span>
-                                                        @elseif($isPast)
-                                                            <button type="button" class="btn btn-xs btn-secondary rounded-pill px-3" disabled>Ended</button>
+                                                        
+                                                        @if($isPast)
+                                                            <div class="w-100 text-center">
+                                                                <span class="badge bg-soft-secondary text-secondary px-4 py-2 rounded-pill">
+                                                                    <i class="feather-clock me-1"></i> Event Ended
+                                                                </span>
+                                                            </div>
+                                                        @elseif($isJoined)
+                                                            @php
+                                                                $registration = $event->registrations()->where('student_id', Auth::guard('student')->user()->student->id)->first();
+                                                                $isTodayEvent = $event->eventDates()->whereDate('date', now()->toDateString())->exists();
+                                                                $canScan = false;
+                                                                $eventDate = null;
+                                                                $openingTime = null;
+                                                                
+                                                                if ($isTodayEvent) {
+                                                                    $eventDate = $event->eventDates()->whereDate('date', now()->toDateString())->first();
+                                                                    if ($eventDate->start_time) {
+                                                                        $buffer = $event->attendance_start_buffer ?? 0;
+                                                                        $startTime = \Carbon\Carbon::parse($eventDate->date . ' ' . $eventDate->start_time);
+                                                                        $openingTime = $startTime->copy()->subMinutes($buffer);
+                                                                        $canScan = now()->gte($openingTime);
+                                                                    } else {
+                                                                        $canScan = true;
+                                                                    }
+                                                                }
+                                                            @endphp
+                                                            <div class="w-100 flex-column">
+                                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                                    <span class="badge bg-soft-success text-success px-3">Joined</span>
+                                                                    <button type="button" 
+                                                                            class="btn btn-sm {{ $canScan ? 'btn-primary' : 'btn-light' }} rounded-pill px-3 show-qr"
+                                                                            data-event-name="{{ $event->name }}"
+                                                                            data-qr-uuid="{{ $registration->uuid ?? '' }}"
+                                                                            {{ $canScan ? '' : 'disabled' }}>
+                                                                        <i class="feather-grid me-1"></i> QR Code
+                                                                    </button>
+                                                                </div>
+                                                                
+                                                                @if(!$canScan && $isTodayEvent && $openingTime)
+                                                                    <div class="alert alert-soft-warning p-1 mb-0 mt-1 border-0 text-center" style="font-size: 10px;">
+                                                                        <i class="feather-info me-1"></i> QR will be available at {{ $openingTime->format('g:i A') }}
+                                                                    </div>
+                                                                @elseif(!$canScan && !$isTodayEvent)
+                                                                    <div class="text-muted text-center" style="font-size: 10px;">
+                                                                        <i class="feather-lock me-1"></i> QR available on event day
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         @else
+                                                            <span class="fs-12 text-primary fw-medium">Open for Join</span>
                                                             <form action="{{ route('student.events.join', $event) }}" method="POST">
                                                                 @csrf
-                                                                <button type="submit" class="btn btn-xs btn-primary rounded-pill px-3">Join</button>
+                                                                <button type="submit" class="btn btn-xs btn-primary rounded-pill px-4 shadow-sm">Join Now</button>
                                                             </form>
                                                         @endif
                                                     </div>
@@ -322,9 +381,105 @@
         </div>
     </div>
 </div>
+
+<!-- QR Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center pt-0">
+                <div class="mb-4">
+                    <div class="avatar-text avatar-lg bg-soft-primary text-primary rounded-circle mb-3 mx-auto">
+                        <i class="feather-grid"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1" id="qrModalEventName">Event Name</h4>
+                    <p class="text-muted small">Present this QR code to the scanner</p>
+                </div>
+                
+                <div class="d-inline-block p-4 bg-white border rounded-4 shadow-sm mb-4">
+                    <div id="qrPrintArea">
+                        <div class="mb-3 d-none d-print-block">
+                            <h5 class="mb-1 text-dark" id="qrPrintEventName">Event Name</h5>
+                            <p class="small text-muted mb-0">{{ Auth::guard('student')->user()->student->first_name }} {{ Auth::guard('student')->user()->student->last_name }}</p>
+                        </div>
+                        <div id="qrPlaceholder" class="qr-responsive d-flex align-items-center justify-content-center" style="min-width: 250px; min-height: 250px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-none d-print-block">
+                            <p class="small fw-bold text-primary mb-0">HOLO BOARD ATTENDANCE</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-soft-info text-start small mx-3">
+                    <i class="feather-info me-2"></i> This QR code is unique to this event and your registration.
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center pb-4 flex-column gap-2">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="printEventQR()">
+                        <i class="feather-printer me-1"></i> Print
+                    </button>
+                    <button type="button" class="btn btn-primary rounded-pill px-3" onclick="downloadEventQR()">
+                        <i class="feather-download me-1"></i> Download
+                    </button>
+                </div>
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
+@push('styles')
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #qrPrintArea, #qrPrintArea * {
+            visibility: visible;
+        }
+        #qrPrintArea {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function printEventQR() {
+    window.print();
+}
+
+function downloadEventQR() {
+    const element = document.getElementById('qrPrintArea');
+    const eventName = document.getElementById('qrModalEventName').textContent;
+    
+    // Ensure all styles are applied before capture
+    html2canvas(element, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher quality
+        logging: false
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `attendance-qr-${eventName.toLowerCase().replace(/\s+/g, '-')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var mobileSelect = document.getElementById('mobileTabsSelect');
@@ -472,6 +627,55 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.show();
       });
     });
+  }
+
+  // Handle QR Modal
+  const qrModalEl = document.getElementById('qrModal');
+  const qrPlaceholder = document.getElementById('qrPlaceholder');
+  const qrEventName = document.getElementById('qrModalEventName');
+  const qrButtons = document.querySelectorAll('.show-qr');
+  
+  if (qrModalEl) {
+      if (qrModalEl.parentNode !== document.body) {
+          document.body.appendChild(qrModalEl);
+      }
+      const qrModal = new bootstrap.Modal(qrModalEl);
+      
+      qrButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+              const uuid = this.getAttribute('data-qr-uuid');
+              const eventName = this.getAttribute('data-event-name');
+              
+              if (!uuid) {
+                  toastr.error('Registration UUID not found. Please contact admin.', 'Error');
+                  return;
+              }
+              
+              qrEventName.textContent = eventName;
+              if (document.getElementById('qrPrintEventName')) {
+                  document.getElementById('qrPrintEventName').textContent = eventName;
+              }
+              qrPlaceholder.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+              
+              qrModal.show();
+              
+              // Load the QR code via our local route using a safer route builder
+              const qrUrl = "{{ route('student.qr.generate', ['uuid' => ':uuid']) }}".replace(':uuid', uuid);
+              
+              fetch(qrUrl)
+                  .then(response => {
+                      if (!response.ok) throw new Error('Failed to load QR code.');
+                      return response.text();
+                  })
+                  .then(svg => {
+                      qrPlaceholder.innerHTML = svg;
+                  })
+                  .catch(err => {
+                      console.error(err);
+                      qrPlaceholder.innerHTML = '<p class="text-danger">Failed to load QR code.</p>';
+                  });
+          });
+      });
   }
 });
 </script>

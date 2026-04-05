@@ -362,4 +362,21 @@ class StudentController extends Controller
         }
         return redirect()->route('admin.students.index')->with('success', 'Student account set to inactive.');
     }
+
+    /**
+     * Generate an attendance QR code for a specific event registration.
+     */
+    public function generateQr($uuid)
+    {
+        $registration = \App\Models\EventRegistration::where('uuid', $uuid)
+            ->where('student_id', Auth::guard('student')->user()->student->id)
+            ->firstOrFail();
+
+        $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)
+            ->style('round')
+            ->margin(1)
+            ->generate($uuid);
+
+        return response($qrCode)->header('Content-Type', 'image/svg+xml');
+    }
 }

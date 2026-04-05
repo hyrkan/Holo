@@ -89,6 +89,8 @@ class StudentAuthController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
+            'year' => ['required', 'string', 'in:1st year,2nd year,3rd year,4th year'],
+            'section' => ['required', 'string', 'max:255'],
             'student_number' => ['required', 'string', 'max:255', 'unique:students,student_number'],
             'student_type' => ['required', 'string', 'in:regular,guest'],
             'id_front' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
@@ -175,6 +177,8 @@ class StudentAuthController extends Controller
         $student = $user->student()->create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'year_level' => $request->year,
+            'section' => $request->section,
             'student_number' => $studentNumber,
             'student_type' => $request->student_type,
             'status' => \App\Models\Student::STATUS_PENDING,

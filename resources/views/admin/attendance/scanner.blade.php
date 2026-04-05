@@ -106,7 +106,7 @@
                         <div class="mt-3 p-3 border rounded-4 bg-light text-center" id="manual-entry-container">
                             <p class="small text-muted mb-2">Camera issues? Use manual entry:</p>
                             <div class="input-group">
-                                <input type="text" id="manual-uuid" class="form-control" placeholder="Enter Student UUID...">
+                                <input type="text" id="manual-uuid" class="form-control" placeholder="Enter Registration UUID...">
                                 <button class="btn btn-primary" type="button" id="btn-manual-scan">
                                     <i class="feather-search"></i>
                                 </button>
@@ -289,7 +289,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                student_uuid: uuid,
+                registration_uuid: uuid,
                 event_id: "{{ $event->id }}",
                 photo: photo
             })

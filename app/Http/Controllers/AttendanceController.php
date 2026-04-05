@@ -33,21 +33,26 @@ class AttendanceController extends Controller
     public function scan(Request $request)
     {
         $request->validate([
-            'student_uuid' => 'required|exists:students,uuid',
+            'registration_uuid' => 'required|exists:event_registrations,uuid',
             'event_id' => 'required|exists:events,id',
             'photo' => 'nullable|string', // Base64 image
         ]);
 
-        $student = Student::with('user')->where('uuid', $request->student_uuid)->first();
+        $registration = \App\Models\EventRegistration::with(['student.user', 'event'])
+            ->where('uuid', $request->registration_uuid)
+            ->where('status', 'registered')
+            ->first();
         
-        if (!$student) {
+        if (!$registration || $registration->event_id != $request->event_id) {
             return response()->json([
                 'success' => false,
                 'type' => 'not_found',
-                'message' => 'Student not found with this ID code.',
+                'message' => 'Registration not found for this event.',
             ], 200);
         }
 
+        $student = $registration->student;
+        $event = $registration->event;
         $today = Carbon::today()->toDateString();
         
         // Response data for lookup
@@ -59,24 +64,6 @@ class AttendanceController extends Controller
             'year_level' => $student->year_level,
             'profile_url' => route('admin.students.show', $student->id),
         ];
-
-        // Context is an event attendance scan
-        $event = Event::findOrFail($request->event_id);
-        
-        // 1. Check if student is registered for this event
-        $registration = $event->registrations()
-            ->where('student_id', $student->id)
-            ->where('status', 'registered')
-            ->first();
-
-        if (!$registration) {
-            return response()->json([
-                'success' => false,
-                'type' => 'event_context',
-                'message' => 'Student is found but NOT registered for this event.',
-                'student' => $studentData,
-            ], 200);
-        }
 
         // 2. Find if today is an active date for this event
         $eventDate = EventDate::where('event_id', $event->id)
@@ -90,6 +77,22 @@ class AttendanceController extends Controller
                 'message' => 'No session scheduled for today (' . Carbon::today()->format('M d, Y') . ') for this event.',
                 'student' => $studentData,
             ], 200);
+        }
+
+        // 2.5 Check if attendance is already open
+        if ($eventDate->start_time) {
+            $buffer = $event->attendance_start_buffer ?? 0;
+            $startTime = Carbon::parse($eventDate->date . ' ' . $eventDate->start_time);
+            $openingTime = $startTime->copy()->subMinutes($buffer);
+
+            if (now()->lt($openingTime)) {
+                return response()->json([
+                    'success' => false,
+                    'type' => 'event_context',
+                    'message' => 'Attendance for this session is not yet open. It will open at ' . $openingTime->format('h:i A') . '.',
+                    'student' => $studentData,
+                ], 200);
+            }
         }
 
         // 3. Mark attendance

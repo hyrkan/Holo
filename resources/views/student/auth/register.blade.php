@@ -95,6 +95,22 @@
                                         <input type="text" name="last_name" class="form-control" placeholder="Last Name" value="{{ old('last_name') }}" required>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label fs-12 fw-bold text-muted">Year <span class="text-danger">*</span></label>
+                                        <select name="year" class="form-control" required>
+                                            <option value="" disabled {{ old('year') ? '' : 'selected' }}>Select Year</option>
+                                            <option value="1st year" {{ old('year') == '1st year' ? 'selected' : '' }}>1st year</option>
+                                            <option value="2nd year" {{ old('year') == '2nd year' ? 'selected' : '' }}>2nd year</option>
+                                            <option value="3rd year" {{ old('year') == '3rd year' ? 'selected' : '' }}>3rd year</option>
+                                            <option value="4th year" {{ old('year') == '4th year' ? 'selected' : '' }}>4th year</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label fs-12 fw-bold text-muted">Section <span class="text-danger">*</span></label>
+                                        <input type="text" name="section" class="form-control" placeholder="Section" value="{{ old('section') }}" required>
+                                    </div>
+                                </div>
                                 <div class="mb-4">
                                     <label class="form-label fs-12 fw-bold text-muted">Student Number <span class="text-danger">*</span></label>
                                     <input type="text" id="student_number" name="student_number" class="form-control" placeholder="Student Number" value="{{ old('student_number') }}" required>
@@ -287,7 +303,10 @@
             };
 
             function isStep1Valid() { 
-                return ['first_name', 'last_name', 'student_number'].every(n => document.querySelector(`[name="${n}"]`).value.trim()); 
+                return ['first_name', 'last_name', 'year', 'section', 'student_number'].every(n => {
+                    const el = document.querySelector(`[name="${n}"]`);
+                    return el && el.value.trim();
+                }); 
             }
             function isStep2Valid() { 
                 return document.getElementById('id_front').files.length && document.getElementById('id_back').files.length && faceInput.value; 

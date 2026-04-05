@@ -144,6 +144,7 @@ Route::prefix('student')->name('student.')->group(function () {
         Route::get('/lost-and-found/{lost_and_found}/edit', [\App\Http\Controllers\LostAndFoundController::class, 'studentEdit'])->name('lost-and-found.edit');
         Route::put('/lost-and-found/{lost_and_found}', [\App\Http\Controllers\LostAndFoundController::class, 'studentUpdate'])->name('lost-and-found.update');
         Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('events.certificate.download');
+        Route::get('/qr/{uuid}', [\App\Http\Controllers\StudentController::class, 'generateQr'])->name('qr.generate');
     });
 });
 

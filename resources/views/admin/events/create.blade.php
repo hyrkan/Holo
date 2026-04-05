@@ -86,19 +86,66 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">Event Dates</label>
+                            <label for="attendance_start_buffer" class="form-label">Attendance Opens (Minutes Before)</label>
+                            <input type="number" class="form-control @error('attendance_start_buffer') is-invalid @enderror" id="attendance_start_buffer" name="attendance_start_buffer" value="{{ old('attendance_start_buffer', 0) }}" min="0">
+                            <div class="form-text">How many minutes before the start time can students scan for attendance?</div>
+                            @error('attendance_start_buffer')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Event Dates & Times</label>
                             <div id="dates-container">
                                 @if(old('dates'))
-                                    @foreach(old('dates') as $date)
-                                        <div class="input-group mb-2">
-                                            <input type="date" class="form-control" name="dates[]" value="{{ $date }}" required>
-                                            <button type="button" class="btn btn-outline-danger remove-date" {{ count(old('dates')) > 1 ? '' : 'disabled' }}><i class="feather-trash-2"></i></button>
+                                    @foreach(old('dates') as $index => $dateData)
+                                        <div class="date-item card border mb-3">
+                                            <div class="card-body p-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label small">Date</label>
+                                                        <input type="date" class="form-control form-control-sm" name="dates[{{ $index }}][date]" value="{{ $dateData['date'] ?? '' }}" required>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label small">Start Time</label>
+                                                        <input type="time" class="form-control form-control-sm" name="dates[{{ $index }}][start_time]" value="{{ $dateData['start_time'] ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label small">End Time</label>
+                                                        <input type="time" class="form-control form-control-sm" name="dates[{{ $index }}][end_time]" value="{{ $dateData['end_time'] ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-date" {{ count(old('dates')) > 1 ? '' : 'disabled' }}>
+                                                            <i class="feather-trash-2"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endforeach
                                 @else
-                                    <div class="input-group mb-2">
-                                        <input type="date" class="form-control" name="dates[]" required>
-                                        <button type="button" class="btn btn-outline-danger remove-date" disabled><i class="feather-trash-2"></i></button>
+                                    <div class="date-item card border mb-3">
+                                        <div class="card-body p-3">
+                                            <div class="row g-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small">Date</label>
+                                                    <input type="date" class="form-control form-control-sm" name="dates[0][date]" required>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small">Start Time</label>
+                                                    <input type="time" class="form-control form-control-sm" name="dates[0][start_time]">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small">End Time</label>
+                                                    <input type="time" class="form-control form-control-sm" name="dates[0][end_time]">
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-date" disabled>
+                                                        <i class="feather-trash-2"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -249,9 +296,19 @@
 
         if (container && addButton) {
             addButton.addEventListener('click', function() {
-                const firstItem = container.querySelector('.input-group');
+                const index = container.querySelectorAll('.date-item').length;
+                const firstItem = container.querySelector('.date-item');
                 const newItem = firstItem.cloneNode(true);
-                newItem.querySelector('input').value = '';
+                
+                // Update names with the correct index
+                newItem.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+                    }
+                });
+                
                 const removeBtn = newItem.querySelector('.remove-date');
                 if (removeBtn) removeBtn.disabled = false;
                 
@@ -266,13 +323,23 @@
 
             container.addEventListener('click', function(e) {
                 if (e.target.closest('.remove-date')) {
-                    const item = e.target.closest('.input-group');
-                    if (container.children.length > 1) {
+                    const item = e.target.closest('.date-item');
+                    if (container.querySelectorAll('.date-item').length > 1) {
                         item.remove();
+                        
+                        // Re-index remaining items to ensure sequential array submission
+                        container.querySelectorAll('.date-item').forEach((dateItem, idx) => {
+                            dateItem.querySelectorAll('input').forEach(input => {
+                                const name = input.getAttribute('name');
+                                if (name) {
+                                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${idx}]`));
+                                }
+                            });
+                        });
                     }
                     
                     // Disable remove button if only one item remains
-                    if (container.children.length === 1) {
+                    if (container.querySelectorAll('.date-item').length === 1) {
                         const remainingBtn = container.querySelector('.remove-date');
                         if (remainingBtn) remainingBtn.disabled = true;
                     }
