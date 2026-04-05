@@ -14,7 +14,18 @@ class EventRegistration extends Model
     {
         parent::boot();
         static::creating(function ($registration) {
-            $registration->uuid = (string) \Illuminate\Support\Str::uuid();
+            if (!$registration->uuid) {
+                $registration->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+
+        // Fail-safe for existing records that might be missing a UUID
+        static::retrieved(function ($registration) {
+            if (!$registration->uuid) {
+                $registration->uuid = (string) \Illuminate\Support\Str::uuid();
+                $registration->unsetEventDispatcher();
+                $registration->save(['timestamps' => false]);
+            }
         });
     }
 
