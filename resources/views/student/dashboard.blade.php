@@ -436,6 +436,7 @@
 @endsection
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <style>
     @media print {
         body * {
@@ -457,6 +458,7 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 function printEventQR() {
@@ -482,6 +484,16 @@ function downloadEventQR() {
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Toastr Configuration
+  if (typeof toastr !== 'undefined') {
+    toastr.options = {
+      "closeButton": true,
+      "progressBar": true,
+      "positionClass": "toast-top-right",
+      "timeOut": "3000"
+    };
+  }
+
   var mobileSelect = document.getElementById('mobileTabsSelect');
   function showTabByKey(key) {
     var btn = document.getElementById(key + '-tab');
