@@ -84,6 +84,15 @@
                         <span class="nxl-mtext">Permissions</span>
                     </a>
                 </li>
+                <li class="nxl-item nxl-caption">
+                    <label>Settings</label>
+                </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->routeIs('admin.settings.certificates.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.certificates.index') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-award"></i></span>
+                        <span class="nxl-mtext">Default Certificates</span>
+                    </a>
+                </li>
                 @endrole
 
             </ul>

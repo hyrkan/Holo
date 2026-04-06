@@ -8,6 +8,7 @@ use App\Models\EventDate;
 use App\Models\Student;
 use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class AttendanceController extends Controller
@@ -138,6 +139,9 @@ class AttendanceController extends Controller
                     'scanned_at' => now(),
                 ]);
 
+                // Automated certification check
+                $this->awardCertificateIfEligible($student, $event, $eventDate);
+
                 return response()->json([
                     'success' => true,
                     'type' => 'clock_out_recorded',
@@ -179,5 +183,89 @@ class AttendanceController extends Controller
             'message' => 'Clock-in recorded successfully!',
             'student' => $studentData,
         ]);
+    }
+
+    /**
+     * Automatically awards the selected default certificate if the student qualifies.
+     */
+    protected function awardCertificateIfEligible(Student $student, Event $event, EventDate $currentDate)
+    {
+        // 1. Check if this is the last day of the event
+        $lastDate = EventDate::where('event_id', $event->id)
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->first();
+
+        if ($lastDate && $lastDate->id != $currentDate->id) {
+            return; // Not the last day yet
+        }
+
+        // 2. Check if student attended all days
+        if (!$student->hasAttendedAllEventDates($event)) {
+            return;
+        }
+
+        // 3. Get the active default certificate template
+        $template = \App\Models\DefaultCertificate::where('is_selected', true)->with('signatories')->first();
+        if (!$template) {
+            return; // No default certificate selected
+        }
+
+        // 4. Check if a certificate for this event already exists from this template
+        $certificate = \App\Models\Certificate::where('event_id', $event->id)
+            ->where('source_template_id', $template->id)
+            ->first();
+
+        if (!$certificate) {
+            // Create event-specific certificate from template
+            $body = $template->body;
+            $body = str_replace('[EVENT_NAME]', $event->name, $body);
+            $dates = $event->eventDates->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('F d, Y'))->toArray();
+            $dateString = count($dates) > 1 
+                ? implode(', ', array_slice($dates, 0, -1)) . ' and ' . end($dates) 
+                : ($dates[0] ?? '');
+            
+            $body = str_replace('[EVENT_DATE]', $dateString, $body);
+            $body = str_replace('[EVENT_LOCATION]', $event->location ?? 'The Venue', $body);
+
+            $certificate = \App\Models\Certificate::create([
+                'event_id' => $event->id,
+                'source_template_id' => $template->id,
+                'name' => 'Auto-Generated Attendance Certificate',
+                'title' => $template->title,
+                'sub_title' => $template->sub_title,
+                'body' => str_replace('[STUDENT_NAME]', $student->full_name, $body),
+                'background_image' => $template->background_image,
+                'is_active' => true,
+            ]);
+
+            // Copy signatories
+            foreach ($template->signatories as $sig) {
+                $certificate->signatories()->create([
+                    'name' => $sig->name,
+                    'label' => $sig->label,
+                    'signature_image' => $sig->signature_image,
+                    'order' => $sig->order,
+                ]);
+            }
+        }
+
+        // 5. Award to student if not already awarded
+        if (!$student->certificates()->where('certificate_id', $certificate->id)->exists()) {
+            $token = Str::random(32);
+            $student->certificates()->attach($certificate->id, [
+                'verification_token' => $token,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 6. Send notification if student has email
+            if ($student->user && $student->user->email) {
+                \App\Helpers\Messenger::send(
+                    $student->user->email, 
+                    new \App\Mail\CertificateAwardedMail($student, $event, [$certificate])
+                );
+            }
+        }
     }
 }

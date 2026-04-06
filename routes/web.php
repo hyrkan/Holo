@@ -118,6 +118,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
         Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
+
+        // Default Certificate Settings
+        Route::prefix('settings/certificates')->name('settings.certificates.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\DefaultCertificateController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\DefaultCertificateController::class, 'create'])->name('create');
+            Route::post('/store', [\App\Http\Controllers\DefaultCertificateController::class, 'store'])->name('store');
+            Route::get('/{certificate}/edit', [\App\Http\Controllers\DefaultCertificateController::class, 'edit'])->name('edit');
+            Route::post('/{certificate}/update', [\App\Http\Controllers\DefaultCertificateController::class, 'update'])->name('update');
+            Route::delete('/{certificate}', [\App\Http\Controllers\DefaultCertificateController::class, 'destroy'])->name('destroy');
+            Route::post('/{certificate}/select', [\App\Http\Controllers\DefaultCertificateController::class, 'select'])->name('select');
+            Route::get('/{certificate}/preview', [\App\Http\Controllers\DefaultCertificateController::class, 'preview'])->name('preview');
+        });
     });
 });
 
@@ -168,3 +180,7 @@ Route::get('/test-gemini', function () {
 
     return "All models failed: " . implode(' | ', $errors);
 });
+
+// Public Certificate Verification
+Route::get('/verify/certificate/{token}', [\App\Http\Controllers\CertificateVerificationController::class, 'verify'])
+    ->name('certificate.verify');

@@ -11,6 +11,7 @@ use App\Mail\CertificateAwardedMail;
 use App\Helpers\Messenger;
 use App\Helpers\ImageStorage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
@@ -140,8 +141,10 @@ class CertificateController extends Controller
             'full_name' => 'JUAN DELA CRUZ',
             'program' => 'BS Information Technology'
         ];
+        
+        $verificationToken = 'PREVIEW_ONLY';
 
-        return view('admin.events.certificate.preview', compact('event', 'certificate', 'student'));
+        return view('admin.events.certificate.preview', compact('event', 'certificate', 'student', 'verificationToken'));
     }
 
     public function download(Certificate $certificate)
@@ -152,16 +155,18 @@ class CertificateController extends Controller
             $student = auth()->guard('student')->user()->student;
             
             // Check if student is awarded this specific certificate
-            $isEligible = $student->certificates()->where('certificate_id', $certificate->id)->exists();
+            $awarded = $student->certificates()->where('certificate_id', $certificate->id)->first();
 
-            if (!$isEligible) {
+            if (!$awarded) {
                 return back()->with('error', 'You are not eligible for this certificate.');
             }
+            
+            $verificationToken = $awarded->pivot->verification_token;
         } else {
             return back()->with('error', 'Unauthorized.');
         }
 
-        return view('admin.events.certificate.preview', compact('event', 'certificate', 'student'));
+        return view('admin.events.certificate.preview', compact('event', 'certificate', 'student', 'verificationToken'));
     }
 
     public function updateEligibility(Request $request, Event $event, Student $student)
@@ -194,9 +199,27 @@ class CertificateController extends Controller
             ->whereNotIn('certificate_id', $eventCertificateIds)
             ->pluck('certificates.id')
             ->toArray();
-            
-        // Sync the combination
-        $student->certificates()->sync(array_merge($otherEventCertificates, $validCertificateIds));
+
+        // Sync the combination while preserving/generating tokens
+        $syncData = [];
+        
+        // Add other event certificates (preserve their tokens)
+        foreach ($otherEventCertificates as $id) {
+            $pivot = $student->certificates()->where('certificate_id', $id)->first()->pivot;
+            $syncData[$id] = ['verification_token' => $pivot->verification_token];
+        }
+        
+        // Add current event certificates
+        foreach ($validCertificateIds as $id) {
+            if (in_array($id, $newlyAwardedIds)) {
+                $syncData[$id] = ['verification_token' => Str::random(32)];
+            } else {
+                $pivot = $student->certificates()->where('certificate_id', $id)->first()->pivot;
+                $syncData[$id] = ['verification_token' => $pivot->verification_token];
+            }
+        }
+        
+        $student->certificates()->sync($syncData);
 
         // Send notification if any new awards were granted
         if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
@@ -240,7 +263,12 @@ class CertificateController extends Controller
                     $newlyAwardedIds = array_values(array_diff($certificateIds, $already));
                 }
 
-                $student->certificates()->syncWithoutDetaching($certificateIds);
+                $attachData = [];
+                foreach ($newlyAwardedIds as $id) {
+                    $attachData[$id] = ['verification_token' => Str::random(32)];
+                }
+                
+                $student->certificates()->syncWithoutDetaching($attachData);
 
                 if (!empty($newlyAwardedIds) && $student->user && $student->user->email) {
                     $awardedCertificates = Certificate::whereIn('id', $newlyAwardedIds)->get()->all();

@@ -172,6 +172,25 @@
             }
         }
 
+        .qr-code-container {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            z-index: 20;
+        }
+
+        .qr-code-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
         .print-btn {
             position: fixed;
             top: 20px;
@@ -228,6 +247,17 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+
+        @php
+            $token = $verificationToken ?? 'PREVIEW_ONLY';
+            $verifyUrl = route('certificate.verify', $token);
+        @endphp
+        <div class="qr-code-container">
+            <div class="qr-code">
+                {!! QrCode::size(80)->generate($verifyUrl) !!}
+            </div>
+            <div class="qr-code-label">Verify Authenticity</div>
         </div>
     </div>
 </body>

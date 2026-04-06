@@ -140,7 +140,7 @@ class Student extends Model
 
     public function certificates()
     {
-        return $this->belongsToMany(Certificate::class, 'certificate_student');
+        return $this->belongsToMany(Certificate::class, 'certificate_student')->withPivot('verification_token')->withTimestamps();
     }
 
     /**
