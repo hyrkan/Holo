@@ -4,7 +4,16 @@
 
 <section class="{{ Auth::guard('student')->check() ? 'p-4' : 'pt-120 pb-120' }}">
     <div class="container">
+        <div class="mb-30">
+            <a href="{{ route('lost-and-found.index', ['type' => $lostAndFound->type]) }}" class="text-decoration-none d-inline-flex align-items-center fw-bold" style="color: #4700c8;">
+                <i class="{{ Auth::guard('student')->check() ? 'feather-arrow-left' : 'fas fa-arrow-left' }} me-2"></i> Back to List
+            </a>
+        </div>
+        @php
+            $hasImage = $lostAndFound->image_path || $lostAndFound->type == 'lost';
+        @endphp
         <div class="row">
+            @if($hasImage)
             <div class="col-lg-6">
                 <div class="item-image mb-30">
                     @if($lostAndFound->image_path)
@@ -16,8 +25,9 @@
                     @endif
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="item-details" style="padding: 20px;">
+            @endif
+            <div class="{{ $hasImage ? 'col-lg-6' : 'col-lg-12' }}">
+                <div class="item-details" style="{{ $hasImage ? 'padding: 20px;' : '' }}">
                     <span class="badge mb-20" style="background: {{ $lostAndFound->type == 'lost' ? '#dc3545' : '#28a745' }}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; text-transform: uppercase;">
                         {{ $lostAndFound->type }}
                     </span>
@@ -37,20 +47,22 @@
                         @endif
                     </div>
 
+                    @if($lostAndFound->type != 'found')
                     <div class="description mb-40">
                         <h4>Description</h4>
                         <p>{{ $lostAndFound->description }}</p>
                     </div>
-
-                    @if($lostAndFound->contact_info)
-                        <div class="contact-box p-30 bg-light rounded" style="background: #f4f2f9 !important;">
-                            <h4>Contact Information</h4>
-                            <p class="mb-0">Please reach out via: <strong>{{ $lostAndFound->contact_info }}</strong></p>
-                        </div>
                     @endif
-                    
-                    <div class="mt-40">
-                        <a href="{{ route('lost-and-found.index', ['type' => $lostAndFound->type]) }}" class="btn btn-outline">Back to List</a>
+
+                    <div class="contact-box p-30 bg-light rounded" style="background: #f4f2f9 !important;">
+                        <h4>Contact Information</h4>
+                        @if($lostAndFound->type == 'found')
+                            <p class="mb-0">Please claim the item at the <strong>CSIT Office</strong>.</p>
+                        @elseif($lostAndFound->contact_info)
+                            <p class="mb-0">Please reach out via: <strong>{{ $lostAndFound->contact_info }}</strong></p>
+                        @else
+                            <p class="mb-0">Please contact the admin for more information.</p>
+                        @endif
                     </div>
                 </div>
             </div>
