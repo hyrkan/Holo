@@ -13,7 +13,7 @@ class PermissionController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth'),
-            new Middleware('role:admin'),
+            new Middleware('role_id:1'),
         ];
     }
 

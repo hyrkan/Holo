@@ -21,7 +21,7 @@ class RedirectByRole
             // Check Admin/Employee (web guard)
             if (Auth::guard('web')->check()) {
                 $user = Auth::guard('web')->user();
-                if ($user->hasAnyRole(['admin', 'employee'])) {
+                if ($user->hasAnyRole([\App\Models\Role::ADMIN, \App\Models\Role::EMPLOYEE])) {
                     return redirect()->route('admin.dashboard');
                 }
             }
@@ -29,7 +29,7 @@ class RedirectByRole
             // Check Student (student guard)
             if (Auth::guard('student')->check()) {
                 $user = Auth::guard('student')->user();
-                if ($user->hasRole('student')) {
+                if ($user->hasRole(\App\Models\Role::STUDENT)) {
                     return redirect()->route('student.dashboard');
                 }
             }

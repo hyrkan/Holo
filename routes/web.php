@@ -19,7 +19,7 @@ Route::get('/login', function () {
 
 Route::post('/student/events/{event}/join', [\App\Http\Controllers\EventController::class, 'join'])
     ->name('student.events.join')
-    ->middleware(['auth:student', 'role:student']);
+    ->middleware(['auth:student', 'role_id:3']);
 
 Route::get('/dashboard', function () {
     return redirect('/');
@@ -47,7 +47,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/reset-password/{token}', [\App\Http\Controllers\AdminPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [\App\Http\Controllers\AdminPasswordController::class, 'reset'])->name('password.store');
 
-    Route::middleware(['auth', 'role:admin|employee'])->group(function () {
+    Route::middleware(['auth', 'role_id:1|2'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Resources accessible by both admin and employee?
@@ -57,8 +57,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('students/{student}/approve', [\App\Http\Controllers\StudentController::class, 'approve'])->name('students.approve');
         Route::post('students/{student}/deny', [\App\Http\Controllers\StudentController::class, 'deny'])->name('students.deny');
         Route::resource('students', \App\Http\Controllers\StudentController::class);
-        Route::get('announcements/export', [\App\Http\Controllers\AnnouncementController::class, 'exportCsv'])->name('announcements.export')->middleware('role:admin');
-        Route::get('announcements/archived', [\App\Http\Controllers\AnnouncementController::class, 'archived'])->name('announcements.archived')->middleware('role:admin');
+        Route::get('announcements/export', [\App\Http\Controllers\AnnouncementController::class, 'exportCsv'])->name('announcements.export')->middleware('role_id:1');
+        Route::get('announcements/archived', [\App\Http\Controllers\AnnouncementController::class, 'archived'])->name('announcements.archived')->middleware('role_id:1');
         Route::post('announcements/{announcement}/restore', [\App\Http\Controllers\AnnouncementController::class, 'restore'])->name('announcements.restore')->middleware('permission:manage announcements');
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->middleware('permission:manage announcements');
         Route::delete('announcements/attachments/{attachment}', [\App\Http\Controllers\AnnouncementController::class, 'deleteAttachment'])->name('announcements.attachments.destroy')->middleware('permission:manage announcements');
@@ -78,8 +78,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/speakers/{speaker}/events', [\App\Http\Controllers\SpeakerController::class, 'events'])->name('speakers.events')->middleware('permission:manage speakers');
         Route::resource('speakers', \App\Http\Controllers\SpeakerController::class)->middleware('permission:manage speakers');
         Route::resource('employees', \App\Http\Controllers\EmployeeController::class)->middleware('permission:manage employees');
-        Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role:admin');
-        Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role:admin');
+        Route::resource('roles', \App\Http\Controllers\RoleController::class)->middleware('role_id:1');
+        Route::resource('permissions', \App\Http\Controllers\PermissionController::class)->middleware('role_id:1');
 
         Route::post('/attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
         Route::get('/attendance/scanner', [\App\Http\Controllers\AttendanceController::class, 'showScanner'])->name('attendance.scanner');
@@ -145,9 +145,9 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/reset-password/{token}', [\App\Http\Controllers\StudentPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [\App\Http\Controllers\StudentPasswordController::class, 'reset'])->name('password.store');
 
-    Route::get('/dashboard', [\App\Http\Controllers\StudentController::class, 'dashboard'])->middleware(['auth:student', 'role:student'])->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\StudentController::class, 'dashboard'])->middleware(['auth:student', 'role_id:3'])->name('dashboard');
 
-    Route::middleware(['auth:student', 'role:student'])->group(function () {
+    Route::middleware(['auth:student', 'role_id:3'])->group(function () {
         Route::get('/profile', [\App\Http\Controllers\StudentController::class, 'profile'])->name('profile');
         Route::post('/profile', [\App\Http\Controllers\StudentController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password', [\App\Http\Controllers\StudentController::class, 'updatePassword'])->name('password.update');

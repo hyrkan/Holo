@@ -6,10 +6,10 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header">
-                    <h5 class="card-title">Employee Details</h5>
+                    <h5 class="card-title">Holo Tech Details</h5>
                     <div class="card-header-action">
                         <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-primary">
-                            <i class="feather-edit-3 me-2"></i> Edit Employee
+                            <i class="feather-edit-3 me-2"></i> Edit Holo Tech
                         </a>
                     </div>
                 </div>

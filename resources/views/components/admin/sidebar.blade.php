@@ -26,7 +26,7 @@
                 <li class="nxl-item nxl-hasmenu">
                     <a href="{{ route('admin.employees.index') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-users"></i></span>
-                        <span class="nxl-mtext">Employees</span>
+                        <span class="nxl-mtext">Holo Tech</span>
                     </a>
                 </li>
                 @endcan

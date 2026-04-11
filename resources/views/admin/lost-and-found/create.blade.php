@@ -46,12 +46,14 @@
                             @error('description') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
 
+                        @if($type !== 'found')
                         <div class="mb-4">
                             <label class="form-label" for="image">Item Photo (Optional)</label>
                             <input type="file" name="image" id="image" class="form-control">
                             <div class="form-text">Attach a photo of the item if available.</div>
                             @error('image') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
+                        @endif
 
                         <div class="mb-4">
                             <label class="form-label" for="contact_info">Reporter Email <span class="text-danger">*</span></label>

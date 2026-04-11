@@ -6,7 +6,7 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header">
-                    <h5 class="card-title">Edit Employee: {{ $employee->first_name }} {{ $employee->last_name }}</h5>
+                    <h5 class="card-title">Edit Holo Tech: {{ $employee->first_name }} {{ $employee->last_name }}</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.employees.update', $employee) }}" method="POST">
@@ -81,7 +81,7 @@
                                 <a href="{{ route('admin.employees.index') }}" class="btn btn-light w-100">Cancel</a>
                             </div>
                             <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary w-100">Update Employee</button>
+                                <button type="submit" class="btn btn-primary w-100">Update Holo Tech</button>
                             </div>
                         </div>
                     </form>

@@ -63,7 +63,7 @@ class EmployeeController extends Controller
             'address' => $validated['address'],
         ]);
 
-        return redirect()->route('admin.employees.index')->with('success', 'Employee created successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Holo Tech created successfully.');
     }
 
     /**
@@ -112,7 +112,7 @@ class EmployeeController extends Controller
             'address' => $validated['address'],
         ]);
 
-        return redirect()->route('admin.employees.index')->with('success', 'Employee updated successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Holo Tech updated successfully.');
     }
 
     /**
@@ -129,6 +129,6 @@ class EmployeeController extends Controller
 
         $employee->user->delete();
 
-        return redirect()->route('admin.employees.index')->with('success', 'Employee deleted successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Holo Tech deleted successfully.');
     }
 }

@@ -33,7 +33,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Check if user has the correct role for this portal
-            if (!$user->hasAnyRole(['admin', 'employee'])) {
+            if (!$user->hasAnyRole([\App\Models\Role::ADMIN, \App\Models\Role::EMPLOYEE])) {
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'These credentials do not match our admin records.',

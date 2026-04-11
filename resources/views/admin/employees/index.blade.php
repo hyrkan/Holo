@@ -6,7 +6,7 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header">
-                    <h5 class="card-title">Employees</h5>
+                    <h5 class="card-title">Holo Tech</h5>
                     <div class="card-header-action">
                         <form action="{{ route('admin.employees.index') }}" method="GET" class="me-3">
                             <div class="input-group">
@@ -15,7 +15,7 @@
                             </div>
                         </form>
                         <a href="{{ route('admin.employees.create') }}" class="btn btn-primary">
-                            <i class="feather-plus me-2"></i> Add Employee
+                            <i class="feather-plus me-2"></i> Add Holo Tech
                         </a>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                                 <tr>
                                     <td colspan="5" class="text-center py-5">
                                         <i class="feather-users fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No employees found.</p>
+                                        <p class="text-muted mt-2">No holo tech found.</p>
                                     </td>
                                 </tr>
                                 @endforelse

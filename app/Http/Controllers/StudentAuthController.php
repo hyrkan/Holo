@@ -26,7 +26,7 @@ class StudentAuthController extends Controller
         if (Auth::guard('student')->attempt($credentials)) {
             $user = Auth::guard('student')->user();
 
-            if (!$user->hasRole('student')) {
+            if (!$user->hasRole(\App\Models\Role::STUDENT)) {
                 Auth::guard('student')->logout();
                 return back()->withErrors([
                     'email' => 'These credentials do not match our student records.',
@@ -165,7 +165,7 @@ class StudentAuthController extends Controller
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
         ]);
 
-        $user->assignRole('student');
+        $user->assignRole(\App\Models\Role::STUDENT);
 
         $expiredAt = null;
         if ($request->student_type === \App\Models\Student::TYPE_GUEST) {

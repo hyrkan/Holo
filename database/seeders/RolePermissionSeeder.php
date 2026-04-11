@@ -28,15 +28,18 @@ class RolePermissionSeeder extends Seeder
         // Create roles and assign created permissions
 
         // Admin role
-        $role = Role::firstOrCreate(['name' => 'admin']);
+        $role = \App\Models\Role::firstOrCreate(['id' => \App\Models\Role::ADMIN], ['name' => 'admin']);
         $role->givePermissionTo(Permission::all());
-
+        $role->update(['name' => 'admin']); // Ensure name is correct if it already existed with different name
+        
         // Employee role
-        $role = Role::firstOrCreate(['name' => 'employee']);
+        $role = \App\Models\Role::firstOrCreate(['id' => \App\Models\Role::EMPLOYEE], ['name' => 'employee']);
         $role->givePermissionTo(['view dashboard', 'manage students', 'manage events', 'manage employees']);
-
+        // Don't force rename here if the user wanted it to be 'holo tech', 
+        // but firstOrCreate with ID will keep the existing name if found.
+        
         // Student role
-        $role = Role::firstOrCreate(['name' => 'student']);
+        $role = \App\Models\Role::firstOrCreate(['id' => \App\Models\Role::STUDENT], ['name' => 'student']);
         $role->givePermissionTo(['view dashboard']);
 
         // Assign Admin role to existing users if they exist

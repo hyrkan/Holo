@@ -23,7 +23,7 @@ class AdminPasswordController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if (!$user || !$user->hasAnyRole(['admin', 'employee'])) {
+        if (!$user || !$user->hasAnyRole([\App\Models\Role::ADMIN, \App\Models\Role::EMPLOYEE])) {
             return back()->withErrors([
                 'email' => 'We could not find an admin account with that email.',
             ])->onlyInput('email');
@@ -51,7 +51,7 @@ class AdminPasswordController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if (!$user || !$user->hasAnyRole(['admin', 'employee'])) {
+        if (!$user || !$user->hasAnyRole([\App\Models\Role::ADMIN, \App\Models\Role::EMPLOYEE])) {
             return back()->withErrors([
                 'email' => 'We could not find an admin account with that email.',
             ])->onlyInput('email');

@@ -23,7 +23,7 @@ class StudentPasswordController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if (!$user || !$user->hasRole('student')) {
+        if (!$user || !$user->hasRole(\App\Models\Role::STUDENT)) {
             return back()->withErrors([
                 'email' => 'We could not find a student account with that email.',
             ])->onlyInput('email');
@@ -51,7 +51,7 @@ class StudentPasswordController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if (!$user || !$user->hasRole('student')) {
+        if (!$user || !$user->hasRole(\App\Models\Role::STUDENT)) {
             return back()->withErrors([
                 'email' => 'We could not find a student account with that email.',
             ])->onlyInput('email');

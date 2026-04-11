@@ -14,7 +14,7 @@ class RoleController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth'),
-            new Middleware('role:admin'),
+            new Middleware('role_id:1'),
         ];
     }
 
@@ -101,7 +101,7 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function destroy(Role $role)
     {
-        if ($role->name === 'admin') {
+        if ($role->id === \App\Models\Role::ADMIN) {
             return back()->with('error', 'Cannot delete admin role.');
         }
         

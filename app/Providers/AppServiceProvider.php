@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
         \Illuminate\Support\Facades\Gate::before(function ($user, $capability) {
-            return $user->hasRole('admin') ? true : null;
+            return $user->hasRole(\App\Models\Role::ADMIN) ? true : null;
         });
 
         // Register Brevo Mailer Transport

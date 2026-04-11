@@ -6,7 +6,7 @@
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
                 <div class="card-header">
-                    <h5 class="card-title">Add New Employee</h5>
+                    <h5 class="card-title">Add New Holo Tech</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.employees.store') }}" method="POST">
@@ -82,7 +82,7 @@
                                 <a href="{{ route('admin.employees.index') }}" class="btn btn-light w-100">Cancel</a>
                             </div>
                             <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary w-100">Create Employee</button>
+                                <button type="submit" class="btn btn-primary w-100">Create Holo Tech</button>
                             </div>
                         </div>
                     </form>

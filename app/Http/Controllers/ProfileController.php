@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user->hasRole('employee') || $user->hasRole('admin')) {
+        if ($user->hasAnyRole([\App\Models\Role::EMPLOYEE, \App\Models\Role::ADMIN])) {
              $user->load('employee');
         }
         return view('admin.profile.index', compact('user'));
@@ -22,7 +22,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        if ($user->hasRole('employee') || $user->hasRole('admin')) {
+        if ($user->hasAnyRole([\App\Models\Role::EMPLOYEE, \App\Models\Role::ADMIN])) {
              $request->validate([
                 'first_name' => ['required', 'string', 'max:255'],
                 'last_name' => ['required', 'string', 'max:255'],
