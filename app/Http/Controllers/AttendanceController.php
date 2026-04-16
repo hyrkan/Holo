@@ -218,23 +218,13 @@ class AttendanceController extends Controller
 
         if (!$certificate) {
             // Create event-specific certificate from template
-            $body = $template->body;
-            $body = str_replace('[EVENT_NAME]', $event->name, $body);
-            $dates = $event->eventDates->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('F d, Y'))->toArray();
-            $dateString = count($dates) > 1 
-                ? implode(', ', array_slice($dates, 0, -1)) . ' and ' . end($dates) 
-                : ($dates[0] ?? '');
-            
-            $body = str_replace('[EVENT_DATE]', $dateString, $body);
-            $body = str_replace('[EVENT_LOCATION]', $event->location ?? 'The Venue', $body);
-
             $certificate = \App\Models\Certificate::create([
                 'event_id' => $event->id,
                 'source_template_id' => $template->id,
                 'name' => 'Auto-Generated Attendance Certificate',
                 'title' => $template->title,
                 'sub_title' => $template->sub_title,
-                'body' => str_replace('[STUDENT_NAME]', $student->full_name, $body),
+                'body' => $template->body,
                 'background_image' => $template->background_image,
                 'is_active' => true,
             ]);

@@ -10,7 +10,7 @@ class DefaultCertificateSignatory extends Model
 
     protected $guarded = [];
 
-    public function getSignatureImageUrlAttribute()
+    public function getSignatureUrlAttribute()
     {
         return $this->getImageUrl('signature_image', 'signatures');
     }

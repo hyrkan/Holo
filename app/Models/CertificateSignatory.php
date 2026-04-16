@@ -15,7 +15,7 @@ class CertificateSignatory extends Model
 
     use \App\Traits\HasImage;
 
-    public function getSignatureImageUrlAttribute()
+    public function getSignatureUrlAttribute()
     {
         return $this->getImageUrl('signature_image');
     }

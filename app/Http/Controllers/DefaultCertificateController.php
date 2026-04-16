@@ -166,18 +166,25 @@ class DefaultCertificateController extends Controller
 
         // Apply placeholders for preview
         $certificate = clone $certificate;
-        $dates = $event->eventDates->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('F d, Y'))->toArray();
-        $dateString = count($dates) > 1 
-            ? implode(', ', array_slice($dates, 0, -1)) . ' and ' . end($dates) 
-            : ($dates[0] ?? '');
-            
-        $certificate->body = str_replace('[STUDENT_NAME]', $student->full_name, $certificate->body);
-        $certificate->body = str_replace('[EVENT_NAME]', $event->name, $certificate->body);
-        $certificate->body = str_replace('[EVENT_DATE]', $dateString, $certificate->body);
-        $certificate->body = str_replace('[EVENT_LOCATION]', $event->location, $certificate->body);
+        $certificate->body = $this->formatBody($certificate->body, $student, $event);
         
         $verificationToken = 'PREVIEW_ONLY';
 
         return view('admin.events.certificate.preview', compact('event', 'certificate', 'student', 'verificationToken'));
+    }
+
+    private function formatBody($body, $student, $event)
+    {
+        $dates = $event->eventDates->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('F d, Y'))->toArray();
+        $dateString = count($dates) > 1 
+            ? implode(', ', array_slice($dates, 0, -1)) . ' and ' . end($dates) 
+            : ($dates[0] ?? '');
+
+        $body = str_replace('[STUDENT_NAME]', $student->full_name, $body);
+        $body = str_replace('[EVENT_NAME]', $event->name, $body);
+        $body = str_replace('[EVENT_DATE]', $dateString, $body);
+        $body = str_replace('[EVENT_LOCATION]', $event->location ?? 'The Venue', $body);
+
+        return $body;
     }
 }
